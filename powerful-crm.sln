@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "powerful-crm.Data", "powerf
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "powerful-crm.Business", "powerful-crm.Business\powerful-crm.Business.csproj", "{3F52310D-3088-4888-90F5-D5628E867FDC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "powerful-crm.Core", "powerful-crm.Core\powerful-crm.Core.csproj", "{DAF3593A-B34A-4BE7-96CA-676D3BFE5D19}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -35,6 +37,10 @@ Global
 		{3F52310D-3088-4888-90F5-D5628E867FDC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3F52310D-3088-4888-90F5-D5628E867FDC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3F52310D-3088-4888-90F5-D5628E867FDC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DAF3593A-B34A-4BE7-96CA-676D3BFE5D19}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DAF3593A-B34A-4BE7-96CA-676D3BFE5D19}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DAF3593A-B34A-4BE7-96CA-676D3BFE5D19}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DAF3593A-B34A-4BE7-96CA-676D3BFE5D19}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -5,5 +5,11 @@
     <RootNamespace>powerful_crm.API</RootNamespace>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\powerful-crm.Business\powerful-crm.Business.csproj" />
+    <ProjectReference Include="..\powerful-crm.Core\powerful-crm.Core.csproj" />
+    <ProjectReference Include="..\powerful-crm.Data\powerful-crm.Data.csproj" />
+  </ItemGroup>
+
 
 </Project>
