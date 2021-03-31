@@ -6,6 +6,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="10.1.1" />
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="8.1.1" />
+    <PackageReference Include="Swashbuckle" Version="5.6.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\powerful-crm.Business\powerful-crm.Business.csproj" />
     <ProjectReference Include="..\powerful-crm.Core\powerful-crm.Core.csproj" />
     <ProjectReference Include="..\powerful-crm.Data\powerful-crm.Data.csproj" />
