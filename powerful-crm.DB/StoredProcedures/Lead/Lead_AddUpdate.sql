@@ -6,7 +6,7 @@
 	@password nvarchar(1000) null,
 	@email nvarchar(100),
 	@phone nvarchar(20),
-	@cityId int null,
+	@cityId int,
 	@birthDate datetime
 AS
 begin
@@ -28,6 +28,7 @@ MERGE [dbo].[Lead] as ls --Целевая таблица
 				LastName = s.LastName,
 				Email = s.Email,
 				Phone = s.Phone,
+				CityId = s.CityId,
 				BirthDate = s.BirthDate
         WHEN NOT MATCHED THEN --Если НЕ истина (INSERT)
                  Insert (FirstName,LastName,Login,Password,Email,Phone,CityId,BirthDate,IsDeleted)
