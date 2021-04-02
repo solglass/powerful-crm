@@ -1,4 +1,4 @@
-﻿using powerful_crm.Data.Models;
+﻿using powerful_crm.Core.Models;
 
 namespace powerful_crm.Data
 {

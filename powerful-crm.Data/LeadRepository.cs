@@ -3,8 +3,8 @@ using System.Data.SqlClient;
 using Dapper;
 using Microsoft.Extensions.Options;
 using powerful_crm.Core.Settings;
-using powerful_crm.Data.Models;
 using System.Data;
+using powerful_crm.Core.Models;
 
 namespace powerful_crm.Data
 {
@@ -18,7 +18,7 @@ namespace powerful_crm.Data
         public int AddLead(LeadDto dto)
         {
             return _connection.QuerySingle<int>(
-                "dbo.Lead_Add",
+                "dbo.Lead_AddUpdate",
                 param: new
                 {
                     dto.FirstName,
@@ -27,6 +27,7 @@ namespace powerful_crm.Data
                     dto.Password,
                     dto.Email,
                     dto.Phone,
+                    CityId = dto.City.Id,
                     dto.BirthDate
                 },
                 commandType: CommandType.StoredProcedure);
@@ -34,8 +35,8 @@ namespace powerful_crm.Data
 
         public int UpdateLead(LeadDto dto)
         {
-            return _connection.Execute(
-                "dbo.Lead_Update",
+            return _connection.QuerySingle<int>(
+                "dbo.Lead_AddUpdate",
                 param: new
                 {
                     dto.Id,
@@ -43,6 +44,7 @@ namespace powerful_crm.Data
                     dto.LastName,
                     dto.Email,
                     dto.Phone,
+                    CityId = dto.City.Id,
                     dto.BirthDate
                 },
                 commandType: CommandType.StoredProcedure);
