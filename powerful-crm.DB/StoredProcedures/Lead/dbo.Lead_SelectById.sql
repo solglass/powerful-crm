@@ -3,14 +3,16 @@
 AS
 begin
 	SELECT 
-	[Id],
-	[FirstName],
-	[LastName],
-	[Login],
-	[Password],
-	[Email],
-	[Phone],
-	[BirthDate],
-	[IsDeleted]
-	from [dbo].[Lead]
+	l.[Id],
+	l.[FirstName],
+	l.[LastName],
+	l.[Login],
+	l.[Password],
+	l.[Email],
+	l.[Phone],
+	l.[BirthDate],
+	l.[IsDeleted],
+	c.Id,
+	c.[Name]
+	from [dbo].[Lead] l inner join [dbo].[City] c on c.Id=l.CityId 
 end

@@ -5,6 +5,7 @@ using Microsoft.Extensions.Options;
 using powerful_crm.Core.Settings;
 using System.Data;
 using powerful_crm.Core.Models;
+using System.Linq;
 
 namespace powerful_crm.Data
 {
@@ -70,18 +71,43 @@ namespace powerful_crm.Data
                    oldPassword,
                    newPassword
                },
-               commandType: System.Data.CommandType.StoredProcedure);
+               commandType: CommandType.StoredProcedure);
         }
 
         public LeadDto GetLeadById(int id)
         {
-            return _connection.QueryFirstOrDefault<LeadDto>(
-                "dbo.Lead_SelectById",
+            return _connection.Query<LeadDto, CityDto, LeadDto>(
+                "dbo.Lead_SelectById", (lead, city) =>
+                {
+                    lead.City = city;
+                    return lead;
+                },
+                new { id },
+                splitOn: "Id",
+                commandType: CommandType.StoredProcedure).FirstOrDefault();
+        }
+
+        public int AddCity(CityDto dto)
+        {
+            return _connection.QuerySingle<int>(
+                "dbo.City_Add",
+                param: new
+                {
+                    dto.Name
+                },
+                commandType: CommandType.StoredProcedure);
+        }
+        public int DeleteCity(int id)
+        {
+            return _connection.Execute(
+                "dbo.City_Delete",
                 param: new
                 {
                     id
                 },
                 commandType: CommandType.StoredProcedure);
         }
+
+
     }
 }
