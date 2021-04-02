@@ -59,14 +59,6 @@ namespace powerful_crm.Data
                 commandType: CommandType.StoredProcedure);
         }
 
-        public int HardDeleteLead(int id)
-        {
-            return _connection
-                .Execute("dbo.Lead_HardDelete",
-                new { id },
-                commandType: System.Data.CommandType.StoredProcedure);
-        }
-
         public int ChangePasswordLead(int id, string oldPassword, string newPassword)
         {
             return _connection

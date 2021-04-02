@@ -31,6 +31,7 @@ namespace powerful_crm.API.Controllers
         {
             if (!ModelState.IsValid)
             {
+                //todo: validationexception
                 return Conflict();
             }
             var dto = _mapper.Map<LeadDto>(inputModel);

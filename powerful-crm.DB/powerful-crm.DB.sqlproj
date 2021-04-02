@@ -67,6 +67,5 @@
     <Build Include="StoredProcedures\Lead\dbo.Lead_ChangePassword.sql" />
     <Build Include="StoredProcedures\Lead\dbo.Lead_DeleteOrRecover.sql" />
     <Build Include="StoredProcedures\Lead\dbo.Lead_Update.sql" />
-    <Build Include="StoredProcedures\Lead\dbo.Lead_HardDelete.sql" />
   </ItemGroup>
 </Project>

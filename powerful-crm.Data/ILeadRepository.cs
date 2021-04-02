@@ -8,7 +8,6 @@ namespace powerful_crm.Data
         int ChangePasswordLead(int id, string oldPassword, string newPassword);
         int DeleteOrRecoverLead(int id, bool isDeleted);
         LeadDto GetLeadById(int id);
-        int HardDeleteLead(int id);
         int UpdateLead(LeadDto dto);
     }
 }
