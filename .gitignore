@@ -349,4 +349,4 @@ MigrationBackup/
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
 
-EducationSystem/EducationSystem/Properties/launchSettings.json
+powerful-crm.API/Properties/launchSettings.json
