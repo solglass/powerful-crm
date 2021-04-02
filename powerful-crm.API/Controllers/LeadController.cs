@@ -21,10 +21,13 @@ namespace powerful_crm.API.Controllers
             _leadService = leadService;
             _mapper = mapper;
         }
-
+        // https://localhost:44307/api/register
+        /// <summary>lead add</summary>
+        /// <param name="inputModel">information about add lead</param>
+        /// <returns>rReturn information about added lead</returns>
         [ProducesResponseType(typeof(LeadOutputModel), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
-        [HttpPut("{leadId}")]
+        [HttpPut("register")]
         public ActionResult<LeadOutputModel> AddLead([FromBody] LeadInputModel inputModel)
         {
             if (!ModelState.IsValid)
@@ -37,7 +40,11 @@ namespace powerful_crm.API.Controllers
             return Ok(outputModel);
 
         }
-
+        // https://localhost:44307/api/lead/2/change-password
+        /// <summary>Changing password of lead</summary>
+        /// <param name="leadId">Id of lead for whom we are changing the password</param>
+        /// <param name="inputModel">Old and new password of lead</param>
+        /// <returns>Status204NoContent response</returns>
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
@@ -55,7 +62,9 @@ namespace powerful_crm.API.Controllers
             _leadService.ChangePassword(leadId, inputModel.OldPassword, inputModel.NewPassword);
             return NoContent();
         }
-
+        /// <summary>Get info of lead</summary>
+        /// <param name="leadId">Id of lead</param>
+        /// <returns>Info of lead</returns>
         [ProducesResponseType(typeof(LeadOutputModel), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
         [HttpGet("{leadId}")]
@@ -71,6 +80,10 @@ namespace powerful_crm.API.Controllers
             return Ok(outputModel);
         }
 
+        /// <summary>Update information about lead</summary>
+        /// <param name="leadId">Id of lead</param>
+        /// /// <param name="inputModel">Nonupdated info about  lead </param>
+        /// <returns>Updated info about lead</returns>
         [ProducesResponseType(typeof(LeadOutputModel), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
@@ -93,6 +106,9 @@ namespace powerful_crm.API.Controllers
 
         }
 
+        /// <summary>Change value of parametr "IsDeleted" to 1(Deleted)</summary>
+        /// <param name="leadId">Id of lead</param>
+        /// <returns>Update lead, which is deleted</returns>
         [ProducesResponseType(typeof(List<LeadOutputModel>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
@@ -113,6 +129,9 @@ namespace powerful_crm.API.Controllers
             return Ok(dto);
         }
 
+        /// <summary>Change value of parametr "IsDeleted" to 0(Not deleted)</summary>
+        /// <param name="leadId">Id of lead</param>
+        /// <returns>Update lead, which is not deleted</returns>
         [ProducesResponseType(typeof(List<LeadOutputModel>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
