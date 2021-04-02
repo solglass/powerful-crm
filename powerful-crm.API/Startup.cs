@@ -1,4 +1,4 @@
-using EducationSystem.API.Config;
+using EducationSystem.Business.Config;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using powerful_crm.Core.Settings;
+
 using System.Linq;
 
 namespace powerful_crm.API
