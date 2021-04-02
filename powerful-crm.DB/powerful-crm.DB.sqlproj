@@ -63,10 +63,8 @@
   <ItemGroup>
     <Build Include="Tables\Lead.sql" />
     <Build Include="StoredProcedures\Lead\dbo.Lead_SelectById.sql" />
-    <Build Include="StoredProcedures\Lead\dbo.Lead_Add.sql" />
     <Build Include="StoredProcedures\Lead\dbo.Lead_ChangePassword.sql" />
     <Build Include="StoredProcedures\Lead\dbo.Lead_DeleteOrRecover.sql" />
-    <Build Include="StoredProcedures\Lead\dbo.Lead_Update.sql" />
     <Build Include="StoredProcedures\Lead\Lead_AddUpdate.sql" />
     <Build Include="Tables\City.sql" />
   </ItemGroup>
