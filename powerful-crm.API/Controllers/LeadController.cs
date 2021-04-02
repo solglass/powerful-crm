@@ -27,7 +27,7 @@ namespace powerful_crm.API.Controllers
         /// <returns>rReturn information about added lead</returns>
         [ProducesResponseType(typeof(LeadOutputModel), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
-        [HttpPut("register")]
+        [HttpPut]
         public ActionResult<LeadOutputModel> AddLead([FromBody] LeadInputModel inputModel)
         {
             if (!ModelState.IsValid)
@@ -87,7 +87,7 @@ namespace powerful_crm.API.Controllers
         [ProducesResponseType(typeof(LeadOutputModel), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
-        [HttpPut("{leadId}/update")]
+        [HttpPut("{leadId}")]
         public ActionResult<LeadOutputModel> UpdateLead(int leadId, [FromBody] UpdateLeadInputModel inputModel)
         {
             if (!ModelState.IsValid)
