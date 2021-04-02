@@ -59,6 +59,7 @@
     <Folder Include="Tables" />
     <Folder Include="StoredProcedures" />
     <Folder Include="StoredProcedures\Lead" />
+    <Folder Include="StoredProcedures\City" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="Tables\Lead.sql" />
@@ -67,5 +68,7 @@
     <Build Include="StoredProcedures\Lead\dbo.Lead_DeleteOrRecover.sql" />
     <Build Include="StoredProcedures\Lead\Lead_AddUpdate.sql" />
     <Build Include="Tables\City.sql" />
+    <Build Include="StoredProcedures\City\City_Delete.sql" />
+    <Build Include="StoredProcedures\City\dbo.City_Add.sql" />
   </ItemGroup>
 </Project>
