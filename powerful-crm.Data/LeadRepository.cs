@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Data.SqlClient;
 using Dapper;
 using Microsoft.Extensions.Options;
@@ -6,6 +6,7 @@ using powerful_crm.Core.Settings;
 using System.Data;
 using powerful_crm.Core.Models;
 using System.Linq;
+using System.Collections.Generic;
 
 namespace powerful_crm.Data
 {
@@ -85,6 +86,30 @@ namespace powerful_crm.Data
                 new { id },
                 splitOn: "Id",
                 commandType: CommandType.StoredProcedure).FirstOrDefault();
+        }
+        public List<LeadDto> GetLeadsByPhone(string phone)
+        {
+            return _connection.Query<LeadDto, CityDto, LeadDto>(
+                "dbo.Lead_SelectByPhone", (lead, city) =>
+                {
+                    lead.City = city;
+                    return lead;
+                },
+                new { phone },
+                splitOn: "Id",
+                commandType: CommandType.StoredProcedure).ToList();
+        }
+        public List<LeadDto> GetLeadsByEmail(string email)
+        {
+            return _connection.Query<LeadDto, CityDto, LeadDto>(
+                "dbo.Lead_SelectByEmail", (lead, city) =>
+                {
+                    lead.City = city;
+                    return lead;
+                },
+                new { email},
+                splitOn: "Id",
+                commandType: CommandType.StoredProcedure).ToList();
         }
 
         public int AddCity(CityDto dto)
