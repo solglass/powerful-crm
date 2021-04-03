@@ -1,5 +1,5 @@
 ﻿using powerful_crm.Data;
-using powerful_crm.Data.Models;
+using powerful_crm.Core.Models;
 using System;
 
 namespace powerful_crm.Business

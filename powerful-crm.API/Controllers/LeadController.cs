@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using powerful_crm.API.Models.InputModels;
 using powerful_crm.API.Models.OutputModels;
 using powerful_crm.Business;
-using powerful_crm.Data.Models;
+using powerful_crm.Core.Models;
 using System.Collections.Generic;
 
 namespace powerful_crm.API.Controllers
