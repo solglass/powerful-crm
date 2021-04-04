@@ -16,5 +16,5 @@ begin
 	c.Id,
 	c.[Name]
 	from [dbo].[Lead] l inner join [dbo].[City] c on c.Id=l.CityId 
-	where l.LastName=@lastName
+	where l.LastName=@lastName and IsDeleted=0
 end

@@ -79,7 +79,102 @@ namespace powerful_crm.API.Controllers
             var outputModel = _mapper.Map<LeadOutputModel>(lead);
             return Ok(outputModel);
         }
-
+        /// <summary>Get info of leads by email</summary>
+        /// <param name="email"> Email of lead</param>
+        /// <returns>Info of leads</returns>
+        [ProducesResponseType(typeof(LeadOutputModel), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
+        [HttpGet("{email}/by-email")]
+        public ActionResult<List<LeadOutputModel>> GetLeadsByEmail (string email)
+        {
+            var lead = _leadService.GetLeadsByEmail(email);
+            if (lead == null)
+            {
+                return NotFound($"Leads with email: {email} is not found");
+            }
+            var outputModel = _mapper.Map<List<LeadOutputModel>>(lead);
+            return Ok(outputModel);
+        }
+        /// <summary>Get info of leads by email</summary>
+        /// <param name="firstName"> firstName of lead</param>
+        /// <returns>Info of leads</returns>
+        [ProducesResponseType(typeof(LeadOutputModel), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
+        [HttpGet("{firstName}/by-firstName")]
+        public ActionResult<List<LeadOutputModel>> GetLeadsByFirstName(string firstName )
+        {
+            var lead = _leadService.GetLeadsByFirstName(firstName);
+            if (lead == null)
+            {
+                return NotFound($"Leads with firstName: {firstName} is not found");
+            }
+            var outputModel = _mapper.Map<List<LeadOutputModel>>(lead);
+            return Ok(outputModel);
+        }
+        /// <summary>Get info of leads by lastName</summary>
+        /// <param name="lastName"> lastName of lead</param>
+        /// <returns>Info of leads</returns>
+        [ProducesResponseType(typeof(LeadOutputModel), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
+        [HttpGet("{lastName}/by-lastName")]
+        public ActionResult<List<LeadOutputModel>> GetLeadsByLastName(string lastName)
+        {
+            var lead = _leadService.GetLeadsByLastName(lastName);
+            if (lead == null)
+            {
+                return NotFound($"Leads with lastName: {lastName} is not found");
+            }
+            var outputModel = _mapper.Map<List<LeadOutputModel>>(lead);
+            return Ok(outputModel);
+        }
+        /// <summary>Get info of leads by login</summary>
+        /// <param name="login"> login of lead</param>
+        /// <returns>Info of leads</returns>
+        [ProducesResponseType(typeof(LeadOutputModel), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
+        [HttpGet("{login}/by-login")]
+        public ActionResult<List<LeadOutputModel>> GetLeadsByLogin(string login)
+        {
+            var lead = _leadService.GetLeadsByLogin(login);
+            if (lead == null)
+            {
+                return NotFound($"Leads with login: {login} is not found");
+            }
+            var outputModel = _mapper.Map<List<LeadOutputModel>>(lead);
+            return Ok(outputModel);
+        }
+        /// <summary>Get info of leads by phone</summary>
+        /// <param name="phone"> phone of lead</param>
+        /// <returns>Info of leads</returns>
+        [ProducesResponseType(typeof(LeadOutputModel), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
+        [HttpGet("{phone}/by-phone")]
+        public ActionResult<List<LeadOutputModel>> GetLeadsByPhone(string phone)
+        {
+            var lead = _leadService.GetLeadsByPhone(phone);
+            if (lead == null)
+            {
+                return NotFound($"Leads with phone: {phone} is not found");
+            }
+            var outputModel = _mapper.Map<List<LeadOutputModel>>(lead);
+            return Ok(outputModel);
+        }
+        /// <summary>Get info of leads by isDeleted</summary>
+        /// <param name="isDeleted"> idDeleted of lead</param>
+        /// <returns>Info of leads</returns>
+        [ProducesResponseType(typeof(LeadOutputModel), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
+        [HttpGet("{isDeleted}/by-isDeleted")]
+        public ActionResult<List<LeadOutputModel>> GetLeadsByIsDeleted(bool isDeleted)
+        {
+            var lead = _leadService.GetLeadsByIsDeleted(isDeleted);
+            if (lead == null)
+            {
+                return NotFound($"Leads with isDeleted: {isDeleted} is not found");
+            }
+            var outputModel = _mapper.Map<List<LeadOutputModel>>(lead);
+            return Ok(outputModel);
+        }
         /// <summary>Update information about lead</summary>
         /// <param name="leadId">Id of lead</param>
         /// /// <param name="inputModel">Nonupdated info about  lead </param>

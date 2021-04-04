@@ -107,7 +107,55 @@ namespace powerful_crm.Data
                     lead.City = city;
                     return lead;
                 },
-                new { email},
+                new { email },
+                splitOn: "Id",
+                commandType: CommandType.StoredProcedure).ToList();
+        }
+        public List<LeadDto> GetLeadsByLogin(string login)
+        {
+            return _connection.Query<LeadDto, CityDto, LeadDto>(
+                "dbo.Lead_SelectByLogin", (lead, city) =>
+                {
+                    lead.City = city;
+                    return lead;
+                },
+                new { login },
+                splitOn: "Id",
+                commandType: CommandType.StoredProcedure).ToList();
+        }
+        public List<LeadDto> GetLeadsByFirstName(string firstName)
+        {
+            return _connection.Query<LeadDto, CityDto, LeadDto>(
+                "dbo.Lead_SelectByFirstName", (lead, city) =>
+                {
+                    lead.City = city;
+                    return lead;
+                },
+                new { firstName },
+                splitOn: "Id",
+                commandType: CommandType.StoredProcedure).ToList();
+        }
+        public List<LeadDto> GetLeadsByLastName(string lastName)
+        {
+            return _connection.Query<LeadDto, CityDto, LeadDto>(
+                "dbo.Lead_SelectByLastName", (lead, city) =>
+                {
+                    lead.City = city;
+                    return lead;
+                },
+                new { lastName },
+                splitOn: "Id",
+                commandType: CommandType.StoredProcedure).ToList();
+        }
+        public List<LeadDto> GetLeadsByIsDeleted(bool isDeleted)
+        {
+            return _connection.Query<LeadDto, CityDto, LeadDto>(
+                "dbo.Lead_SelectByIsDeleted", (lead, city) =>
+                {
+                    lead.City = city;
+                    return lead;
+                },
+                new { isDeleted },
                 splitOn: "Id",
                 commandType: CommandType.StoredProcedure).ToList();
         }

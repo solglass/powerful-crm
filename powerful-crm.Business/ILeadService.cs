@@ -1,4 +1,5 @@
 ﻿using powerful_crm.Core.Models;
+using System.Collections.Generic;
 
 namespace powerful_crm.Business
 {
@@ -10,5 +11,11 @@ namespace powerful_crm.Business
         LeadDto GetLeadById(int leadId);
         int RecoverLead(int leadId);
         int UpdateLead(int leadId, LeadDto dto);
+        List<LeadDto> GetLeadsByEmail(string email);
+        List<LeadDto> GetLeadsByFirstName(string firstName);
+        List<LeadDto> GetLeadsByLastName(string lastName);
+        List<LeadDto> GetLeadsByLogin(string login);
+        List<LeadDto> GetLeadsByPhone(string phone);
+        List<LeadDto> GetLeadsByIsDeleted(bool isDeleted);
     }
 }

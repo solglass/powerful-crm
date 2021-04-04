@@ -1,6 +1,7 @@
 ﻿using powerful_crm.Data;
 using powerful_crm.Core.Models;
 using System;
+using System.Collections.Generic;
 
 namespace powerful_crm.Business
 {
@@ -23,5 +24,11 @@ namespace powerful_crm.Business
         public int RecoverLead(int leadId) => _leadRepository.DeleteOrRecoverLead(leadId, false);
         public int ChangePassword(int leadId, string oldPassword, string newPassword) => _leadRepository.ChangePasswordLead(leadId, oldPassword, newPassword);
         public LeadDto GetLeadById(int leadId) => _leadRepository.GetLeadById(leadId);
+        public List<LeadDto> GetLeadsByEmail(string email) => _leadRepository.GetLeadsByEmail(email);
+        public List<LeadDto> GetLeadsByFirstName(string firstName) => _leadRepository.GetLeadsByFirstName(firstName);
+        public List<LeadDto> GetLeadsByLastName(string lastName) => _leadRepository.GetLeadsByLastName(lastName);
+        public List<LeadDto> GetLeadsByLogin(string login) => _leadRepository.GetLeadsByLogin(login);
+        public List<LeadDto> GetLeadsByPhone(string phone) => _leadRepository.GetLeadsByPhone(phone);
+        public List<LeadDto> GetLeadsByIsDeleted(bool isDeleted) => _leadRepository.GetLeadsByIsDeleted(isDeleted);
     }
 }
