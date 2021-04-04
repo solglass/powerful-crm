@@ -1,4 +1,5 @@
 ﻿using powerful_crm.Core.Models;
+using System;
 using System.Collections.Generic;
 
 namespace powerful_crm.Business
@@ -17,5 +18,8 @@ namespace powerful_crm.Business
         List<LeadDto> GetLeadsByLogin(string login);
         List<LeadDto> GetLeadsByPhone(string phone);
         List<LeadDto> GetLeadsByIsDeleted(bool isDeleted);
+        List<LeadDto> GetLeadsByBirthDate(DateTime birthDate);
+        List<LeadDto> GetLeadsByCity(string city);
+
     }
 }

@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using powerful_crm.API.Models.InputModels;
 using powerful_crm.API.Models.OutputModels;
 using powerful_crm.Core;

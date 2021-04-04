@@ -1,4 +1,5 @@
 ﻿using powerful_crm.Core.Models;
+using System;
 using System.Collections.Generic;
 
 namespace powerful_crm.Data
@@ -17,6 +18,8 @@ namespace powerful_crm.Data
         List<LeadDto> GetLeadsByLastName(string lastName);
         List<LeadDto> GetLeadsByLogin(string login);
         List<LeadDto> GetLeadsByPhone(string phone);
+        List<LeadDto> GetLeadsByCity(string city);
+        List<LeadDto> GetLeadsByBirthDate(DateTime birthDate);
         int UpdateLead(LeadDto dto);
     }
 }

@@ -4,7 +4,9 @@ using Microsoft.AspNetCore.Mvc;
 using powerful_crm.API.Models.InputModels;
 using powerful_crm.API.Models.OutputModels;
 using powerful_crm.Business;
+using powerful_crm.Core;
 using powerful_crm.Core.Models;
+using System;
 using System.Collections.Generic;
 
 namespace powerful_crm.API.Controllers
@@ -123,6 +125,39 @@ namespace powerful_crm.API.Controllers
             if (lead == null)
             {
                 return NotFound($"Leads with lastName: {lastName} is not found");
+            }
+            var outputModel = _mapper.Map<List<LeadOutputModel>>(lead);
+            return Ok(outputModel);
+        }
+        /// <summary>Get info of leads by city</summary>
+        /// <param name="city"> city of lead</param>
+        /// <returns>Info of leads</returns>
+        [ProducesResponseType(typeof(LeadOutputModel), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
+        [HttpGet("{city}/by-city")]
+        public ActionResult<List<LeadOutputModel>> GetLeadsByCity(string city)
+        {
+            var lead = _leadService.GetLeadsByLastName(city);
+            if (lead == null)
+            {
+                return NotFound($"Leads with city: {city} is not found");
+            }
+            var outputModel = _mapper.Map<List<LeadOutputModel>>(lead);
+            return Ok(outputModel);
+        }
+        /// <summary>Get info of leads by birthDate</summary>
+        /// <param name="birthDate"> birthDate of lead</param>
+        /// <returns>Info of leads</returns>
+        [ProducesResponseType(typeof(LeadOutputModel), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
+        [HttpGet("{birthDate}/by-birthDate")]
+        public ActionResult<List<LeadOutputModel>> GetLeadsByBirthDate(string birthDate)
+        {
+            var dto = DateTime.ParseExact(birthDate, Constants.DATE_FORMAT,System.Globalization.CultureInfo.InvariantCulture);
+            var lead = _leadService.GetLeadsByBirthDate(dto);
+            if (lead == null)
+            {
+                return NotFound($"Leads with birthDate: {dto} is not found");
             }
             var outputModel = _mapper.Map<List<LeadOutputModel>>(lead);
             return Ok(outputModel);

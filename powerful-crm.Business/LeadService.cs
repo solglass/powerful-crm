@@ -30,5 +30,7 @@ namespace powerful_crm.Business
         public List<LeadDto> GetLeadsByLogin(string login) => _leadRepository.GetLeadsByLogin(login);
         public List<LeadDto> GetLeadsByPhone(string phone) => _leadRepository.GetLeadsByPhone(phone);
         public List<LeadDto> GetLeadsByIsDeleted(bool isDeleted) => _leadRepository.GetLeadsByIsDeleted(isDeleted);
+        public List<LeadDto> GetLeadsByCity(string city) => _leadRepository.GetLeadsByCity(city);
+        public List<LeadDto> GetLeadsByBirthDate(DateTime birthDate) => _leadRepository.GetLeadsByBirthDate(birthDate);
     }
 }

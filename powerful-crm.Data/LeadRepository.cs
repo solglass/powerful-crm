@@ -99,6 +99,30 @@ namespace powerful_crm.Data
                 splitOn: "Id",
                 commandType: CommandType.StoredProcedure).ToList();
         }
+        public List<LeadDto> GetLeadsByBirthDate(DateTime birthDate)
+        {
+            return _connection.Query<LeadDto, CityDto, LeadDto>(
+                "dbo.Lead_SelectByBirthDate", (lead, city) =>
+                {
+                    lead.City = city;
+                    return lead;
+                },
+                new { birthDate },
+                splitOn: "Id",
+                commandType: CommandType.StoredProcedure).ToList();
+        }
+        public List<LeadDto> GetLeadsByCity(string city)
+        {
+            return _connection.Query<LeadDto, CityDto, LeadDto>(
+                "dbo.Lead_SelectByCity", (lead, city) =>
+                {
+                    lead.City = city;
+                    return lead;
+                },
+                new { city },
+                splitOn: "Id",
+                commandType: CommandType.StoredProcedure).ToList();
+        }
         public List<LeadDto> GetLeadsByEmail(string email)
         {
             return _connection.Query<LeadDto, CityDto, LeadDto>(
