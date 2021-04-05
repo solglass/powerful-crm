@@ -6,4 +6,5 @@ begin
 	c.Id,
 	c.Name
 	from [dbo].[City] c 
+	where c.Id=@id
 end

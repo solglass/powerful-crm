@@ -26,6 +26,7 @@ namespace powerful_crm.API.Controllers
         /// <param name="inputModel">information about add lead</param>
         /// <returns>rReturn information about added lead</returns>
         [ProducesResponseType(typeof(LeadOutputModel), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status409Conflict)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
         [HttpPost]
         public ActionResult<LeadOutputModel> AddLead([FromBody] LeadInputModel inputModel)
@@ -33,6 +34,10 @@ namespace powerful_crm.API.Controllers
             if (!ModelState.IsValid)
             {
                 throw new ValidationException(ModelState);
+            }
+            if (_leadService.GetCityById(inputModel.CityId) == null)
+            {
+                return NotFound($"City with id {inputModel.CityId} is not found");
             }
             var dto = _mapper.Map<LeadDto>(inputModel);
             var addedLeadId = _leadService.AddLead(dto);
@@ -99,6 +104,10 @@ namespace powerful_crm.API.Controllers
             {
                 return NotFound($"Lead with id {leadId} is not found");
             }
+            if (inputModel.CityId>0 && _leadService.GetCityById(inputModel.CityId) == null)
+            {
+                return NotFound($"City with id {inputModel.CityId} is not found");
+            }
             var dto = _mapper.Map<LeadDto>(inputModel);
             _leadService.UpdateLead(leadId, dto);
             var outputModel = _mapper.Map<LeadOutputModel>(_leadService.GetLeadById(leadId));
@@ -113,7 +122,7 @@ namespace powerful_crm.API.Controllers
         [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
         [HttpDelete("{leadId}")]
-        public ActionResult<LeadOutputModel> DeleteUser(int leadId)
+        public ActionResult<LeadOutputModel> DeleteLead(int leadId)
         {
             var lead = _leadService.GetLeadById(leadId);
             if (lead == null)

@@ -14,5 +14,6 @@ namespace powerful_crm.API.Models.OutputModels
         public string Email { get; set; }
         public string Phone { get; set; }
         public string BirthDate { get; set; }
+        public CityOutputModel City { get; set; }
     }
 }

@@ -14,7 +14,7 @@ namespace powerful_crm.Core.CustomExceptions
         public ValidationException(ModelStateDictionary modelState)
         {
             StatusCode = (int)HttpStatusCode.Conflict;
-            ErrorMessage = ""; // get errors from modelState and combine them into ErrorMessage
+            ErrorMessage = ""; 
             foreach (var state in modelState)
             {
                 ErrorMessage += $"Invalid format {state.Key}{System.Environment.NewLine}";

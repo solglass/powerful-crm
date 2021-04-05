@@ -31,5 +31,8 @@ namespace powerful_crm.API.Models.InputModels
         [Required]
         [CustomDateTimeValidation]
         public string BirthDate { get; set; }
+        [Required]
+        [Range(1, int.MaxValue)]
+        public int CityId { get; set; }
     }
 }
