@@ -13,11 +13,11 @@ namespace powerful_crm.Business
             _leadRepository = leadRepository;
         }
 
-        public int AddLead(LeadDto dto) => _leadRepository.AddLead(dto);
+        public int AddLead(LeadDto dto) => _leadRepository.AddUpdateLead(dto);
         public int UpdateLead(int leadId, LeadDto dto)
         {
             dto.Id = leadId;
-            return _leadRepository.UpdateLead(dto);
+            return _leadRepository.AddUpdateLead(dto);
         }
         public int DeleteLead(int leadId) => _leadRepository.DeleteOrRecoverLead(leadId, true);
         public int RecoverLead(int leadId) => _leadRepository.DeleteOrRecoverLead(leadId, false);

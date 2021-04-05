@@ -16,12 +16,13 @@ namespace powerful_crm.Data
             _connection = new SqlConnection(_connectionString);
         }
 
-        public int AddLead(LeadDto dto)
+        public int AddUpdateLead(LeadDto dto)
         {
-            return _connection.QuerySingle<int>(
+            return _connection.QuerySingleOrDefault<int>(
                 "dbo.Lead_AddUpdate",
                 param: new
                 {
+                    dto.Id,
                     dto.FirstName,
                     dto.LastName,
                     dto.Login,
@@ -34,22 +35,6 @@ namespace powerful_crm.Data
                 commandType: CommandType.StoredProcedure);
         }
 
-        public int UpdateLead(LeadDto dto)
-        {
-            return _connection.QuerySingle<int>(
-                "dbo.Lead_AddUpdate",
-                param: new
-                {
-                    dto.Id,
-                    dto.FirstName,
-                    dto.LastName,
-                    dto.Email,
-                    dto.Phone,
-                    CityId = dto.City.Id,
-                    dto.BirthDate
-                },
-                commandType: CommandType.StoredProcedure);
-        }
         public int DeleteOrRecoverLead(int id, bool isDeleted)
         {
             return _connection
@@ -89,7 +74,7 @@ namespace powerful_crm.Data
 
         public int AddCity(CityDto dto)
         {
-            return _connection.QuerySingle<int>(
+            return _connection.QuerySingleOrDefault<int>(
                 "dbo.City_Add",
                 param: new
                 {

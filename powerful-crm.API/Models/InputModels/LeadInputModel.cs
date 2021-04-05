@@ -1,9 +1,6 @@
 ﻿using powerful_crm.API.Attributes;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace powerful_crm.API.Models.InputModels
 {
@@ -23,7 +20,7 @@ namespace powerful_crm.API.Models.InputModels
         public string Password { get; set; }
         [Required]
         [EmailAddress]
-        [StringLength(100)]
+        [StringLength(100, MinimumLength = 6)]
         public string Email { get; set; }
         [Required]
         [StringLength(20)]
