@@ -194,22 +194,6 @@ namespace powerful_crm.API.Controllers
             var outputModel = _mapper.Map<List<LeadOutputModel>>(lead);
             return Ok(outputModel);
         }
-        /// <summary>Get info of leads by isDeleted</summary>
-        /// <param name="isDeleted"> idDeleted of lead</param>
-        /// <returns>Info of leads</returns>
-        [ProducesResponseType(typeof(LeadOutputModel), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
-        [HttpGet("{isDeleted}/by-isDeleted")]
-        public ActionResult<List<LeadOutputModel>> GetLeadsByIsDeleted(bool isDeleted)
-        {
-            var lead = _leadService.GetLeadsByIsDeleted(isDeleted);
-            if (lead == null)
-            {
-                return NotFound($"Leads with isDeleted: {isDeleted} is not found");
-            }
-            var outputModel = _mapper.Map<List<LeadOutputModel>>(lead);
-            return Ok(outputModel);
-        }
         /// <summary>Update information about lead</summary>
         /// <param name="leadId">Id of lead</param>
         /// /// <param name="inputModel">Nonupdated info about  lead </param>

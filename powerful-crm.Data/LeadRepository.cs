@@ -87,103 +87,31 @@ namespace powerful_crm.Data
                 splitOn: "Id",
                 commandType: CommandType.StoredProcedure).FirstOrDefault();
         }
-        public List<LeadDto> GetLeadsByPhone(string phone)
+        public List<LeadDto> SearchLeads(string? firstName, string? lastName, string? email, string? login,string? phone, DateTime? birthDate, string? cityName)
         {
+            if (firstName == null && lastName == null && email == null && login == null && phone == null && birthDate == null && cityName == null)
+                throw new ArgumentNullException();
             return _connection.Query<LeadDto, CityDto, LeadDto>(
-                "dbo.Lead_SelectByPhone", (lead, city) =>
+                "dbo.Lead_Search", (lead, city) =>
                 {
                     lead.City = city;
                     return lead;
                 },
-                new { phone },
-                splitOn: "Id",
-                commandType: CommandType.StoredProcedure).ToList();
+                    new
+                    {
+                        firstName,
+                        lastName,
+                        email,
+                        login,
+                        phone,
+                        birthDate,
+                        cityName
+                    },
+                    splitOn: "Id",
+                    commandType: System.Data.CommandType.StoredProcedure)
+                .Distinct()
+                .ToList();
         }
-        public List<LeadDto> GetLeadsByBirthDate(DateTime birthDate)
-        {
-            return _connection.Query<LeadDto, CityDto, LeadDto>(
-                "dbo.Lead_SelectByBirthDate", (lead, city) =>
-                {
-                    lead.City = city;
-                    return lead;
-                },
-                new { birthDate },
-                splitOn: "Id",
-                commandType: CommandType.StoredProcedure).ToList();
-        }
-        public List<LeadDto> GetLeadsByCity(string city)
-        {
-            return _connection.Query<LeadDto, CityDto, LeadDto>(
-                "dbo.Lead_SelectByCity", (lead, city) =>
-                {
-                    lead.City = city;
-                    return lead;
-                },
-                new { city },
-                splitOn: "Id",
-                commandType: CommandType.StoredProcedure).ToList();
-        }
-        public List<LeadDto> GetLeadsByEmail(string email)
-        {
-            return _connection.Query<LeadDto, CityDto, LeadDto>(
-                "dbo.Lead_SelectByEmail", (lead, city) =>
-                {
-                    lead.City = city;
-                    return lead;
-                },
-                new { email },
-                splitOn: "Id",
-                commandType: CommandType.StoredProcedure).ToList();
-        }
-        public List<LeadDto> GetLeadsByLogin(string login)
-        {
-            return _connection.Query<LeadDto, CityDto, LeadDto>(
-                "dbo.Lead_SelectByLogin", (lead, city) =>
-                {
-                    lead.City = city;
-                    return lead;
-                },
-                new { login },
-                splitOn: "Id",
-                commandType: CommandType.StoredProcedure).ToList();
-        }
-        public List<LeadDto> GetLeadsByFirstName(string firstName)
-        {
-            return _connection.Query<LeadDto, CityDto, LeadDto>(
-                "dbo.Lead_SelectByFirstName", (lead, city) =>
-                {
-                    lead.City = city;
-                    return lead;
-                },
-                new { firstName },
-                splitOn: "Id",
-                commandType: CommandType.StoredProcedure).ToList();
-        }
-        public List<LeadDto> GetLeadsByLastName(string lastName)
-        {
-            return _connection.Query<LeadDto, CityDto, LeadDto>(
-                "dbo.Lead_SelectByLastName", (lead, city) =>
-                {
-                    lead.City = city;
-                    return lead;
-                },
-                new { lastName },
-                splitOn: "Id",
-                commandType: CommandType.StoredProcedure).ToList();
-        }
-        public List<LeadDto> GetLeadsByIsDeleted(bool isDeleted)
-        {
-            return _connection.Query<LeadDto, CityDto, LeadDto>(
-                "dbo.Lead_SelectByIsDeleted", (lead, city) =>
-                {
-                    lead.City = city;
-                    return lead;
-                },
-                new { isDeleted },
-                splitOn: "Id",
-                commandType: CommandType.StoredProcedure).ToList();
-        }
-
         public int AddCity(CityDto dto)
         {
             return _connection.QuerySingle<int>(

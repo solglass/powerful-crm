@@ -12,14 +12,7 @@ namespace powerful_crm.Data
         int DeleteCity(int id);
         int DeleteOrRecoverLead(int id, bool isDeleted);
         LeadDto GetLeadById(int id);
-        List<LeadDto> GetLeadsByEmail(string email);
-        List<LeadDto> GetLeadsByFirstName(string firstName);
-        List<LeadDto> GetLeadsByIsDeleted(bool isDeleted);
-        List<LeadDto> GetLeadsByLastName(string lastName);
-        List<LeadDto> GetLeadsByLogin(string login);
-        List<LeadDto> GetLeadsByPhone(string phone);
-        List<LeadDto> GetLeadsByCity(string city);
-        List<LeadDto> GetLeadsByBirthDate(DateTime birthDate);
+        List<LeadDto> SearchLeads(string? firstName, string? lastName, string? email, string? login, string? phone, DateTime? birthDate, string? cityName);
         int UpdateLead(LeadDto dto);
     }
 }
