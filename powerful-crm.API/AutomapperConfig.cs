@@ -18,6 +18,8 @@ namespace EducationSystem.API
                 .ForMember(dest => dest.BirthDate, opts => opts.MapFrom(src => src.BirthDate.ToString(Constants.DATE_FORMAT)));
             CreateMap<LeadInputModel, LeadDto>()
                 .ForMember(dest => dest.BirthDate, opts => opts.MapFrom(src => DateTime.ParseExact(src.BirthDate, Constants.DATE_FORMAT, CultureInfo.InvariantCulture, DateTimeStyles.None)));
+            CreateMap<CityDto, CityOutputModel>();
+            CreateMap<CityInputModel, CityDto>();
         }
     }
 }

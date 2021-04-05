@@ -26,7 +26,7 @@ namespace powerful_crm.API.Controllers
         /// <param name="inputModel">information about add lead</param>
         /// <returns>rReturn information about added lead</returns>
         [ProducesResponseType(typeof(LeadOutputModel), StatusCodes.Status200OK)]
-       // [ProducesResponseType(StatusCodes.Status409Conflict)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
         [HttpPost]
         public ActionResult<LeadOutputModel> AddLead([FromBody] LeadInputModel inputModel)
         {
@@ -47,7 +47,7 @@ namespace powerful_crm.API.Controllers
         /// <returns>Status204NoContent response</returns>
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
-        //[ProducesResponseType(StatusCodes.Status409Conflict)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
         [HttpPut("{leadId}/change-password")]
         public ActionResult ChangePassword(int leadId, [FromBody]ChangePasswordInputModel inputModel)
         {
@@ -86,7 +86,7 @@ namespace powerful_crm.API.Controllers
         /// <returns>Updated info about lead</returns>
         [ProducesResponseType(typeof(LeadOutputModel), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
-        //[ProducesResponseType(StatusCodes.Status409Conflict)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
         [HttpPut("{leadId}")]
         public ActionResult<LeadOutputModel> UpdateLead(int leadId, [FromBody] UpdateLeadInputModel inputModel)
         {
@@ -156,7 +156,7 @@ namespace powerful_crm.API.Controllers
         /// <param name="city">Information about new city</param>
         /// <returns>Created city</returns>
         [ProducesResponseType(typeof(CityOutputModel), StatusCodes.Status200OK)]
-       // [ProducesResponseType(StatusCodes.Status409Conflict)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
         [HttpPost("/city")]
         public ActionResult<CityOutputModel> AddCity([FromBody] CityInputModel city)
         {
