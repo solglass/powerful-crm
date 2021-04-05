@@ -108,6 +108,11 @@ namespace powerful_crm.Data
                 commandType: CommandType.StoredProcedure);
         }
 
-
+        public CityDto GetCityById (int id)
+        {
+            return _connection.QueryFirstOrDefault<CityDto>("dbo.City_SelectById",
+                new { id },
+                commandType: CommandType.StoredProcedure);
+        }
     }
 }

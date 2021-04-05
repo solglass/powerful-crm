@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+using powerful_crm.API.Middleware;
 using powerful_crm.Core.Settings;
 
 using System.Linq;
@@ -58,7 +59,7 @@ namespace powerful_crm.API
             app.UseRouting();
 
             app.UseAuthorization();
-
+            app.UseMiddleware<ExceptionMiddleware>();
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
