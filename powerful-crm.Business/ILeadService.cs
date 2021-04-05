@@ -10,13 +10,7 @@ namespace powerful_crm.Business
         int ChangePassword(int leadId, string oldPassword, string newPassword);
         int DeleteLead(int leadId);
         LeadDto GetLeadById(int leadId);
-        List<LeadDto> GetLeadsByBirthDate(DateTime birthDate);
-        List<LeadDto> GetLeadsByCity(string city);
-        List<LeadDto> GetLeadsByEmail(string email);
-        List<LeadDto> GetLeadsByFirstName(string firstName);
-        List<LeadDto> GetLeadsByLastName(string lastName);
-        List<LeadDto> GetLeadsByLogin(string login);
-        List<LeadDto> GetLeadsByPhone(string phone);
+        List<LeadDto> SearchLead(LeadDto leadDto);
         int RecoverLead(int leadId);
         int UpdateLead(int leadId, LeadDto dto);
     }

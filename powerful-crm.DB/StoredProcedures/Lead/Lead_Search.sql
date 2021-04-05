@@ -27,5 +27,5 @@ SELECT
   (@login is not null and l.Login = @login or @login is null)and
   (@phone is not null and l.Phone = @phone or @phone is null)and
   (@CityName is not null and c.Name = @CityName or @CityName is null)and
-  (@birthDate is not null and l.BirthDate = @birthDate or @birthDate is null)
+  (@birthDate!=Convert(date, getdate())  and l.BirthDate = @birthDate or @birthDate=Convert(date, getdate()))
 end

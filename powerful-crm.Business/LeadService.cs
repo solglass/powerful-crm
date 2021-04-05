@@ -24,12 +24,9 @@ namespace powerful_crm.Business
         public int RecoverLead(int leadId) => _leadRepository.DeleteOrRecoverLead(leadId, false);
         public int ChangePassword(int leadId, string oldPassword, string newPassword) => _leadRepository.ChangePasswordLead(leadId, oldPassword, newPassword);
         public LeadDto GetLeadById(int leadId) => _leadRepository.GetLeadById(leadId);
-        public List<LeadDto> GetLeadsByEmail(string email) => _leadRepository.SearchLeads(null, null, email, null, null, null, null);
-        public List<LeadDto> GetLeadsByFirstName(string firstName) => _leadRepository.SearchLeads(firstName, null, null, null, null, null, null);
-        public List<LeadDto> GetLeadsByLastName(string lastName) => _leadRepository.SearchLeads(null, lastName, null, null, null, null, null);
-        public List<LeadDto> GetLeadsByLogin(string login) => _leadRepository.SearchLeads(null, null, null, login, null, null, null);
-        public List<LeadDto> GetLeadsByPhone(string phone) => _leadRepository.SearchLeads(null, null, null, null, phone, null, null);
-        public List<LeadDto> GetLeadsByCity(string city) => _leadRepository.SearchLeads(null, null, null, null, null, null, city);
-        public List<LeadDto> GetLeadsByBirthDate(DateTime birthDate) => _leadRepository.SearchLeads(null, null, null, null, null, birthDate, null);
+        public List<LeadDto> SearchLead(LeadDto leadDto)
+        {
+            return _leadRepository.SearchLeads(leadDto);
+        }
     }
 }
