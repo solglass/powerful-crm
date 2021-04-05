@@ -151,5 +151,24 @@ namespace powerful_crm.API.Controllers
             var dto = _mapper.Map<LeadOutputModel>(_leadService.GetLeadById(leadId));
             return Ok(dto);
         }
+
+        /// <summary>Creates new city</summary>
+        /// <param name="city">Information about new city</param>
+        /// <returns>Created city</returns>
+        [ProducesResponseType(typeof(CityOutputModel), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
+        [HttpPost]
+        public ActionResult<CityOutputModel> AddCity([FromBody] CityInputModel city)
+        {
+            if (!ModelState.IsValid)
+            {
+                //todo: validationexception
+                return Conflict();
+            }
+            var dto = _mapper.Map<CityDto>(city);
+            var addedCityId = _leadService.AddCity(dto);
+            var outputModel = _mapper.Map<CityOutputModel>(_leadService.GetCityById(addedCityId));
+            return Ok(outputModel);
+        }
     }
 }

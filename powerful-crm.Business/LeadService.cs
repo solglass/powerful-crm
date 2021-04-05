@@ -23,5 +23,8 @@ namespace powerful_crm.Business
         public int RecoverLead(int leadId) => _leadRepository.DeleteOrRecoverLead(leadId, false);
         public int ChangePassword(int leadId, string oldPassword, string newPassword) => _leadRepository.ChangePasswordLead(leadId, oldPassword, newPassword);
         public LeadDto GetLeadById(int leadId) => _leadRepository.GetLeadById(leadId);
+        public int AddCity(CityDto city) => _leadRepository.AddCity(city);
+        public int DeleteCity(int id) => _leadRepository.DeleteCity(id);
+        public CityDto GetCityById(int id) => _leadRepository.GetCityById(id);
     }
 }
