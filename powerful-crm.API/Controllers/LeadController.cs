@@ -160,10 +160,10 @@ namespace powerful_crm.API.Controllers
         /// <summary>Get lead balance</summary>
         /// <param name="leadId">Id of lead</param>
         /// <returns>Info about balance</returns>
-        [ProducesResponseType(typeof(List<BalanceInputModel>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(List<BalanceOutputModel>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
         [HttpGet("{leadId}/balance")]
-        public ActionResult<List<BalanceInputModel>> GetBalanceByLeadId(int leadId)
+        public ActionResult<List<BalanceOutputModel>> GetBalanceByLeadId(int leadId)
         {
             var lead = _leadService.GetLeadById(leadId);
             if (lead == null)
@@ -174,7 +174,50 @@ namespace powerful_crm.API.Controllers
             var request = new RestRequest($"/api/Transaction/balance/{leadId}", Method.GET);
             var queryResult = _client.Execute<List<BalanceInputModel>>(request).Data;
 
-            return Ok(queryResult);
+            var result = _mapper.Map<List<BalanceOutputModel>>(queryResult);
+            return Ok(result);
+        }
+
+        /// <summary>Get lead transactions</summary>
+        /// <param name="leadId">Id of lead</param>
+        /// <returns>Info about transactions</returns>
+        [ProducesResponseType(typeof(List<TransactionOutputModel>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
+        [HttpGet("{leadId}/transactions")]
+        public ActionResult<List<TransactionOutputModel>> GetTransactionsByLeadId(int leadId)
+        {
+            var lead = _leadService.GetLeadById(leadId);
+            if (lead == null)
+            {
+                return NotFound($"Lead with id {leadId} is not found");
+            }
+
+            var request = new RestRequest($"/api/Transaction/{leadId}", Method.GET);
+            var queryResult = _client.Execute<List<TransactionInputModel>>(request).Data;
+
+            var result = _mapper.Map<List<TransactionOutputModel>>(queryResult);
+            return Ok(result);
+        }
+
+        /// <summary>Get lead transfers</summary>
+        /// <param name="leadId">Id of lead</param>
+        /// <returns>Info about transfers</returns>
+        [ProducesResponseType(typeof(List<TransferOutputModel>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
+        [HttpGet("{leadId}/transfers")]
+        public ActionResult<List<TransferOutputModel>> GetTransfersByLeadId(int leadId)
+        {
+            var lead = _leadService.GetLeadById(leadId);
+            if (lead == null)
+            {
+                return NotFound($"Lead with id {leadId} is not found");
+            }
+
+            var request = new RestRequest($"/api/Transaction/transfers/{leadId}", Method.GET);
+            var queryResult = _client.Execute<List<TransferInputModel>>(request).Data;
+
+            var result = _mapper.Map<List<TransferOutputModel>>(queryResult);
+            return Ok(result);
         }
     }
 }

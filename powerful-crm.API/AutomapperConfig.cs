@@ -18,6 +18,12 @@ namespace EducationSystem.API
                 .ForMember(dest => dest.BirthDate, opts => opts.MapFrom(src => src.BirthDate.ToString(Constants.DATE_FORMAT)));
             CreateMap<LeadInputModel, LeadDto>()
                 .ForMember(dest => dest.BirthDate, opts => opts.MapFrom(src => DateTime.ParseExact(src.BirthDate, Constants.DATE_FORMAT, CultureInfo.InvariantCulture, DateTimeStyles.None)));
+
+            CreateMap<BalanceInputModel, BalanceOutputModel>();
+            CreateMap<TransactionInputModel, TransactionOutputModel>()
+                .ForMember(dest => dest.Timestamp, opts => opts.MapFrom(src => src.Timestamp.ToString(Constants.DATE_FORMAT_WITH_TIME)));
+            CreateMap<TransferInputModel, TransferOutputModel>()
+                .ForMember(dest => dest.Timestamp, opts => opts.MapFrom(src => src.Timestamp.ToString(Constants.DATE_FORMAT_WITH_TIME)));
         }
     }
 }
