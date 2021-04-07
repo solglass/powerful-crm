@@ -48,24 +48,14 @@ namespace powerful_crm.API.Middleware
         private Task HandleSqlExceptionAsync(HttpContext context, SqlException exception)
         {
             ModifyContextResponse(context, (int)HttpStatusCode.BadRequest);
-            string errorMessage;
-            int statusCode;
-            if (exception.Message.Contains("UQLead5E55825B7B2276C4"))
+            var keys = new string[] { "UQLead5E55825B7B2276C4", "UQLeadA9D10534BF185160" };
+            var result = keys.FirstOrDefault<string>(s => exception.Message.Contains(s));
+            return result switch
             {
-                errorMessage = "This login is already in use.";
-                statusCode = 409;
-            }
-            else if (exception.Message.Contains("UQLeadA9D10534BF185160"))
-            {
-                errorMessage = "This email is already in use.";
-                statusCode = 409;
-            }
-            else
-            {
-                errorMessage = GlobalErrorMessage;
-                statusCode = 400;
-            }
-            return ConstructResponse(context, statusCode, errorMessage);
+                "UQLead5E55825B7B2276C4" => ConstructResponse(context, 409, "This login is already in use."),
+                "UQLeadA9D10534BF185160" => ConstructResponse(context, 409, "This email is already in use."),
+                _ => ConstructResponse(context, 400, GlobalErrorMessage),
+            };
         }
 
         private Task HandleExceptionAsync(HttpContext context, Exception exception)

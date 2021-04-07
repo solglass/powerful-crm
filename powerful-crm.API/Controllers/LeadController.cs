@@ -194,10 +194,10 @@ namespace powerful_crm.API.Controllers
             {
                 return NotFound($"City with id {id} is not found");
             }
-           if( _leadService.DeleteLead(id)==1)
-            return NoContent();
-           else 
-                return Conflict($"The city with id {id} can't be deleted because there are some accounts connected with it.")
+            if (_leadService.DeleteLead(id) == 1)
+                return NoContent();
+            else
+                return Conflict($"The city with id {id} can't be deleted because there are some accounts connected with it.");
         }
     }
 }
