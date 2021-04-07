@@ -104,7 +104,7 @@ namespace powerful_crm.API.Controllers
             {
                 return NotFound($"Lead with id {leadId} is not found");
             }
-            if (inputModel.CityId>0 && _leadService.GetCityById(inputModel.CityId) == null)
+            if ( _leadService.GetCityById(inputModel.CityId) == null)
             {
                 return NotFound($"City with id {inputModel.CityId} is not found");
             }
@@ -185,6 +185,7 @@ namespace powerful_crm.API.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status409Conflict)]
         [HttpDelete("city/{id}")]
         public ActionResult<LeadOutputModel> DeleteCity(int id)
         {
@@ -193,9 +194,10 @@ namespace powerful_crm.API.Controllers
             {
                 return NotFound($"City with id {id} is not found");
             }
-            //TODO: bad request if City is connected with any leads
-            _leadService.DeleteLead(id);
+           if( _leadService.DeleteLead(id)==1)
             return NoContent();
+           else 
+                return Conflict($"The city with id {id} can't be deleted because there are some accounts connected with it.")
         }
     }
 }

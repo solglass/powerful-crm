@@ -2,6 +2,7 @@
 using powerful_crm.Core.CustomExceptions;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Net;
 using System.Net.Mime;
@@ -28,6 +29,10 @@ namespace powerful_crm.API.Middleware
             {
                 await HandleValidationExceptionAsync(httpContext, ex);
             }
+            catch (SqlException ex)
+            {
+                await HandleSqlExceptionAsync(httpContext, ex);
+            }
             catch (Exception ex)
             {
                 await HandleExceptionAsync(httpContext, ex);
@@ -39,6 +44,28 @@ namespace powerful_crm.API.Middleware
             ModifyContextResponse(context, exception.StatusCode);
 
             return ConstructResponse(context, exception.StatusCode, exception.ErrorMessage);
+        }
+        private Task HandleSqlExceptionAsync(HttpContext context, SqlException exception)
+        {
+            ModifyContextResponse(context, (int)HttpStatusCode.BadRequest);
+            string errorMessage;
+            int statusCode;
+            if (exception.Message.Contains("UQLead5E55825B7B2276C4"))
+            {
+                errorMessage = "This login is already in use.";
+                statusCode = 409;
+            }
+            else if (exception.Message.Contains("UQLeadA9D10534BF185160"))
+            {
+                errorMessage = "This email is already in use.";
+                statusCode = 409;
+            }
+            else
+            {
+                errorMessage = GlobalErrorMessage;
+                statusCode = 400;
+            }
+            return ConstructResponse(context, statusCode, errorMessage);
         }
 
         private Task HandleExceptionAsync(HttpContext context, Exception exception)
