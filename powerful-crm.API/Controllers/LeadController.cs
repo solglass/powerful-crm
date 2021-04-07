@@ -27,7 +27,7 @@ namespace powerful_crm.API.Controllers
         /// <returns>rReturn information about added lead</returns>
         [ProducesResponseType(typeof(LeadOutputModel), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status409Conflict)]
-        [ProducesResponseType(StatusCodes.Status409Conflict)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
         [HttpPost]
         public ActionResult<LeadOutputModel> AddLead([FromBody] LeadInputModel inputModel)
         {
@@ -52,7 +52,7 @@ namespace powerful_crm.API.Controllers
         /// <returns>Status204NoContent response</returns>
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status409Conflict)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status409Conflict)]
         [HttpPut("{leadId}/change-password")]
         public ActionResult ChangePassword(int leadId, [FromBody]ChangePasswordInputModel inputModel)
         {
@@ -91,7 +91,7 @@ namespace powerful_crm.API.Controllers
         /// <returns>Updated info about lead</returns>
         [ProducesResponseType(typeof(LeadOutputModel), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status409Conflict)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status409Conflict)]
         [HttpPut("{leadId}")]
         public ActionResult<LeadOutputModel> UpdateLead(int leadId, [FromBody] UpdateLeadInputModel inputModel)
         {
@@ -145,7 +145,7 @@ namespace powerful_crm.API.Controllers
         [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
         [HttpPut("{leadId}/recover")]
-        public ActionResult<LeadOutputModel> RecoverUser(int leadId)
+        public ActionResult<LeadOutputModel> RecoverLead(int leadId)
         {
             var lead = _leadService.GetLeadById(leadId);
             if (lead == null)
@@ -165,8 +165,8 @@ namespace powerful_crm.API.Controllers
         /// <param name="city">Information about new city</param>
         /// <returns>Created city</returns>
         [ProducesResponseType(typeof(CityOutputModel), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status409Conflict)]
-        [HttpPost("/city")]
+        [ProducesResponseType(typeof(string), StatusCodes.Status409Conflict)]
+        [HttpPost("city")]
         public ActionResult<CityOutputModel> AddCity([FromBody] CityInputModel city)
         {
             if (!ModelState.IsValid)
@@ -185,7 +185,7 @@ namespace powerful_crm.API.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
-        [HttpDelete("/city/{id}")]
+        [HttpDelete("city/{id}")]
         public ActionResult<LeadOutputModel> DeleteCity(int id)
         {
             var city = _leadService.GetCityById(id);
