@@ -1,10 +1,13 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using powerful_crm.API.Models.InputModels;
 using powerful_crm.API.Models.OutputModels;
 using powerful_crm.Business;
 using powerful_crm.Core.Models;
+using powerful_crm.Core.Settings;
+using RestSharp;
 using System.Collections.Generic;
 
 namespace powerful_crm.API.Controllers
@@ -15,11 +18,13 @@ namespace powerful_crm.API.Controllers
     {
         private ILeadService _leadService;
         private IMapper _mapper;
+        private RestClient _client;
 
-        public LeadController(IMapper mapper, ILeadService leadService)
+        public LeadController(IOptions<AppSettings> options,IMapper mapper, ILeadService leadService)
         {
             _leadService = leadService;
             _mapper = mapper;
+            _client = new RestClient(options.Value.TRANSACTIONSTORE_URL);
         }
         /// <summary>lead add</summary>
         /// <param name="inputModel">information about add lead</param>
@@ -150,6 +155,26 @@ namespace powerful_crm.API.Controllers
             _leadService.RecoverLead(leadId);
             var dto = _mapper.Map<LeadOutputModel>(_leadService.GetLeadById(leadId));
             return Ok(dto);
+        }
+
+        /// <summary>Get lead balance</summary>
+        /// <param name="leadId">Id of lead</param>
+        /// <returns>Info about balance</returns>
+        [ProducesResponseType(typeof(List<BalanceInputModel>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
+        [HttpGet("{leadId}/balance")]
+        public ActionResult<List<BalanceInputModel>> GetBalanceByLeadId(int leadId)
+        {
+            var lead = _leadService.GetLeadById(leadId);
+            if (lead == null)
+            {
+                return NotFound($"Lead with id {leadId} is not found");
+            }
+
+            var request = new RestRequest($"/api/Transaction/balance/{leadId}", Method.GET);
+            var queryResult = _client.Execute<List<BalanceInputModel>>(request).Data;
+
+            return Ok(queryResult);
         }
     }
 }
