@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using powerful_crm.Core;
 using powerful_crm.Core.CustomExceptions;
 using System;
 using System.Collections.Generic;
@@ -48,12 +49,12 @@ namespace powerful_crm.API.Middleware
         private Task HandleSqlExceptionAsync(HttpContext context, SqlException exception)
         {
             ModifyContextResponse(context, (int)HttpStatusCode.BadRequest);
-            var keys = new string[] { "UQLead5E55825B7B2276C4", "UQLeadA9D10534BF185160" };
+            var keys = new string[] { Constants.EMAIL_UNIQUE_CONSTRAINT, Constants.EMAIL_UNIQUE_CONSTRAINT };
             var result = keys.FirstOrDefault<string>(s => exception.Message.Contains(s));
             return result switch
             {
-                "UQLead5E55825B7B2276C4" => ConstructResponse(context, 409, "This login is already in use."),
-                "UQLeadA9D10534BF185160" => ConstructResponse(context, 409, "This email is already in use."),
+                Constants.LOGIN_UNIQUE_CONSTRAINT => ConstructResponse(context, 409, "This login is already in use."),
+                Constants.EMAIL_UNIQUE_CONSTRAINT => ConstructResponse(context, 409, "This email is already in use."),
                 _ => ConstructResponse(context, 400, GlobalErrorMessage),
             };
         }
