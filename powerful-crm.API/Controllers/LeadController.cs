@@ -89,7 +89,7 @@ namespace powerful_crm.API.Controllers
         [HttpPost("search")]
         public ActionResult<List<LeadOutputModel>> SearchLeads ([FromBody] SearchLeadInputModel inputModel)
         {
-            var dto = _mapper.Map<LeadDto>(inputModel);
+            var dto = _mapper.Map<SearchLeadDto>(inputModel);
             var lead = _leadService.SearchLead(dto);
             if (lead == null)
             {

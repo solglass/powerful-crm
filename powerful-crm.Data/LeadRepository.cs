@@ -87,10 +87,10 @@ namespace powerful_crm.Data
                 splitOn: "Id",
                 commandType: CommandType.StoredProcedure).FirstOrDefault();
         }
-        public List<LeadDto> SearchLeads(LeadDto leadDto)
+        public List<LeadDto> SearchLeads(SearchLeadDto leadDto)
         {
             if (leadDto.FirstName == null && leadDto.LastName == null && leadDto.Email == null && leadDto.Login == null
-                && leadDto.Phone == null && leadDto.BirthDate == null && leadDto.City == null)
+                && leadDto.Phone == null && leadDto.StartBirthDate == null && leadDto.City == null)
                 throw new ArgumentNullException();
             return _connection.Query<LeadDto, CityDto, LeadDto>(
                 "dbo.Lead_Search", (lead, city) =>
@@ -105,8 +105,9 @@ namespace powerful_crm.Data
                         leadDto.Email,
                         leadDto.Login,
                         leadDto.Phone,
-                        leadDto.BirthDate,
-                        @ñityName = leadDto.City.Name
+                        leadDto.StartBirthDate,
+                        leadDto.EndBirthDate,
+                        ñityName = leadDto.City.Name
                     },
                     splitOn: "Id",
                     commandType: System.Data.CommandType.StoredProcedure)

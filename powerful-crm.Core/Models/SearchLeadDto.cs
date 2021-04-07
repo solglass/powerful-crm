@@ -1,12 +1,11 @@
 ﻿using powerful_crm.Core.Enums;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using System.Text;
 
-namespace powerful_crm.API.Models.InputModels
+namespace powerful_crm.Core.Models
 {
-    public class SearchLeadInputModel
+    public class SearchLeadDto
     {
         public string FirstName { get; set; }
         public SearchType TypeSearchFirstName { get; set; }
@@ -18,9 +17,9 @@ namespace powerful_crm.API.Models.InputModels
         public SearchType TypeSearchLogin { get; set; }
         public string Phone { get; set; }
         public SearchType TypeSearchPhone { get; set; }
-        public string StartBirthDate { get; set; }
-        public string EndBirthDate { get; set; }
-        public string CityName { get; set; }
+        public DateTime? StartBirthDate { get; set; }
+        public DateTime? EndBirthDate { get; set; }
+        public CityDto City{ get; set; }
         public SearchType TypeSearchCityName { get; set; }
     }
 }
