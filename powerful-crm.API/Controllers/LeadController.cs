@@ -5,6 +5,7 @@ using Microsoft.Extensions.Options;
 using powerful_crm.API.Models.InputModels;
 using powerful_crm.API.Models.OutputModels;
 using powerful_crm.Business;
+using powerful_crm.Core.CustomExceptions;
 using powerful_crm.Core.Models;
 using powerful_crm.Core.Settings;
 using RestSharp;
@@ -30,14 +31,18 @@ namespace powerful_crm.API.Controllers
         /// <param name="inputModel">information about add lead</param>
         /// <returns>rReturn information about added lead</returns>
         [ProducesResponseType(typeof(LeadOutputModel), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status409Conflict)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status409Conflict)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
         [HttpPost]
         public ActionResult<LeadOutputModel> AddLead([FromBody] LeadInputModel inputModel)
         {
             if (!ModelState.IsValid)
             {
-                //todo: validationexception
-                return Conflict();
+                throw new ValidationException(ModelState);
+            }
+            if (_leadService.GetCityById(inputModel.CityId) == null)
+            {
+                return NotFound($"City with id {inputModel.CityId} is not found");
             }
             var dto = _mapper.Map<LeadDto>(inputModel);
             var addedLeadId = _leadService.AddLead(dto);
@@ -52,13 +57,13 @@ namespace powerful_crm.API.Controllers
         /// <returns>Status204NoContent response</returns>
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status409Conflict)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status409Conflict)]
         [HttpPut("{leadId}/change-password")]
         public ActionResult ChangePassword(int leadId, [FromBody]ChangePasswordInputModel inputModel)
         {
             if (!ModelState.IsValid)
             {
-                return Conflict();
+                throw new ValidationException(ModelState);
             }
             if (_leadService.GetLeadById(leadId) == null)
             {
@@ -91,18 +96,22 @@ namespace powerful_crm.API.Controllers
         /// <returns>Updated info about lead</returns>
         [ProducesResponseType(typeof(LeadOutputModel), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status409Conflict)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status409Conflict)]
         [HttpPut("{leadId}")]
         public ActionResult<LeadOutputModel> UpdateLead(int leadId, [FromBody] UpdateLeadInputModel inputModel)
         {
             if (!ModelState.IsValid)
             {
-                return Conflict();
+                throw new ValidationException(ModelState);
             }
             var lead = _leadService.GetLeadById(leadId);
             if (lead == null)
             {
                 return NotFound($"Lead with id {leadId} is not found");
+            }
+            if ( _leadService.GetCityById(inputModel.CityId) == null)
+            {
+                return NotFound($"City with id {inputModel.CityId} is not found");
             }
             var dto = _mapper.Map<LeadDto>(inputModel);
             _leadService.UpdateLead(leadId, dto);
@@ -118,7 +127,7 @@ namespace powerful_crm.API.Controllers
         [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
         [HttpDelete("{leadId}")]
-        public ActionResult<LeadOutputModel> DeleteUser(int leadId)
+        public ActionResult<LeadOutputModel> DeleteLead(int leadId)
         {
             var lead = _leadService.GetLeadById(leadId);
             if (lead == null)
@@ -141,7 +150,7 @@ namespace powerful_crm.API.Controllers
         [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
         [HttpPut("{leadId}/recover")]
-        public ActionResult<LeadOutputModel> RecoverUser(int leadId)
+        public ActionResult<LeadOutputModel> RecoverLead(int leadId)
         {
             var lead = _leadService.GetLeadById(leadId);
             if (lead == null)
@@ -155,6 +164,45 @@ namespace powerful_crm.API.Controllers
             _leadService.RecoverLead(leadId);
             var dto = _mapper.Map<LeadOutputModel>(_leadService.GetLeadById(leadId));
             return Ok(dto);
+        }
+
+        /// <summary>Creates new city</summary>
+        /// <param name="city">Information about new city</param>
+        /// <returns>Created city</returns>
+        [ProducesResponseType(typeof(CityOutputModel), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status409Conflict)]
+        [HttpPost("city")]
+        public ActionResult<CityOutputModel> AddCity([FromBody] CityInputModel city)
+        {
+            if (!ModelState.IsValid)
+            {
+                throw new ValidationException(ModelState);
+            }
+            var dto = _mapper.Map<CityDto>(city);
+            var addedCityId = _leadService.AddCity(dto);
+            var outputModel = _mapper.Map<CityOutputModel>(_leadService.GetCityById(addedCityId));
+            return Ok(outputModel);
+        }
+
+        /// <summary>Deletes the city</summary>
+        /// <param name="id">Id of the city to delete</param>
+        /// <returns>NoContent result</returns>
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status409Conflict)]
+        [HttpDelete("city/{id}")]
+        public ActionResult<LeadOutputModel> DeleteCity(int id)
+        {
+            var city = _leadService.GetCityById(id);
+            if (city == null)
+            {
+                return NotFound($"City with id {id} is not found");
+            }
+            if (_leadService.DeleteLead(id) == 1)
+                return NoContent();
+            else
+                return Conflict($"The city with id {id} can't be deleted because there are some accounts connected with it.");
         }
 
         /// <summary>Get lead balance</summary>
