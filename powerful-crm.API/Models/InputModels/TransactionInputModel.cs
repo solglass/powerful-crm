@@ -11,8 +11,7 @@ namespace powerful_crm.API.Models.InputModels
         [Range(0, int.MaxValue)]
         public int LeadId { get; set; }
         public decimal Amount { get; set; }
-
-        public int Type { get; set; }
-        public DateTime  Timestamp { get; set; }
+        public string Type { get; set; }
+        public DateTime Timestamp { get; set; }
     }
 }

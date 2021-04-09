@@ -24,6 +24,12 @@ namespace EducationSystem.API
             CreateMap<UpdateLeadInputModel, LeadDto>()
                 .ForMember(dest => dest.BirthDate, opts => opts.MapFrom(src => DateTime.ParseExact(src.BirthDate, Constants.DATE_FORMAT, CultureInfo.InvariantCulture, DateTimeStyles.None)))
              .ForMember(dest => dest.City, opts => opts.MapFrom(src => new CityDto { Id = src.CityId }));
-        } 
+
+            CreateMap<BalanceInputModel, BalanceOutputModel>();
+            CreateMap<TransactionInputModel, TransactionOutputModel>()
+                .ForMember(dest => dest.Timestamp, opts => opts.MapFrom(src => src.Timestamp.ToString(Constants.DATE_FORMAT_WITH_TIME)));
+            CreateMap<TransferInputModel, TransferOutputModel>()
+                .ForMember(dest => dest.Timestamp, opts => opts.MapFrom(src => src.Timestamp.ToString(Constants.DATE_FORMAT_WITH_TIME)));
+        }
     }
 }
