@@ -11,5 +11,14 @@ namespace powerful_crm.Core
 
         public const string LOGIN_UNIQUE_CONSTRAINT = "UQLead5E55825B7B2276C4";
         public const string EMAIL_UNIQUE_CONSTRAINT = "UQLeadA9D10534BF185160";
+
+        public const string API_GETTRANSACTION = "/api/Transaction/{0}";
+        public const string API_GETBALANCE = "/api/Transaction/balance/{0}";
+
+        public const string ERROR_LEADNOTFOUND = "Lead with id {0} is not found";
+        public const string ERROR_LEADALREADYDELETED = "Lead with id {0} has already been deleted";
+        public const string ERROR_LEADNOTDELETED = "Lead with id {0} is not deleted";
+        public const string ERROR_CITYNOTFOUND = "City with id {0} is not found";
+        public const string ERROR_CITYHASDEPENDENCIES = "The city with id {0} can't be deleted because there are some accounts connected with it";
     }
 }

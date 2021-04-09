@@ -5,6 +5,7 @@ using Microsoft.Extensions.Options;
 using powerful_crm.API.Models.InputModels;
 using powerful_crm.API.Models.OutputModels;
 using powerful_crm.Business;
+using powerful_crm.Core;
 using powerful_crm.Core.CustomExceptions;
 using powerful_crm.Core.Models;
 using powerful_crm.Core.Settings;
@@ -42,7 +43,7 @@ namespace powerful_crm.API.Controllers
             }
             if (_leadService.GetCityById(inputModel.CityId) == null)
             {
-                return NotFound($"City with id {inputModel.CityId} is not found");
+                return NotFound(string.Format(Constants.ERROR_CITYNOTFOUND, inputModel.CityId));
             }
             var dto = _mapper.Map<LeadDto>(inputModel);
             var addedLeadId = _leadService.AddLead(dto);
@@ -67,7 +68,7 @@ namespace powerful_crm.API.Controllers
             }
             if (_leadService.GetLeadById(leadId) == null)
             {
-                return NotFound($"Lead with id {leadId} is not found");
+                return NotFound(string.Format(Constants.ERROR_LEADNOTFOUND, leadId));
             }
             _leadService.ChangePassword(leadId, inputModel.OldPassword, inputModel.NewPassword);
             return NoContent();
@@ -83,7 +84,7 @@ namespace powerful_crm.API.Controllers
             var lead = _leadService.GetLeadById(leadId);
             if (lead == null)
             {
-                return NotFound($"Lead with id {leadId} is not found");
+                return NotFound(string.Format(Constants.ERROR_LEADNOTFOUND, leadId));
             }
 
             var outputModel = _mapper.Map<LeadOutputModel>(lead);
@@ -107,11 +108,11 @@ namespace powerful_crm.API.Controllers
             var lead = _leadService.GetLeadById(leadId);
             if (lead == null)
             {
-                return NotFound($"Lead with id {leadId} is not found");
+                return NotFound(string.Format(Constants.ERROR_LEADNOTFOUND, leadId));
             }
             if ( _leadService.GetCityById(inputModel.CityId) == null)
             {
-                return NotFound($"City with id {inputModel.CityId} is not found");
+                return NotFound(string.Format(Constants.ERROR_CITYNOTFOUND, inputModel.CityId));
             }
             var dto = _mapper.Map<LeadDto>(inputModel);
             _leadService.UpdateLead(leadId, dto);
@@ -132,11 +133,11 @@ namespace powerful_crm.API.Controllers
             var lead = _leadService.GetLeadById(leadId);
             if (lead == null)
             {
-                return NotFound($"Lead with id {leadId} is not found");
+                return NotFound(string.Format(Constants.ERROR_LEADNOTFOUND, leadId));
             }
             if (lead.IsDeleted == true)
             {
-                return BadRequest($"Lead with id {leadId} has already been deleted");
+                return BadRequest(string.Format(Constants.ERROR_LEADALREADYDELETED, leadId));
             }
             _leadService.DeleteLead(leadId);
             var dto = _mapper.Map<LeadOutputModel>(_leadService.GetLeadById(leadId));
@@ -155,11 +156,11 @@ namespace powerful_crm.API.Controllers
             var lead = _leadService.GetLeadById(leadId);
             if (lead == null)
             {
-                return NotFound($"Lead with id {leadId} is not found");
+                return NotFound(string.Format(Constants.ERROR_LEADNOTFOUND, leadId));
             }
             if (lead.IsDeleted == false)
             {
-                return BadRequest($"Lead with id {leadId} is not deleted");
+                return BadRequest(string.Format(Constants.ERROR_LEADNOTDELETED, leadId));
             }
             _leadService.RecoverLead(leadId);
             var dto = _mapper.Map<LeadOutputModel>(_leadService.GetLeadById(leadId));
@@ -185,24 +186,24 @@ namespace powerful_crm.API.Controllers
         }
 
         /// <summary>Deletes the city</summary>
-        /// <param name="id">Id of the city to delete</param>
+        /// <param name="cityId">Id of the city to delete</param>
         /// <returns>NoContent result</returns>
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(string), StatusCodes.Status409Conflict)]
         [HttpDelete("city/{id}")]
-        public ActionResult<LeadOutputModel> DeleteCity(int id)
+        public ActionResult<LeadOutputModel> DeleteCity(int cityId)
         {
-            var city = _leadService.GetCityById(id);
+            var city = _leadService.GetCityById(cityId);
             if (city == null)
             {
-                return NotFound($"City with id {id} is not found");
+                return NotFound(string.Format(Constants.ERROR_CITYNOTFOUND, cityId));
             }
-            if (_leadService.DeleteLead(id) == 1)
+            if (_leadService.DeleteLead(cityId) == 1)
                 return NoContent();
             else
-                return Conflict($"The city with id {id} can't be deleted because there are some accounts connected with it.");
+                return Conflict(string.Format(Constants.ERROR_CITYHASDEPENDENCIES, cityId));
         }
 
         /// <summary>Get lead balance</summary>
@@ -216,10 +217,10 @@ namespace powerful_crm.API.Controllers
             var lead = _leadService.GetLeadById(leadId);
             if (lead == null)
             {
-                return NotFound($"Lead with id {leadId} is not found");
+                return NotFound(string.Format(Constants.ERROR_LEADNOTFOUND, leadId));
             }
 
-            var request = new RestRequest($"/api/Transaction/balance/{leadId}", Method.GET);
+            var request = new RestRequest(string.Format(Constants.API_GETBALANCE, leadId), Method.GET);
             var queryResult = _client.Execute<List<BalanceInputModel>>(request).Data;
 
             var result = _mapper.Map<List<BalanceOutputModel>>(queryResult);
@@ -237,35 +238,14 @@ namespace powerful_crm.API.Controllers
             var lead = _leadService.GetLeadById(leadId);
             if (lead == null)
             {
-                return NotFound($"Lead with id {leadId} is not found");
+                return NotFound(string.Format(Constants.ERROR_LEADNOTFOUND, leadId));
             }
 
-            var request = new RestRequest($"/api/Transaction/{leadId}", Method.GET);
-            var queryResult = _client.Execute<List<TransactionInputModel>>(request).Data;
+            var request = new RestRequest(string.Format(Constants.API_GETTRANSACTION, leadId), Method.GET);
+            var queryResult = _client.Execute<string>(request).Data;
 
-            var result = _mapper.Map<List<TransactionOutputModel>>(queryResult);
-            return Ok(result);
+            return Ok(queryResult);
         }
-
-        /// <summary>Get lead transfers</summary>
-        /// <param name="leadId">Id of lead</param>
-        /// <returns>Info about transfers</returns>
-        [ProducesResponseType(typeof(List<TransferOutputModel>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
-        [HttpGet("{leadId}/transfers")]
-        public ActionResult<List<TransferOutputModel>> GetTransfersByLeadId(int leadId)
-        {
-            var lead = _leadService.GetLeadById(leadId);
-            if (lead == null)
-            {
-                return NotFound($"Lead with id {leadId} is not found");
-            }
-
-            var request = new RestRequest($"/api/Transaction/transfers/{leadId}", Method.GET);
-            var queryResult = _client.Execute<List<TransferInputModel>>(request).Data;
-
-            var result = _mapper.Map<List<TransferOutputModel>>(queryResult);
-            return Ok(result);
-        }
+        
     }
 }
