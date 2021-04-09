@@ -13,5 +13,8 @@ namespace powerful_crm.Business
         List<LeadDto> SearchLead(SearchLeadDto leadDto);
         int RecoverLead(int leadId);
         int UpdateLead(int leadId, LeadDto dto);
+        int AddCity(CityDto city);
+        int DeleteCity(int id);
+        CityDto GetCityById(int id);
     }
 }

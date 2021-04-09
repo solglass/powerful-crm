@@ -14,10 +14,22 @@ namespace EducationSystem.API
     {
         public AutomapperConfig()
         {
-         CreateMap<LeadDto, LeadOutputModel>()
-         .ForMember(dest => dest.BirthDate, opts => opts.MapFrom(src => src.BirthDate.ToString(Constants.DATE_FORMAT)));
-         CreateMap<LeadInputModel, LeadDto>()
-         .ForMember(dest => dest.BirthDate, opts => opts.MapFrom(src => DateTime.ParseExact(src.BirthDate, Constants.DATE_FORMAT, CultureInfo.InvariantCulture, DateTimeStyles.None)));
+            CreateMap<LeadDto, LeadOutputModel>()
+                .ForMember(dest => dest.BirthDate, opts => opts.MapFrom(src => src.BirthDate.ToString(Constants.DATE_FORMAT)));
+            CreateMap<LeadInputModel, LeadDto>()
+                .ForMember(dest => dest.City, opts => opts.MapFrom(src => new CityDto { Id = src.CityId }))
+                .ForMember(dest => dest.BirthDate, opts => opts.MapFrom(src => DateTime.ParseExact(src.BirthDate, Constants.DATE_FORMAT, CultureInfo.InvariantCulture, DateTimeStyles.None)));
+            CreateMap<CityDto, CityOutputModel>();
+            CreateMap<CityInputModel, CityDto>();
+            CreateMap<UpdateLeadInputModel, LeadDto>()
+                .ForMember(dest => dest.BirthDate, opts => opts.MapFrom(src => DateTime.ParseExact(src.BirthDate, Constants.DATE_FORMAT, CultureInfo.InvariantCulture, DateTimeStyles.None)))
+             .ForMember(dest => dest.City, opts => opts.MapFrom(src => new CityDto { Id = src.CityId }));
+
+            CreateMap<BalanceInputModel, BalanceOutputModel>();
+            CreateMap<TransactionInputModel, TransactionOutputModel>()
+                .ForMember(dest => dest.Timestamp, opts => opts.MapFrom(src => src.Timestamp.ToString(Constants.DATE_FORMAT_WITH_TIME)));
+            CreateMap<TransferInputModel, TransferOutputModel>()
+                .ForMember(dest => dest.Timestamp, opts => opts.MapFrom(src => src.Timestamp.ToString(Constants.DATE_FORMAT_WITH_TIME)));
             CreateMap<SearchLeadInputModel, SearchLeadDto>()
             .ForMember(dest => dest.StartBirthDate, opts => opts.MapFrom(src => DateTime.ParseExact(src.StartBirthDate, Constants.DATE_FORMAT, CultureInfo.InvariantCulture, DateTimeStyles.None)))
          .ForMember(dest => dest.City, opts => opts.MapFrom(src=> new CityDto() {Name = src.CityName }));

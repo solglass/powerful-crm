@@ -1,8 +1,4 @@
-﻿using powerful_crm.Core.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System;
 
 namespace powerful_crm.API.Models.OutputModels
 {
@@ -15,5 +11,6 @@ namespace powerful_crm.API.Models.OutputModels
         public string Email { get; set; }
         public string Phone { get; set; }
         public string BirthDate { get; set; }
+        public CityOutputModel City { get; set; }
     }
 }
