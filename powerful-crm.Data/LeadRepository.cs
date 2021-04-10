@@ -7,13 +7,17 @@ using System.Data;
 using powerful_crm.Core.Models;
 using System.Linq;
 using System.Collections.Generic;
+using SqlKata;
+using SqlKata.Execution;
 
 namespace powerful_crm.Data
 {
     public class LeadRepository : BaseRepository, ILeadRepository
     {
-        public LeadRepository(IOptions<AppSettings> options) : base(options)
+            private readonly QueryFactory db;
+        public LeadRepository(IOptions<AppSettings> options, QueryFactory db) : base(options)
         {
+            this.db = db;
             _connection = new SqlConnection(_connectionString);
         }
 

@@ -12,9 +12,7 @@ namespace powerful_crm.Data
         int DeleteOrRecoverLead(int id, bool isDeleted);
         LeadDto GetLeadById(int id);
         List<LeadDto> SearchLeads(SearchLeadDto leadDto);
-        int UpdateLead(LeadDto dto);
         int AddCity(CityDto name);
-        int DeleteCity(int id);
         CityDto GetCityById(int id);
 
     }
