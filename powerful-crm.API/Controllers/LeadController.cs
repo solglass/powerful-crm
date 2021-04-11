@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using powerful_crm.API.Models.InputModels;
+using powerful_crm.API.Models.MiddleModels;
 using powerful_crm.API.Models.OutputModels;
 using powerful_crm.Business;
 using powerful_crm.Core;
@@ -262,8 +263,9 @@ namespace powerful_crm.API.Controllers
             {
                 return NotFound(string.Format(Constants.ERROR_LEADNOTFOUND, inputModel.LeadId));
             }
-            var request = new RestRequest($"/api/Transaction/deposite", Method.POST);
-            request.AddParameter("application/json", JsonSerializer.Serialize(inputModel), ParameterType.RequestBody);
+            var middle = _mapper.Map<TransactionMiddleModel>(inputModel);
+            var request = new RestRequest(Constants.API_DEPOSIT, Method.POST);
+            request.AddParameter("application/json", JsonSerializer.Serialize(middle), ParameterType.RequestBody);
             var queryResult = _client.Execute<int>(request).Data;
             return Ok(queryResult);
         }
@@ -282,9 +284,9 @@ namespace powerful_crm.API.Controllers
             {
                 return NotFound(string.Format(Constants.ERROR_LEADNOTFOUND, inputModel.LeadId));
             }
-
-            var request = new RestRequest($"/api/Transaction/withdraw", Method.POST);
-            request.AddParameter("application/json", JsonSerializer.Serialize(inputModel), ParameterType.RequestBody);
+            var middle = _mapper.Map<TransactionMiddleModel>(inputModel);
+            var request = new RestRequest(Constants.API_WITHDRAW, Method.POST);
+            request.AddParameter("application/json", JsonSerializer.Serialize(middle), ParameterType.RequestBody);
             var queryResult = _client.Execute<int>(request).Data;
             return Ok(queryResult);
         }
