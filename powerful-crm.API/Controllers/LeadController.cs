@@ -11,6 +11,7 @@ using powerful_crm.Core.Models;
 using powerful_crm.Core.Settings;
 using RestSharp;
 using System.Collections.Generic;
+using System.Text.Json;
 
 namespace powerful_crm.API.Controllers
 {
@@ -246,6 +247,61 @@ namespace powerful_crm.API.Controllers
 
             return Ok(queryResult);
         }
-        
+
+        /// <summary>Add deposit</summary>
+        /// <param name="inputModel">information about deposit</param>
+        /// <returns>Return id added deposit</returns>
+        [ProducesResponseType(typeof(int), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
+        [HttpPost("deposit")]
+        public ActionResult<int> AddDeposit([FromBody] TransactionInputModel inputModel)
+        {
+            if (!ModelState.IsValid)
+                throw new ValidationException(ModelState);
+            if (_leadService.GetLeadById(inputModel.LeadId) == null)
+            {
+                return NotFound(string.Format(Constants.ERROR_LEADNOTFOUND, inputModel.LeadId));
+            }
+            var request = new RestRequest($"/api/Transaction/deposite", Method.POST);
+            request.AddParameter("application/json", JsonSerializer.Serialize(inputModel), ParameterType.RequestBody);
+            var queryResult = _client.Execute<int>(request).Data;
+            return Ok(queryResult);
+        }
+
+        /// <summary>Add withdraw</summary>
+        /// <param name="inputModel">information about withdraw</param>
+        /// <returns>Return id added withdraw</returns>
+        [ProducesResponseType(typeof(int), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
+        [HttpPost("withdraw")]
+        public ActionResult<int> AddWithdraw([FromBody] TransactionInputModel inputModel)
+        {
+            if (!ModelState.IsValid)
+                throw new ValidationException(ModelState);
+            if (_leadService.GetLeadById(inputModel.LeadId) == null)
+            {
+                return NotFound(string.Format(Constants.ERROR_LEADNOTFOUND, inputModel.LeadId));
+            }
+
+            var request = new RestRequest($"/api/Transaction/withdraw", Method.POST);
+            request.AddParameter("application/json", JsonSerializer.Serialize(inputModel), ParameterType.RequestBody);
+            var queryResult = _client.Execute<int>(request).Data;
+            return Ok(queryResult);
+        }
+
+        /// <summary>Add deposit</summary>
+        /// <param name="inputModel">information about deposit</param>
+        /// <returns>Return information about added deposit</returns>
+        [ProducesResponseType(typeof(int), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
+        [HttpPost("transfer")]
+        public ActionResult<int> AddTransfer([FromBody] TransactionInputModel inputModel)
+        {
+            var request = new RestRequest($"/api/Transaction/deposite", Method.POST);
+            request.AddParameter("application/json", JsonSerializer.Serialize(inputModel), ParameterType.RequestBody);
+            var queryResult = _client.Execute<int>(request).Data;
+            return Ok(queryResult);
+        }
+
     }
 }
