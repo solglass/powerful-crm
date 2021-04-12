@@ -9,6 +9,7 @@ namespace powerful_crm.API.Models.InputModels
 {
     public class TransactionInputModel
     {
+        [Required]
         [Range(1, int.MaxValue)]
         public int LeadId { get; set; }
         [Required]

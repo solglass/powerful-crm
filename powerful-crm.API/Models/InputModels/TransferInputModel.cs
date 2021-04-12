@@ -6,8 +6,10 @@ namespace powerful_crm.API.Models.InputModels
 {
     public class TransferInputModel
     {
+        [Required]
         [Range(1, int.MaxValue)]
         public int SenderId { get; set; }
+        [Required]
         [Range(1, int.MaxValue)]
         public int RecipientId { get; set; }
         [Required]

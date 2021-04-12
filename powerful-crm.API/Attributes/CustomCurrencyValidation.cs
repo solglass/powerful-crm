@@ -8,8 +8,8 @@ namespace powerful_crm.API.Attributes
     {
         public override bool IsValid(object value)
         {
-            string currancy = (string)value;
-            return Enum.IsDefined(typeof(Currency), currancy);
+            var currency = (string)value;
+            return Enum.IsDefined(typeof(Currency), currency);
         }
     }
 }

@@ -29,9 +29,9 @@ namespace EducationSystem.API
             CreateMap<BalanceInputModel, BalanceOutputModel>();
             
             CreateMap<TransactionInputModel, TransactionMiddleModel>()
-                .ForMember("CurrencyPair", opt => opt.MapFrom(c => c.CurrentCurrency + c.AccountCurrency));
+                .ForMember(dest => dest.CurrencyPair, opt => opt.MapFrom(c => c.CurrentCurrency + c.AccountCurrency));
             CreateMap<TransferInputModel, TransferMiddleModel>()
-                .ForMember("CurrencyPair", opt => opt.MapFrom(c => c.CurrentCurrency + c.AccountCurrency));
+                .ForMember(dest => dest.CurrencyPair, opt => opt.MapFrom(c => c.CurrentCurrency + c.AccountCurrency));
         }
     }
 }
