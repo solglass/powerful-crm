@@ -43,12 +43,6 @@ namespace powerful_crm.API
                 swagger.SwaggerDoc("v1", new OpenApiInfo { Title = "powerful-crm" });
             });
             services.AddSwaggerGenNewtonsoftSupport();
-            services.AddScoped(factory =>
-            {
-                   var compiler = new MySqlCompiler();
-                var _connection = new SqlConnection("Data Source=80.78.240.16;Initial Catalog=CRM;Persist Security Info=True;User ID=student;Password=qwe!23");
-                return new QueryFactory(_connection, compiler,4);
-            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

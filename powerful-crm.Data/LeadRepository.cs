@@ -9,16 +9,20 @@ using System.Linq;
 using System.Collections.Generic;
 using SqlKata;
 using SqlKata.Execution;
+using SqlKata.Compilers;
 
 namespace powerful_crm.Data
 {
     public class LeadRepository : BaseRepository, ILeadRepository
     {
-            private readonly QueryFactory db;
-        public LeadRepository(IOptions<AppSettings> options, QueryFactory db) : base(options)
+        private readonly QueryFactory db;
+        private SqlServerCompiler _compiler;
+
+        public LeadRepository(IOptions<AppSettings> options) : base(options)
         {
-            this.db = db;
+            _compiler = new SqlServerCompiler();
             _connection = new SqlConnection(_connectionString);
+            db = new QueryFactory(_connection, _compiler);
         }
 
         public int AddUpdateLead(LeadDto dto)
@@ -81,25 +85,43 @@ namespace powerful_crm.Data
             if (leadDto.FirstName == null && leadDto.LastName == null && leadDto.Email == null && leadDto.Login == null
                 && leadDto.Phone == null && leadDto.StartBirthDate == null && leadDto.City == null)
                 throw new ArgumentNullException();
+
+            var query = db.Query("Lead as l").Join("City as c", "c.Id","l.CityId").Select("l.Id",
+                                                "l.FirstName",
+                                                "l.LastName",
+                                                "l.Login",
+                                                "l.Email",
+                                                "l.Phone",
+                                                "l.BirthDate",
+                                                "c.Id",
+                                                "c.Name").Where("IsDeleted", "=", 0);
+            if(leadDto.FirstName != null)
+            {
+                query = query.Where("FirstName", "like", leadDto.FirstName);
+            }
+            if (leadDto.LastName != null)
+            {
+                query = query.Where("LastName", "like", leadDto.LastName);
+            }
+            if (leadDto.Email != null)
+            {
+                query = query.Where("Email", "like", leadDto.Email);
+            }
+            if (leadDto.Login != null)
+            {
+                query = query.Where("Login", "like", leadDto.Login);
+            }
+            if (leadDto.Phone != null)
+            {
+                query = query.Where("Phone", "like", leadDto.Phone);
+            }
+            var sql = _compiler.Compile(query).ToString();
             return _connection.Query<LeadDto, CityDto, LeadDto>(
-                "dbo.Lead_Search", (lead, city) =>
+                sql, (lead, city) =>
                 {
                     lead.City = city;
                     return lead;
-                },
-                    new
-                    {
-                        leadDto.FirstName,
-                        leadDto.LastName,
-                        leadDto.Email,
-                        leadDto.Login,
-                        leadDto.Phone,
-                        leadDto.StartBirthDate,
-                        leadDto.EndBirthDate,
-                        ñityName = leadDto.City.Name
-                    },
-                    splitOn: "Id",
-                    commandType: System.Data.CommandType.StoredProcedure)
+                }, splitOn: "Id")
                 .Distinct()
                 .ToList();
         }
@@ -124,7 +146,7 @@ namespace powerful_crm.Data
                 commandType: CommandType.StoredProcedure);
         }
 
-        public CityDto GetCityById (int id)
+        public CityDto GetCityById(int id)
         {
             return _connection.QueryFirstOrDefault<CityDto>("dbo.City_SelectById",
                 new { id },
