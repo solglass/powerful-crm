@@ -11,8 +11,9 @@ namespace powerful_crm.Core.Enums
 
             string friendlyName = searchType switch
             {
-                SearchType.Сontent => '%' + name + '%',
                 SearchType.Beginning => name + '%',
+                SearchType.Сontent => '%' + name + '%',
+                SearchType.Ending=>'%'+name,
                 _ => name
             };
             return friendlyName;
