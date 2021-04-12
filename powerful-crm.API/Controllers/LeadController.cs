@@ -254,6 +254,7 @@ namespace powerful_crm.API.Controllers
         /// <returns>Return id added deposit</returns>
         [ProducesResponseType(typeof(int), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
         [HttpPost("deposit")]
         public ActionResult<int> AddDeposit([FromBody] TransactionInputModel inputModel)
         {
@@ -275,6 +276,7 @@ namespace powerful_crm.API.Controllers
         /// <returns>Return id added withdraw</returns>
         [ProducesResponseType(typeof(int), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
         [HttpPost("withdraw")]
         public ActionResult<int> AddWithdraw([FromBody] TransactionInputModel inputModel)
         {
@@ -291,16 +293,28 @@ namespace powerful_crm.API.Controllers
             return Ok(queryResult);
         }
 
-        /// <summary>Add deposit</summary>
-        /// <param name="inputModel">information about deposit</param>
-        /// <returns>Return information about added deposit</returns>
+        /// <summary>Add transfer</summary>
+        /// <param name="inputModel">information about transfer</param>
+        /// <returns>Return id added transfer</returns>
         [ProducesResponseType(typeof(int), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
         [HttpPost("transfer")]
-        public ActionResult<int> AddTransfer([FromBody] TransactionInputModel inputModel)
+        public ActionResult<int> AddTransfer([FromBody] TransferInputModel inputModel)
         {
-            var request = new RestRequest($"/api/Transaction/deposite", Method.POST);
-            request.AddParameter("application/json", JsonSerializer.Serialize(inputModel), ParameterType.RequestBody);
+            if (!ModelState.IsValid)
+                throw new ValidationException(ModelState);
+            if (_leadService.GetLeadById(inputModel.RecipientId) == null)
+            {
+                return NotFound(string.Format(Constants.ERROR_LEADNOTFOUND, inputModel.RecipientId));
+            }
+            if (_leadService.GetLeadById(inputModel.SenderId) == null)
+            {
+                return NotFound(string.Format(Constants.ERROR_LEADNOTFOUND, inputModel.SenderId));
+            }
+            var middle = _mapper.Map<TransferMiddleModel>(inputModel);
+            var request = new RestRequest(Constants.API_TRANSFER, Method.POST);
+            request.AddParameter("application/json", JsonSerializer.Serialize(middle), ParameterType.RequestBody);
             var queryResult = _client.Execute<int>(request).Data;
             return Ok(queryResult);
         }

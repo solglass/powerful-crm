@@ -27,12 +27,10 @@ namespace EducationSystem.API
              .ForMember(dest => dest.City, opts => opts.MapFrom(src => new CityDto { Id = src.CityId }));
 
             CreateMap<BalanceInputModel, BalanceOutputModel>();
-            //CreateMap<TransactionInputModel, TransactionOutputModel>()
-            //    .ForMember(dest => dest.Timestamp, opts => opts.MapFrom(src => src.Timestamp.ToString(Constants.DATE_FORMAT_WITH_TIME)));
-            CreateMap<TransferInputModel, TransferOutputModel>()
-                .ForMember(dest => dest.Timestamp, opts => opts.MapFrom(src => src.Timestamp.ToString(Constants.DATE_FORMAT_WITH_TIME)));
-
+            
             CreateMap<TransactionInputModel, TransactionMiddleModel>()
+                .ForMember("CurrencyPair", opt => opt.MapFrom(c => c.CurrentCurrency + c.AccountCurrency));
+            CreateMap<TransferInputModel, TransferMiddleModel>()
                 .ForMember("CurrencyPair", opt => opt.MapFrom(c => c.CurrentCurrency + c.AccountCurrency));
         }
     }
