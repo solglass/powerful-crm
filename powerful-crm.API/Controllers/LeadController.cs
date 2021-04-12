@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
@@ -26,7 +26,7 @@ namespace powerful_crm.API.Controllers
         {
             _leadService = leadService;
             _mapper = mapper;
-            _client = new RestClient(options.Value.TRANSACTIONSTORE_URL);
+            _client = new RestClient(options.Value.TSTORE_URL);
         }
         /// <summary>lead add</summary>
         /// <param name="inputModel">information about add lead</param>
