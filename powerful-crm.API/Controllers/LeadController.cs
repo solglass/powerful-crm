@@ -98,12 +98,18 @@ namespace powerful_crm.API.Controllers
         /// <returns>Info of leads</returns>
         [ProducesResponseType(typeof(LeadOutputModel), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status409Conflict)]
         [HttpPost("search")]
         public ActionResult<List<LeadOutputModel>> SearchLeads ([FromBody] SearchLeadInputModel inputModel)
         {
+
+            if (!ModelState.IsValid)
+            {
+                throw new ValidationException(ModelState);
+            }
             var dto = _mapper.Map<SearchLeadDto>(inputModel);
             var lead = _leadService.SearchLead(dto);
-            if (lead == null)
+            if (lead.Count==0)
             {
                 return NotFound($"Leads is not found");
             }

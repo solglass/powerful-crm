@@ -97,23 +97,23 @@ namespace powerful_crm.Data
                                                 "c.Name").Where("IsDeleted", "0");
             if(leadDto.FirstName != null)
             {
-                query = query.WhereLike("FirstName",leadDto.FirstName);
+                query = query.WhereLike("l.FirstName",leadDto.FirstName);
             }
             if (leadDto.LastName != null)
             {
-                query = query.WhereLike("LastName",leadDto.LastName);
+                query = query.WhereLike("l.LastName",leadDto.LastName);
             }
             if (leadDto.Email != null)
             {
-                query = query.WhereLike("Email", leadDto.Email);
+                query = query.WhereLike("l.Email", leadDto.Email);
             }
             if (leadDto.Login != null)
             {
-                query = query.WhereLike("Login",leadDto.Login);
+                query = query.WhereLike("l.Login",leadDto.Login);
             }
             if (leadDto.Phone != null)
             {
-                query = query.WhereLike("Phone", leadDto.Phone);
+                query = query.WhereLike("l.Phone", leadDto.Phone);
             }
             if (leadDto.City.Name != null)
             {
@@ -121,15 +121,15 @@ namespace powerful_crm.Data
             }
             if (leadDto.StartBirthDate != null && leadDto.EndBirthDate !=null)
             {
-                query = query.WhereBetween("BirthDate",leadDto.StartBirthDate, leadDto.EndBirthDate);
+                query = query.WhereBetween("l.BirthDate",leadDto.StartBirthDate, leadDto.EndBirthDate);
             }
             if (leadDto.StartBirthDate != null && leadDto.EndBirthDate == null)
             {
-                query = query.WhereDate("BirthDate", ">",leadDto.StartBirthDate);
+                query = query.WhereDate("l.BirthDate", ">",leadDto.StartBirthDate);
             }
             if (leadDto.StartBirthDate == null && leadDto.EndBirthDate != null)
             {
-                query = query.WhereDate("BirthDate", "<", leadDto.EndBirthDate);
+                query = query.WhereDate("l.BirthDate", "<", leadDto.EndBirthDate);
             }
 
             var sql = _compiler.Compile(query).ToString();
