@@ -1,5 +1,6 @@
 using AutoMapper;
 using powerful_crm.API.Models.InputModels;
+using powerful_crm.API.Models.MiddleModels;
 using powerful_crm.API.Models.OutputModels;
 using powerful_crm.Core;
 using powerful_crm.Core.Models;
@@ -26,13 +27,14 @@ namespace EducationSystem.API
              .ForMember(dest => dest.City, opts => opts.MapFrom(src => new CityDto { Id = src.CityId }));
 
             CreateMap<BalanceInputModel, BalanceOutputModel>();
-            CreateMap<TransactionInputModel, TransactionOutputModel>()
-                .ForMember(dest => dest.Timestamp, opts => opts.MapFrom(src => src.Timestamp.ToString(Constants.DATE_FORMAT_WITH_TIME)));
-            CreateMap<TransferInputModel, TransferOutputModel>()
-                .ForMember(dest => dest.Timestamp, opts => opts.MapFrom(src => src.Timestamp.ToString(Constants.DATE_FORMAT_WITH_TIME)));
             CreateMap<SearchLeadInputModel, SearchLeadDto>()
             .ForMember(dest => dest.StartBirthDate, opts => opts.MapFrom(src => DateTime.ParseExact(src.StartBirthDate, Constants.DATE_FORMAT, CultureInfo.InvariantCulture, DateTimeStyles.None)))
          .ForMember(dest => dest.City, opts => opts.MapFrom(src=> new CityDto() {Name = src.CityName }));
+            
+            CreateMap<TransactionInputModel, TransactionMiddleModel>()
+                .ForMember(dest => dest.CurrencyPair, opt => opt.MapFrom(c => c.CurrentCurrency + c.AccountCurrency));
+            CreateMap<TransferInputModel, TransferMiddleModel>()
+                .ForMember(dest => dest.CurrencyPair, opt => opt.MapFrom(c => c.CurrentCurrency + c.AccountCurrency));
         }
     }
 }
