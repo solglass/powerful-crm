@@ -30,12 +30,12 @@ namespace powerful_crm.Business
         public CityDto GetCityById(int id) => _leadRepository.GetCityById(id);
         public List<LeadDto> SearchLead(SearchLeadDto leadDto)
         {
-            if (leadDto.City.Name != null) { leadDto.City.Name = GetFriendlyString.GetFriendlyType(leadDto.City.Name, leadDto.TypeSearchCityName); }
-            if (leadDto.Email != null) { leadDto.Email = GetFriendlyString.GetFriendlyType(leadDto.Email, leadDto.TypeSearchEmail); }
-            if (leadDto.Login != null) { leadDto.Login = GetFriendlyString.GetFriendlyType(leadDto.Login, leadDto.TypeSearchLogin); }
-            if (leadDto.FirstName != null) { leadDto.FirstName = GetFriendlyString.GetFriendlyType(leadDto.FirstName, leadDto.TypeSearchFirstName); }
-            if (leadDto.LastName != null) { leadDto.LastName = GetFriendlyString.GetFriendlyType(leadDto.LastName, leadDto.TypeSearchLastName); }
-            if (leadDto.Phone != null) { leadDto.Phone = GetFriendlyString.GetFriendlyType(leadDto.Phone, leadDto.TypeSearchPhone); }
+            if (leadDto.City.Name != null) { leadDto.City.Name = StringWithSearchType.GetStringWithSearchType(leadDto.City.Name, leadDto.TypeSearchCityName); }
+            if (leadDto.Email != null) { leadDto.Email = StringWithSearchType.GetStringWithSearchType(leadDto.Email, leadDto.TypeSearchEmail); }
+            if (leadDto.Login != null) { leadDto.Login = StringWithSearchType.GetStringWithSearchType(leadDto.Login, leadDto.TypeSearchLogin); }
+            if (leadDto.FirstName != null) { leadDto.FirstName = StringWithSearchType.GetStringWithSearchType(leadDto.FirstName, leadDto.TypeSearchFirstName); }
+            if (leadDto.LastName != null) { leadDto.LastName = StringWithSearchType.GetStringWithSearchType(leadDto.LastName, leadDto.TypeSearchLastName); }
+            if (leadDto.Phone != null) { leadDto.Phone = StringWithSearchType.GetStringWithSearchType(leadDto.Phone, leadDto.TypeSearchPhone); }
             return _leadRepository.SearchLeads(leadDto);
         }
     }

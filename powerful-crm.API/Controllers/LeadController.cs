@@ -108,13 +108,13 @@ namespace powerful_crm.API.Controllers
                 throw new ValidationException(ModelState);
             }
             var dto = _mapper.Map<SearchLeadDto>(inputModel);
-            var lead = _leadService.SearchLead(dto);
-            if (lead.Count==0)
+            var leads = _leadService.SearchLead(dto);
+            if (leads.Count==0)
             {
                 return NotFound($"Leads is not found");
             }
-            var outputModel = _mapper.Map<List<LeadOutputModel>>(lead);
-            return Ok(outputModel);
+            var outputModels = _mapper.Map<List<LeadOutputModel>>(leads);
+            return Ok(outputModels);
         }
         /// <summary>Update information about lead</summary>
         /// <param name="leadId">Id of lead</param>

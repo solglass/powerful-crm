@@ -8,6 +8,7 @@ namespace powerful_crm.Core.Enums
     {
         Beginning = 1,
         Сontent,
-        Ending
+        Ending,
+        Equal
     }
 }
