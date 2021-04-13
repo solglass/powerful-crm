@@ -104,7 +104,7 @@ namespace powerful_crm.API.Controllers
 
             if (!ModelState.IsValid)
             {
-                throw new ValidationException(ModelState);
+                throw new CustomValidationException(ModelState);
             }
             var dto = _mapper.Map<SearchLeadDto>(inputModel);
             var leads = _leadService.SearchLead(dto);
