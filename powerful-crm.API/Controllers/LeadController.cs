@@ -18,7 +18,6 @@ using System.Text.Json;
 namespace powerful_crm.API.Controllers
 {
     [Route("api/[controller]")]
-    [ApiController]
     public class LeadController : ControllerBase
     {
         private ILeadService _leadService;
@@ -42,7 +41,7 @@ namespace powerful_crm.API.Controllers
         {
             if (!ModelState.IsValid)
             {
-                throw new ValidationException(ModelState);
+                throw new CustomValidationException(ModelState);
             }
             if (_leadService.GetCityById(inputModel.CityId) == null)
             {
@@ -67,7 +66,7 @@ namespace powerful_crm.API.Controllers
         {
             if (!ModelState.IsValid)
             {
-                throw new ValidationException(ModelState);
+                throw new CustomValidationException(ModelState);
             }
             if (_leadService.GetLeadById(leadId) == null)
             {
@@ -128,7 +127,7 @@ namespace powerful_crm.API.Controllers
         {
             if (!ModelState.IsValid)
             {
-                throw new ValidationException(ModelState);
+                throw new CustomValidationException(ModelState);
             }
             var lead = _leadService.GetLeadById(leadId);
             if (lead == null)
@@ -202,7 +201,7 @@ namespace powerful_crm.API.Controllers
         {
             if (!ModelState.IsValid)
             {
-                throw new ValidationException(ModelState);
+                throw new CustomValidationException(ModelState);
             }
             var dto = _mapper.Map<CityDto>(city);
             var addedCityId = _leadService.AddCity(dto);
@@ -282,7 +281,7 @@ namespace powerful_crm.API.Controllers
         public ActionResult<int> AddDeposit([FromBody] TransactionInputModel inputModel)
         {
             if (!ModelState.IsValid)
-                throw new ValidationException(ModelState);
+                throw new CustomValidationException(ModelState);
             if (_leadService.GetLeadById(inputModel.LeadId) == null)
             {
                 return NotFound(string.Format(Constants.ERROR_LEADNOTFOUND, inputModel.LeadId));
@@ -304,7 +303,7 @@ namespace powerful_crm.API.Controllers
         public ActionResult<int> AddWithdraw([FromBody] TransactionInputModel inputModel)
         {
             if (!ModelState.IsValid)
-                throw new ValidationException(ModelState);
+                throw new CustomValidationException(ModelState);
             if (_leadService.GetLeadById(inputModel.LeadId) == null)
             {
                 return NotFound(string.Format(Constants.ERROR_LEADNOTFOUND, inputModel.LeadId));
@@ -326,7 +325,7 @@ namespace powerful_crm.API.Controllers
         public ActionResult<int> AddTransfer([FromBody] TransferInputModel inputModel)
         {
             if (!ModelState.IsValid)
-                throw new ValidationException(ModelState);
+                throw new CustomValidationException(ModelState);
             if (_leadService.GetLeadById(inputModel.RecipientId) == null)
             {
                 return NotFound(string.Format(Constants.ERROR_LEADNOTFOUND, inputModel.RecipientId));

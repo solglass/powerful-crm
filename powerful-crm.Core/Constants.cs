@@ -22,6 +22,7 @@ namespace powerful_crm.Core
         public const string ERROR_LEADALREADYDELETED = "Lead with id {0} has already been deleted";
         public const string ERROR_LEADNOTDELETED = "Lead with id {0} is not deleted";
         public const string ERROR_CITYNOTFOUND = "City with id {0} is not found";
-        public const string ERROR_CITYHASDEPENDENCIES = "The city with id {0} can't be deleted because there are some accounts connected with it";
+        public const string ERROR_CITYHASDEPENDENCIES = "The city with id {0} can't be deleted because there are some accounts connected with it";
+        public const string GLOBAL_ERROR_MESSAGE = "An error occured while processing the request.";
     }
 }
