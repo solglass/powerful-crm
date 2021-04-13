@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using powerful_crm.API.Models.InputModels;
+using powerful_crm.API.Models.MiddleModels;
 using powerful_crm.API.Models.OutputModels;
 using powerful_crm.Business;
 using powerful_crm.Core;
@@ -11,6 +12,7 @@ using powerful_crm.Core.Models;
 using powerful_crm.Core.Settings;
 using RestSharp;
 using System.Collections.Generic;
+using System.Text.Json;
 
 namespace powerful_crm.API.Controllers
 {
@@ -246,6 +248,76 @@ namespace powerful_crm.API.Controllers
 
             return Ok(queryResult);
         }
-        
+
+        /// <summary>Add deposit</summary>
+        /// <param name="inputModel">information about deposit</param>
+        /// <returns>Return id added deposit</returns>
+        [ProducesResponseType(typeof(int), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
+        [HttpPost("deposit")]
+        public ActionResult<int> AddDeposit([FromBody] TransactionInputModel inputModel)
+        {
+            if (!ModelState.IsValid)
+                throw new ValidationException(ModelState);
+            if (_leadService.GetLeadById(inputModel.LeadId) == null)
+            {
+                return NotFound(string.Format(Constants.ERROR_LEADNOTFOUND, inputModel.LeadId));
+            }
+            var middle = _mapper.Map<TransactionMiddleModel>(inputModel);
+            var request = new RestRequest(Constants.API_DEPOSIT, Method.POST);
+            request.AddParameter("application/json", JsonSerializer.Serialize(middle), ParameterType.RequestBody);
+            var queryResult = _client.Execute<int>(request).Data;
+            return Ok(queryResult);
+        }
+
+        /// <summary>Add withdraw</summary>
+        /// <param name="inputModel">information about withdraw</param>
+        /// <returns>Return id added withdraw</returns>
+        [ProducesResponseType(typeof(int), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
+        [HttpPost("withdraw")]
+        public ActionResult<int> AddWithdraw([FromBody] TransactionInputModel inputModel)
+        {
+            if (!ModelState.IsValid)
+                throw new ValidationException(ModelState);
+            if (_leadService.GetLeadById(inputModel.LeadId) == null)
+            {
+                return NotFound(string.Format(Constants.ERROR_LEADNOTFOUND, inputModel.LeadId));
+            }
+            var middle = _mapper.Map<TransactionMiddleModel>(inputModel);
+            var request = new RestRequest(Constants.API_WITHDRAW, Method.POST);
+            request.AddParameter("application/json", JsonSerializer.Serialize(middle), ParameterType.RequestBody);
+            var queryResult = _client.Execute<int>(request).Data;
+            return Ok(queryResult);
+        }
+
+        /// <summary>Add transfer</summary>
+        /// <param name="inputModel">information about transfer</param>
+        /// <returns>Return id added transfer</returns>
+        [ProducesResponseType(typeof(int), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
+        [HttpPost("transfer")]
+        public ActionResult<int> AddTransfer([FromBody] TransferInputModel inputModel)
+        {
+            if (!ModelState.IsValid)
+                throw new ValidationException(ModelState);
+            if (_leadService.GetLeadById(inputModel.RecipientId) == null)
+            {
+                return NotFound(string.Format(Constants.ERROR_LEADNOTFOUND, inputModel.RecipientId));
+            }
+            if (_leadService.GetLeadById(inputModel.SenderId) == null)
+            {
+                return NotFound(string.Format(Constants.ERROR_LEADNOTFOUND, inputModel.SenderId));
+            }
+            var middle = _mapper.Map<TransferMiddleModel>(inputModel);
+            var request = new RestRequest(Constants.API_TRANSFER, Method.POST);
+            request.AddParameter("application/json", JsonSerializer.Serialize(middle), ParameterType.RequestBody);
+            var queryResult = _client.Execute<int>(request).Data;
+            return Ok(queryResult);
+        }
+
     }
 }

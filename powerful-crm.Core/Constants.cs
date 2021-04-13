@@ -14,6 +14,9 @@ namespace powerful_crm.Core
 
         public const string API_GETTRANSACTION = "/api/Transaction/{0}";
         public const string API_GETBALANCE = "/api/Transaction/balance/{0}";
+        public const string API_DEPOSIT = "/api/Transaction/deposite";
+        public const string API_WITHDRAW = "/api/Transaction/withdraw";
+        public const string API_TRANSFER = "/api/Transaction/transfer";
 
         public const string ERROR_LEADNOTFOUND = "Lead with id {0} is not found";
         public const string ERROR_LEADALREADYDELETED = "Lead with id {0} has already been deleted";
