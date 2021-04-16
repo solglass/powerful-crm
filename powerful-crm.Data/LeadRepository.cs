@@ -83,7 +83,7 @@ namespace powerful_crm.Data
         public List<LeadDto> SearchLeads(SearchLeadDto leadDto)
         {
             if (leadDto.FirstName == null && leadDto.LastName == null && leadDto.Email == null && leadDto.Login == null
-                && leadDto.Phone == null && leadDto.StartBirthDate == null && leadDto.City == null)
+                && leadDto.Phone == null && leadDto.StartBirthDate == null && leadDto.City.Name == null)
                 throw new ArgumentNullException();
 
             var query = db.Query("Lead as l").Join("City as c", "c.Id","l.CityId").Select("l.Id",
