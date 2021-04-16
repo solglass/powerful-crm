@@ -11,6 +11,7 @@ using powerful_crm.Core.CustomExceptions;
 using powerful_crm.Core.Models;
 using powerful_crm.Core.Settings;
 using RestSharp;
+using System;
 using System.Collections.Generic;
 using System.Text.Json;
 
@@ -91,7 +92,29 @@ namespace powerful_crm.API.Controllers
             var outputModel = _mapper.Map<LeadOutputModel>(lead);
             return Ok(outputModel);
         }
+        /// <summary>Get info of leads by params</summary>
+        /// <param name="inputModel"> information about add lead</param>
+        /// <returns>Info of leads</returns>
+        [ProducesResponseType(typeof(LeadOutputModel), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status409Conflict)]
+        [HttpPost("search")]
+        public ActionResult<List<LeadOutputModel>> SearchLeads ([FromBody] SearchLeadInputModel inputModel)
+        {
 
+            if (!ModelState.IsValid)
+            {
+                throw new CustomValidationException(ModelState);
+            }
+            var dto = _mapper.Map<SearchLeadDto>(inputModel);
+            var leads = _leadService.SearchLead(dto);
+            if (leads.Count==0)
+            {
+                return NotFound($"Leads is not found");
+            }
+            var outputModels = _mapper.Map<List<LeadOutputModel>>(leads);
+            return Ok(outputModels);
+        }
         /// <summary>Update information about lead</summary>
         /// <param name="leadId">Id of lead</param>
         /// /// <param name="inputModel">Nonupdated info about  lead </param>

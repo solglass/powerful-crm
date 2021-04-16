@@ -4,10 +4,13 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using powerful_crm.API.Middleware;
 using powerful_crm.Core.Settings;
-
+using SqlKata.Compilers;
+using SqlKata.Execution;
+using System.Data.SqlClient;
 using System.Linq;
 
 namespace powerful_crm.API

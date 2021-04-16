@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Data.SqlClient;
 using Dapper;
 using Microsoft.Extensions.Options;
@@ -6,14 +6,23 @@ using powerful_crm.Core.Settings;
 using System.Data;
 using powerful_crm.Core.Models;
 using System.Linq;
+using System.Collections.Generic;
+using SqlKata;
+using SqlKata.Execution;
+using SqlKata.Compilers;
 
 namespace powerful_crm.Data
 {
     public class LeadRepository : BaseRepository, ILeadRepository
     {
+        private readonly QueryFactory db;
+        private SqlServerCompiler _compiler;
+
         public LeadRepository(IOptions<AppSettings> options) : base(options)
         {
+            _compiler = new SqlServerCompiler();
             _connection = new SqlConnection(_connectionString);
+            db = new QueryFactory(_connection, _compiler);
         }
 
         public int AddUpdateLead(LeadDto dto)
@@ -71,7 +80,68 @@ namespace powerful_crm.Data
                 splitOn: "Id",
                 commandType: CommandType.StoredProcedure).FirstOrDefault();
         }
+        public List<LeadDto> SearchLeads(SearchLeadDto leadDto)
+        {
+            if (leadDto.FirstName == null && leadDto.LastName == null && leadDto.Email == null && leadDto.Login == null
+                && leadDto.Phone == null && leadDto.StartBirthDate == null && leadDto.City.Name == null)
+                throw new ArgumentNullException();
 
+            var query = db.Query("Lead as l").Join("City as c", "c.Id","l.CityId").Select("l.Id",
+                                                "l.FirstName",
+                                                "l.LastName",
+                                                "l.Login",
+                                                "l.Email",
+                                                "l.Phone",
+                                                "l.BirthDate",
+                                                "c.Id",
+                                                "c.Name").Where("IsDeleted", "0");
+            if(leadDto.FirstName != null)
+            {
+                query = query.WhereLike("l.FirstName",leadDto.FirstName);
+            }
+            if (leadDto.LastName != null)
+            {
+                query = query.WhereLike("l.LastName",leadDto.LastName);
+            }
+            if (leadDto.Email != null)
+            {
+                query = query.WhereLike("l.Email", leadDto.Email);
+            }
+            if (leadDto.Login != null)
+            {
+                query = query.WhereLike("l.Login",leadDto.Login);
+            }
+            if (leadDto.Phone != null)
+            {
+                query = query.WhereLike("l.Phone", leadDto.Phone);
+            }
+            if (leadDto.City.Name != null)
+            {
+                query = query.WhereLike("c.Name", leadDto.City.Name);
+            }
+            if (leadDto.StartBirthDate != null && leadDto.EndBirthDate !=null)
+            {
+                query = query.WhereBetween("l.BirthDate",leadDto.StartBirthDate, leadDto.EndBirthDate);
+            }
+            if (leadDto.StartBirthDate != null && leadDto.EndBirthDate == null)
+            {
+                query = query.WhereDate("l.BirthDate", ">",leadDto.StartBirthDate);
+            }
+            if (leadDto.StartBirthDate == null && leadDto.EndBirthDate != null)
+            {
+                query = query.WhereDate("l.BirthDate", "<", leadDto.EndBirthDate);
+            }
+
+            var sql = _compiler.Compile(query).ToString();
+            return _connection.Query<LeadDto, CityDto, LeadDto>(
+                sql, (lead, city) =>
+                {
+                    lead.City = city;
+                    return lead;
+                }, splitOn: "Id")
+                .Distinct()
+                .ToList();
+        }
         public int AddCity(CityDto dto)
         {
             return _connection.QuerySingleOrDefault<int>(
@@ -93,7 +163,7 @@ namespace powerful_crm.Data
                 commandType: CommandType.StoredProcedure);
         }
 
-        public CityDto GetCityById (int id)
+        public CityDto GetCityById(int id)
         {
             return _connection.QueryFirstOrDefault<CityDto>("dbo.City_SelectById",
                 new { id },

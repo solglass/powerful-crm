@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using powerful_crm.API.Models.InputModels;
 using powerful_crm.API.Models.MiddleModels;
 using powerful_crm.API.Models.OutputModels;
@@ -27,6 +27,10 @@ namespace EducationSystem.API
              .ForMember(dest => dest.City, opts => opts.MapFrom(src => new CityDto { Id = src.CityId }));
 
             CreateMap<BalanceInputModel, BalanceOutputModel>();
+            CreateMap<SearchLeadInputModel, SearchLeadDto>()
+            .ForMember(dest => dest.StartBirthDate, opts => opts.MapFrom(src => DateTime.ParseExact(src.StartBirthDate, Constants.DATE_FORMAT, CultureInfo.InvariantCulture, DateTimeStyles.None)))
+            .ForMember(dest => dest.EndBirthDate, opts => opts.MapFrom(src => DateTime.ParseExact(src.EndBirthDate, Constants.DATE_FORMAT, CultureInfo.InvariantCulture, DateTimeStyles.None)))
+         .ForMember(dest => dest.City, opts => opts.MapFrom(src=> new CityDto() {Name = src.CityName }));
             
             CreateMap<TransactionInputModel, TransactionMiddleModel>()
                 .ForMember(dest => dest.CurrencyPair, opt => opt.MapFrom(c => c.CurrentCurrency + c.AccountCurrency));

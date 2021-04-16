@@ -70,6 +70,7 @@
     <Build Include="Tables\City.sql" />
     <Build Include="StoredProcedures\City\dbo.City_Delete.sql" />
     <Build Include="StoredProcedures\City\dbo.City_Add.sql" />
+    <Build Include="StoredProcedures\Lead\Lead_Search.sql" />
     <Build Include="StoredProcedures\City\dbo.City_SelectById.sql" />
   </ItemGroup>
 </Project>

@@ -1,6 +1,8 @@
 ﻿using powerful_crm.Data;
 using powerful_crm.Core.Models;
 using System;
+using System.Collections.Generic;
+using powerful_crm.Core.Enums;
 
 namespace powerful_crm.Business
 {
@@ -26,5 +28,15 @@ namespace powerful_crm.Business
         public int AddCity(CityDto city) => _leadRepository.AddCity(city);
         public int DeleteCity(int id) => _leadRepository.DeleteCity(id);
         public CityDto GetCityById(int id) => _leadRepository.GetCityById(id);
+        public List<LeadDto> SearchLead(SearchLeadDto leadDto)
+        {
+            if (leadDto.City.Name != null) { leadDto.City.Name = StringWithSearchType.GetStringWithSearchType(leadDto.City.Name, leadDto.TypeSearchCityName); }
+            if (leadDto.Email != null) { leadDto.Email = StringWithSearchType.GetStringWithSearchType(leadDto.Email, leadDto.TypeSearchEmail); }
+            if (leadDto.Login != null) { leadDto.Login = StringWithSearchType.GetStringWithSearchType(leadDto.Login, leadDto.TypeSearchLogin); }
+            if (leadDto.FirstName != null) { leadDto.FirstName = StringWithSearchType.GetStringWithSearchType(leadDto.FirstName, leadDto.TypeSearchFirstName); }
+            if (leadDto.LastName != null) { leadDto.LastName = StringWithSearchType.GetStringWithSearchType(leadDto.LastName, leadDto.TypeSearchLastName); }
+            if (leadDto.Phone != null) { leadDto.Phone = StringWithSearchType.GetStringWithSearchType(leadDto.Phone, leadDto.TypeSearchPhone); }
+            return _leadRepository.SearchLeads(leadDto);
+        }
     }
 }
