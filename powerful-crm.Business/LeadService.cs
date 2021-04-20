@@ -29,7 +29,7 @@ namespace powerful_crm.Business
         public int RecoverLead(int leadId) => _leadRepository.DeleteOrRecoverLead(leadId, false);
         public int ChangePassword(int leadId, string oldPassword, string newPassword)
         {
-            if (new SecurityService().VerifyPassword(_leadRepository.GetLeadCredentials(leadId).Password, oldPassword))
+            if (new SecurityService().VerifyPassword(_leadRepository.GetLeadCredentials(leadId, null).Password, oldPassword))
             {
                 newPassword = new SecurityService().GetHash(newPassword);
                 return _leadRepository.ChangePasswordLead(leadId, oldPassword, newPassword);

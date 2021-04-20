@@ -14,7 +14,7 @@ namespace powerful_crm.Data
         List<LeadDto> SearchLeads(SearchLeadDto leadDto);
         int AddCity(CityDto name);
         CityDto GetCityById(int id);
-        LeadDto GetLeadCredentials(int id);
+        LeadDto GetLeadCredentials(int id, string login);
 
     }
 }
