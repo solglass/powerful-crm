@@ -80,6 +80,14 @@ namespace powerful_crm.Data
                 splitOn: "Id",
                 commandType: CommandType.StoredProcedure).FirstOrDefault();
         }
+
+        public LeadDto GetLeadCredentials(int id)
+        {
+            return _connection.QueryFirstOrDefault<LeadDto>(
+                "dbo.Lead_GetCredentials", 
+                new { id },
+                commandType: CommandType.StoredProcedure);
+        }
         public List<LeadDto> SearchLeads(SearchLeadDto leadDto)
         {
             if (leadDto.FirstName == null && leadDto.LastName == null && leadDto.Email == null && leadDto.Login == null

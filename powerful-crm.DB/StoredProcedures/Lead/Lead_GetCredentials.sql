@@ -1,5 +1,5 @@
 ﻿CREATE PROCEDURE [dbo].[Lead_GetCredentials](
-	@login nvarchar(100)
+	 @id int
 )as
 begin
 	select
@@ -7,5 +7,5 @@ begin
 		l.Login,
 		l.Password
 	from dbo.[Lead] l
-	where l.Login = @login 
+	where l.Id = @id 
 end

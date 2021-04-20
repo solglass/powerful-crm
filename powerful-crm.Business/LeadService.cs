@@ -29,10 +29,13 @@ namespace powerful_crm.Business
         public int RecoverLead(int leadId) => _leadRepository.DeleteOrRecoverLead(leadId, false);
         public int ChangePassword(int leadId, string oldPassword, string newPassword)
         {
-           // var secutity = new SecurityService();
-            oldPassword = new SecurityService().GetHash(oldPassword);
-            newPassword = new SecurityService().GetHash(newPassword);
-            return _leadRepository.ChangePasswordLead(leadId, oldPassword, newPassword);
+            // var secutity = new SecurityService();
+            if (new SecurityService().VerifyPassword(_leadRepository.GetLeadCredentials(leadId).Password, oldPassword))
+            {
+                newPassword = new SecurityService().GetHash(newPassword);
+                return _leadRepository.ChangePasswordLead(leadId, oldPassword, newPassword);
+            }
+            return 0;
         }
         public LeadDto GetLeadById(int leadId) => _leadRepository.GetLeadById(leadId);
         public int AddCity(CityDto city) => _leadRepository.AddCity(city);

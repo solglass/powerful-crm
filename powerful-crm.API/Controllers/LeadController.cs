@@ -75,7 +75,7 @@ namespace powerful_crm.API.Controllers
             if (_leadService.ChangePassword(leadId, inputModel.OldPassword, inputModel.NewPassword) == 1)
                 return NoContent();
             else
-                return NotFound(Constants.ERROR_WRONG_PASSWORD);
+                return Conflict(Constants.ERROR_WRONG_PASSWORD);
         }
         /// <summary>Get info of lead</summary>
         /// <param name="leadId">Id of lead</param>
