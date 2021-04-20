@@ -29,9 +29,9 @@ namespace powerful_crm.Business
         public int RecoverLead(int leadId) => _leadRepository.DeleteOrRecoverLead(leadId, false);
         public int ChangePassword(int leadId, string oldPassword, string newPassword)
         {
-            var secutity = new SecurityService();
-            oldPassword = secutity.GetHash(oldPassword);
-            newPassword = secutity.GetHash(newPassword);
+           // var secutity = new SecurityService();
+            oldPassword = new SecurityService().GetHash(oldPassword);
+            newPassword = new SecurityService().GetHash(newPassword);
             return _leadRepository.ChangePasswordLead(leadId, oldPassword, newPassword);
         }
         public LeadDto GetLeadById(int leadId) => _leadRepository.GetLeadById(leadId);

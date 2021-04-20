@@ -72,5 +72,6 @@
     <Build Include="StoredProcedures\City\dbo.City_Add.sql" />
     <Build Include="StoredProcedures\Lead\Lead_Search.sql" />
     <Build Include="StoredProcedures\City\dbo.City_SelectById.sql" />
+    <Build Include="StoredProcedures\Lead\Lead_GetCredentials.sql" />
   </ItemGroup>
 </Project>

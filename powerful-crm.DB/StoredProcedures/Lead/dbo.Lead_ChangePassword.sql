@@ -10,5 +10,5 @@ begin
     update dbo.[Lead]
         set
             Password = @newPassword
-            where Id = @id and Password = @oldPassword
+            where Id = @id 
 end
