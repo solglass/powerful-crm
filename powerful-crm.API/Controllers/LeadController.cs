@@ -11,7 +11,6 @@ using powerful_crm.Core.CustomExceptions;
 using powerful_crm.Core.Models;
 using powerful_crm.Core.Settings;
 using RestSharp;
-using System;
 using System.Collections.Generic;
 using System.Text.Json;
 
