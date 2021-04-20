@@ -15,7 +15,11 @@ namespace powerful_crm.Business
             _leadRepository = leadRepository;
         }
 
-        public int AddLead(LeadDto dto) => _leadRepository.AddUpdateLead(dto);
+        public int AddLead(LeadDto dto)
+        {
+            dto.Password = new SecurityService().GetHash(dto.Password);
+            return  _leadRepository.AddUpdateLead(dto);
+        }
         public int UpdateLead(int leadId, LeadDto dto)
         {
             dto.Id = leadId;
@@ -23,7 +27,13 @@ namespace powerful_crm.Business
         }
         public int DeleteLead(int leadId) => _leadRepository.DeleteOrRecoverLead(leadId, true);
         public int RecoverLead(int leadId) => _leadRepository.DeleteOrRecoverLead(leadId, false);
-        public int ChangePassword(int leadId, string oldPassword, string newPassword) => _leadRepository.ChangePasswordLead(leadId, oldPassword, newPassword);
+        public int ChangePassword(int leadId, string oldPassword, string newPassword)
+        {
+            var secutity = new SecurityService();
+            oldPassword = secutity.GetHash(oldPassword);
+            newPassword = secutity.GetHash(newPassword);
+            return _leadRepository.ChangePasswordLead(leadId, oldPassword, newPassword);
+        }
         public LeadDto GetLeadById(int leadId) => _leadRepository.GetLeadById(leadId);
         public int AddCity(CityDto city) => _leadRepository.AddCity(city);
         public int DeleteCity(int id) => _leadRepository.DeleteCity(id);
