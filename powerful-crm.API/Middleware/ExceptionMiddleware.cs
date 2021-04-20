@@ -47,7 +47,7 @@ namespace powerful_crm.API.Middleware
         }
         private Task HandleSqlExceptionAsync(HttpContext context, SqlException exception)
         {
-            var keys = new string[] { Constants.EMAIL_UNIQUE_CONSTRAINT, Constants.EMAIL_UNIQUE_CONSTRAINT };
+            var keys = new string[] { Constants.EMAIL_UNIQUE_CONSTRAINT, Constants.LOGIN_UNIQUE_CONSTRAINT };
             var result = keys.FirstOrDefault<string>(s => exception.Message.Contains(s));
             switch (result)
                 {
