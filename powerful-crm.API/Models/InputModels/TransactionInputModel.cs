@@ -13,6 +13,7 @@ namespace powerful_crm.API.Models.InputModels
         [Range(1, int.MaxValue)]
         public int LeadId { get; set; }
         [Required]
+        [Range(1, (double)decimal.MaxValue)]
         public decimal Amount { get; set; }
         [Required]
         [CustomCurrencyValidation]
