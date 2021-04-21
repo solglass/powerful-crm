@@ -9,8 +9,10 @@ namespace EducationSystem.Business.Config
         public static void RegistrateServicesConfig(this IServiceCollection services)
         {
             services.AddScoped<ILeadService, LeadService>();
+            services.AddScoped<ISecurityService, SecurityService>();
 
             services.AddScoped<ILeadRepository, LeadRepository>();
+
         }
     }
 }

@@ -5,11 +5,8 @@ using System.Net;
 
 namespace powerful_crm.Core.CustomExceptions
 {
-    public class CustomValidationException : Exception
+    public class CustomValidationException : CustomException
     {
-        public int StatusCode { get; private set; }
-        public string ErrorMessage { get; private set; }
-
         public CustomValidationException(ModelStateDictionary modelState)
         {
             StatusCode = (int)HttpStatusCode.Conflict;
