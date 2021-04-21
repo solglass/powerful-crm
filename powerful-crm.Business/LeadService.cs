@@ -3,19 +3,26 @@ using powerful_crm.Core.Models;
 using System;
 using System.Collections.Generic;
 using powerful_crm.Core.Enums;
+using powerful_crm.Core.CustomExceptions;
+using powerful_crm.Core;
 
 namespace powerful_crm.Business
 {
     public class LeadService : ILeadService
     {
         private ILeadRepository _leadRepository;
-
-        public LeadService(ILeadRepository leadRepository)
+        private ISecurityService _securityService;
+        public LeadService(ILeadRepository leadRepository, ISecurityService securityService)
         {
             _leadRepository = leadRepository;
+            _securityService = securityService;
         }
 
-        public int AddLead(LeadDto dto) => _leadRepository.AddUpdateLead(dto);
+        public int AddLead(LeadDto dto)
+        {
+            dto.Password = _securityService.GetHash(dto.Password);
+            return  _leadRepository.AddUpdateLead(dto);
+        }
         public int UpdateLead(int leadId, LeadDto dto)
         {
             dto.Id = leadId;
@@ -23,7 +30,17 @@ namespace powerful_crm.Business
         }
         public int DeleteLead(int leadId) => _leadRepository.DeleteOrRecoverLead(leadId, true);
         public int RecoverLead(int leadId) => _leadRepository.DeleteOrRecoverLead(leadId, false);
-        public int ChangePassword(int leadId, string oldPassword, string newPassword) => _leadRepository.ChangePasswordLead(leadId, oldPassword, newPassword);
+        public int ChangePassword(int leadId, string oldPassword, string newPassword)
+        {
+            if (_securityService.VerifyPassword(_leadRepository.GetLeadCredentials(leadId, null).Password, oldPassword))
+            {
+                newPassword = _securityService.GetHash(newPassword);
+                if(_leadRepository.ChangePasswordLead(leadId, oldPassword, newPassword)==1)
+                    return 1;
+                throw new Exception();
+            }
+            throw new WrongCredentialsException();
+        }
         public LeadDto GetLeadById(int leadId) => _leadRepository.GetLeadById(leadId);
         public int AddCity(CityDto city) => _leadRepository.AddCity(city);
         public int DeleteCity(int id) => _leadRepository.DeleteCity(id);
