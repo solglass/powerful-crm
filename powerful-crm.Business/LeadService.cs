@@ -35,7 +35,9 @@ namespace powerful_crm.Business
             if (_securityService.VerifyPassword(_leadRepository.GetLeadCredentials(leadId, null).Password, oldPassword))
             {
                 newPassword = _securityService.GetHash(newPassword);
-                return _leadRepository.ChangePasswordLead(leadId, oldPassword, newPassword);
+                if(_leadRepository.ChangePasswordLead(leadId, oldPassword, newPassword)==1)
+                    return 1;
+                throw new Exception();
             }
             throw new WrongCredentialsException();
         }
