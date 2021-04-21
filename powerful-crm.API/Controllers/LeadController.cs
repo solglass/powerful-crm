@@ -11,7 +11,6 @@ using powerful_crm.Core.CustomExceptions;
 using powerful_crm.Core.Models;
 using powerful_crm.Core.Settings;
 using RestSharp;
-using System;
 using System.Collections.Generic;
 using System.Text.Json;
 
@@ -30,9 +29,9 @@ namespace powerful_crm.API.Controllers
             _mapper = mapper;
             _client = new RestClient(options.Value.TSTORE_URL);
         }
-        /// <summary>lead add</summary>
-        /// <param name="inputModel">information about add lead</param>
-        /// <returns>rReturn information about added lead</returns>
+        /// <summary>Adds new lead</summary>
+        /// <param name="inputModel">Information about lead to add</param>
+        /// <returns>Information about added lead</returns>
         [ProducesResponseType(typeof(LeadOutputModel), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status409Conflict)]
         [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
@@ -54,10 +53,10 @@ namespace powerful_crm.API.Controllers
 
         }
         // https://localhost:44307/api/lead/2/change-password
-        /// <summary>Changing password of lead</summary>
+        /// <summary>Changes password of lead</summary>
         /// <param name="leadId">Id of lead for whom we are changing the password</param>
         /// <param name="inputModel">Old and new password of lead</param>
-        /// <returns>Status204NoContent response</returns>
+        /// <returns>NoContent response</returns>
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(string), StatusCodes.Status409Conflict)]
@@ -77,9 +76,9 @@ namespace powerful_crm.API.Controllers
             else
                 return Conflict(Constants.ERROR_WRONG_PASSWORD);
         }
-        /// <summary>Get info of lead</summary>
+        /// <summary>Gets info about lead</summary>
         /// <param name="leadId">Id of lead</param>
-        /// <returns>Info of lead</returns>
+        /// <returns>Info about lead</returns>
         [ProducesResponseType(typeof(LeadOutputModel), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
         [HttpGet("{leadId}")]
@@ -94,9 +93,9 @@ namespace powerful_crm.API.Controllers
             var outputModel = _mapper.Map<LeadOutputModel>(lead);
             return Ok(outputModel);
         }
-        /// <summary>Get info of leads by params</summary>
-        /// <param name="inputModel"> information about add lead</param>
-        /// <returns>Info of leads</returns>
+        /// <summary>Searches leads by parameters</summary>
+        /// <param name="inputModel"> Parameters for searching</param>
+        /// <returns>List of leads that suit the parameters</returns>
         [ProducesResponseType(typeof(LeadOutputModel), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(string), StatusCodes.Status409Conflict)]
@@ -117,9 +116,9 @@ namespace powerful_crm.API.Controllers
             var outputModels = _mapper.Map<List<LeadOutputModel>>(leads);
             return Ok(outputModels);
         }
-        /// <summary>Update information about lead</summary>
+        /// <summary>Updates information about lead</summary>
         /// <param name="leadId">Id of lead</param>
-        /// /// <param name="inputModel">Nonupdated info about  lead </param>
+        /// <param name="inputModel">Updated info about lead</param>
         /// <returns>Updated info about lead</returns>
         [ProducesResponseType(typeof(LeadOutputModel), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
@@ -147,9 +146,9 @@ namespace powerful_crm.API.Controllers
 
         }
 
-        /// <summary>Change value of parametr "IsDeleted" to 1(Deleted)</summary>
+        /// <summary>Changes value of parameter "IsDeleted" to 1(Deleted)</summary>
         /// <param name="leadId">Id of lead</param>
-        /// <returns>Update lead, which is deleted</returns>
+        /// <returns>Info about lead which is deleted</returns>
         [ProducesResponseType(typeof(List<LeadOutputModel>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
@@ -170,9 +169,9 @@ namespace powerful_crm.API.Controllers
             return Ok(dto);
         }
 
-        /// <summary>Change value of parametr "IsDeleted" to 0(Not deleted)</summary>
+        /// <summary>Changes value of parameter "IsDeleted" to 0(Not deleted)</summary>
         /// <param name="leadId">Id of lead</param>
-        /// <returns>Update lead, which is not deleted</returns>
+        /// <returns>Info about lead which is recovered</returns>
         [ProducesResponseType(typeof(List<LeadOutputModel>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
@@ -195,7 +194,7 @@ namespace powerful_crm.API.Controllers
 
         /// <summary>Creates new city</summary>
         /// <param name="city">Information about new city</param>
-        /// <returns>Created city</returns>
+        /// <returns>Info about created city</returns>
         [ProducesResponseType(typeof(CityOutputModel), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status409Conflict)]
         [HttpPost("city")]
@@ -232,7 +231,7 @@ namespace powerful_crm.API.Controllers
                 return Conflict(string.Format(Constants.ERROR_CITYHASDEPENDENCIES, cityId));
         }
 
-        /// <summary>Get lead balance</summary>
+        /// <summary>Gets lead balance</summary>
         /// <param name="leadId">Id of lead</param>
         /// <returns>Info about balance</returns>
         [ProducesResponseType(typeof(List<BalanceOutputModel>), StatusCodes.Status200OK)]
@@ -253,7 +252,7 @@ namespace powerful_crm.API.Controllers
             return Ok(result);
         }
 
-        /// <summary>Get lead transactions</summary>
+        /// <summary>Gets lead transactions</summary>
         /// <param name="leadId">Id of lead</param>
         /// <returns>Info about transactions</returns>
         [ProducesResponseType(typeof(List<TransactionOutputModel>), StatusCodes.Status200OK)]
@@ -273,9 +272,9 @@ namespace powerful_crm.API.Controllers
             return Ok(queryResult);
         }
 
-        /// <summary>Add deposit</summary>
-        /// <param name="inputModel">information about deposit</param>
-        /// <returns>Return id added deposit</returns>
+        /// <summary>Adds deposit</summary>
+        /// <param name="inputModel">Information about deposit</param>
+        /// <returns>Id of added deposit</returns>
         [ProducesResponseType(typeof(int), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
         [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
@@ -295,9 +294,9 @@ namespace powerful_crm.API.Controllers
             return Ok(queryResult);
         }
 
-        /// <summary>Add withdraw</summary>
-        /// <param name="inputModel">information about withdraw</param>
-        /// <returns>Return id added withdraw</returns>
+        /// <summary>Adds withdraw</summary>
+        /// <param name="inputModel">Information about withdraw</param>
+        /// <returns>Id of added withdraw</returns>
         [ProducesResponseType(typeof(int), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
         [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
@@ -317,9 +316,9 @@ namespace powerful_crm.API.Controllers
             return Ok(queryResult);
         }
 
-        /// <summary>Add transfer</summary>
-        /// <param name="inputModel">information about transfer</param>
-        /// <returns>Return id added transfer</returns>
+        /// <summary>Adds transfer</summary>
+        /// <param name="inputModel">Information about transfer</param>
+        /// <returns>Id of added transfer</returns>
         [ProducesResponseType(typeof(int), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
         [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
