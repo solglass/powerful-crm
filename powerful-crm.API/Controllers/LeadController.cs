@@ -116,7 +116,7 @@ namespace powerful_crm.API.Controllers
         }
         /// <summary>Update information about lead</summary>
         /// <param name="leadId">Id of lead</param>
-        /// /// <param name="inputModel">Nonupdated info about  lead </param>
+        /// <param name="inputModel">Updated info about  lead </param>
         /// <returns>Updated info about lead</returns>
         [ProducesResponseType(typeof(LeadOutputModel), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
