@@ -5,11 +5,8 @@ using System.Text;
 
 namespace powerful_crm.Core.CustomExceptions
 {
-    public class WrongCredentialsException:Exception
+    public class WrongCredentialsException:CustomException
     {
-        public int StatusCode { get; private set; }
-        public string ErrorMessage { get; private set; }
-
         public WrongCredentialsException(string message)
         {
             StatusCode = (int)HttpStatusCode.Conflict;

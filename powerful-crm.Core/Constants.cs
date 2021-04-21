@@ -24,6 +24,9 @@ namespace powerful_crm.Core
         public const string ERROR_CITYNOTFOUND = "City with id {0} is not found";
         public const string ERROR_CITYHASDEPENDENCIES = "The city with id {0} can't be deleted because there are some accounts connected with it";
         public const string ERROR_WRONG_PASSWORD = "Entered password doesn't match current password!";
+        public const string ERROR_NOT_UNIQUE_EMAIL = "This email is already in use.";
+        public const string ERROR_NOT_UNIQUE_LOGIN = "This login is already in use.";
         public const string GLOBAL_ERROR_MESSAGE = "An error occured while processing the request.";
+
     }
 }
