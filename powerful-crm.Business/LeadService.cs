@@ -37,7 +37,7 @@ namespace powerful_crm.Business
                 newPassword = _securityService.GetHash(newPassword);
                 return _leadRepository.ChangePasswordLead(leadId, oldPassword, newPassword);
             }
-            throw new WrongCredentialsException(Constants.ERROR_WRONG_PASSWORD);
+            throw new WrongCredentialsException();
         }
         public LeadDto GetLeadById(int leadId) => _leadRepository.GetLeadById(leadId);
         public int AddCity(CityDto city) => _leadRepository.AddCity(city);

@@ -7,10 +7,10 @@ namespace powerful_crm.Core.CustomExceptions
 {
     public class WrongCredentialsException:CustomException
     {
-        public WrongCredentialsException(string message)
+        public WrongCredentialsException()
         {
             StatusCode = (int)HttpStatusCode.Conflict;
-            ErrorMessage = message;
+            ErrorMessage = Constants.ERROR_WRONG_PASSWORD;
         }
     }
 }
