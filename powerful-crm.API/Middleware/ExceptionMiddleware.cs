@@ -34,6 +34,10 @@ namespace powerful_crm.API.Middleware
             {
                 await HandleSqlExceptionAsync(httpContext, ex);
             }
+            catch(WrongCredentialsException ex)
+            {
+
+            }
             catch (Exception ex)
             {
                 await HandleExceptionAsync(httpContext, ex);

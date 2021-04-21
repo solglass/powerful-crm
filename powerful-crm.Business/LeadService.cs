@@ -3,21 +3,24 @@ using powerful_crm.Core.Models;
 using System;
 using System.Collections.Generic;
 using powerful_crm.Core.Enums;
+using powerful_crm.Core.CustomExceptions;
+using powerful_crm.Core;
 
 namespace powerful_crm.Business
 {
     public class LeadService : ILeadService
     {
         private ILeadRepository _leadRepository;
-
-        public LeadService(ILeadRepository leadRepository)
+        private ISecurityService _securityService;
+        public LeadService(ILeadRepository leadRepository, ISecurityService securityService)
         {
             _leadRepository = leadRepository;
+            _securityService = securityService;
         }
 
         public int AddLead(LeadDto dto)
         {
-            dto.Password = new SecurityService().GetHash(dto.Password);
+            dto.Password = _securityService.GetHash(dto.Password);
             return  _leadRepository.AddUpdateLead(dto);
         }
         public int UpdateLead(int leadId, LeadDto dto)
@@ -29,12 +32,12 @@ namespace powerful_crm.Business
         public int RecoverLead(int leadId) => _leadRepository.DeleteOrRecoverLead(leadId, false);
         public int ChangePassword(int leadId, string oldPassword, string newPassword)
         {
-            if (new SecurityService().VerifyPassword(_leadRepository.GetLeadCredentials(leadId, null).Password, oldPassword))
+            if (_securityService.VerifyPassword(_leadRepository.GetLeadCredentials(leadId, null).Password, oldPassword))
             {
-                newPassword = new SecurityService().GetHash(newPassword);
+                newPassword = _securityService.GetHash(newPassword);
                 return _leadRepository.ChangePasswordLead(leadId, oldPassword, newPassword);
             }
-            return 0;
+            throw new WrongCredentialsException(Constants.ERROR_WRONG_PASSWORD);
         }
         public LeadDto GetLeadById(int leadId) => _leadRepository.GetLeadById(leadId);
         public int AddCity(CityDto city) => _leadRepository.AddCity(city);

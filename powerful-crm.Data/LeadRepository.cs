@@ -81,7 +81,7 @@ namespace powerful_crm.Data
                 commandType: CommandType.StoredProcedure).FirstOrDefault();
         }
 
-        public LeadDto GetLeadCredentials(int id, string login)
+        public LeadDto GetLeadCredentials(int? id, string login)
         {
             return _connection.QueryFirstOrDefault<LeadDto>(
                 "dbo.Lead_GetCredentials", 

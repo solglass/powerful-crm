@@ -8,5 +8,5 @@ begin
 		l.Login,
 		l.Password
 	from dbo.[Lead] l
-	where @id is not null and l.Id = @id or @login is not null and l.Login=@login
+	where l.Id = @id or l.Login=@login
 end

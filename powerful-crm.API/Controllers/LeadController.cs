@@ -11,6 +11,7 @@ using powerful_crm.Core.CustomExceptions;
 using powerful_crm.Core.Models;
 using powerful_crm.Core.Settings;
 using RestSharp;
+using System;
 using System.Collections.Generic;
 using System.Text.Json;
 
@@ -74,7 +75,7 @@ namespace powerful_crm.API.Controllers
             if (_leadService.ChangePassword(leadId, inputModel.OldPassword, inputModel.NewPassword) == 1)
                 return NoContent();
             else
-                return Conflict(Constants.ERROR_WRONG_PASSWORD);
+                throw new Exception();
         }
         /// <summary>Gets info about lead</summary>
         /// <param name="leadId">Id of lead</param>
