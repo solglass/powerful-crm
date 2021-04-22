@@ -64,7 +64,6 @@ namespace powerful_crm.API.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(string), StatusCodes.Status409Conflict)]
-        [Authorize]
         [HttpPut("{leadId}/change-password")]
         public ActionResult ChangePassword(int leadId, [FromBody]ChangePasswordInputModel inputModel)
         {
