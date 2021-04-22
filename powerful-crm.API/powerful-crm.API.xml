@@ -4,6 +4,11 @@
         <name>powerful-crm.API</name>
     </assembly>
     <members>
+        <member name="M:powerful_crm.API.Controllers.AuthenticationController.Authentificate(powerful_crm.API.Models.InputModels.LoginInputModel)">
+            <summary>Log in</summary>
+            <param name="model">Lead credentials</param>
+            <returns>Token</returns>
+        </member>
         <member name="M:powerful_crm.API.Controllers.LeadController.AddLead(powerful_crm.API.Models.InputModels.LeadInputModel)">
             <summary>Adds new lead</summary>
             <param name="inputModel">Information about lead to add</param>

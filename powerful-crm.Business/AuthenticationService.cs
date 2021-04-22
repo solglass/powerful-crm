@@ -22,7 +22,7 @@ namespace powerful_crm.Business
         {
             return _repo.GetLeadCredentials(null, login);
         }
-        public AuthenticateResponse GenerateToken(LeadDto lead)
+        public AuthenticationResponse GenerateToken(LeadDto lead)
         {
             var identity = GetIdentity(lead);
             var now = DateTime.UtcNow;
@@ -35,7 +35,7 @@ namespace powerful_crm.Business
                     signingCredentials: new SigningCredentials(AuthOptions.GetSymmetricSecurityKey(), SecurityAlgorithms.HmacSha256));
             var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
 
-            return new AuthenticateResponse
+            return new AuthenticationResponse
             {
                 Token = encodedJwt,
                 LeadLogin = identity.Name

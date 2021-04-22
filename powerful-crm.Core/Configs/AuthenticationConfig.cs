@@ -9,7 +9,7 @@ namespace powerful_crm.Core.Configs
 {
     public static class AuthentificationConfig
     {
-        public static void AuthentificationConfigExtention(this IServiceCollection services)
+        public static void AuthenticationConfigExtention(this IServiceCollection services)
         {
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                     .AddJwtBearer(options =>

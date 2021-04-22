@@ -4,7 +4,7 @@ using System.Text;
 
 namespace powerful_crm.Business.Models
 {
-    public class AuthenticateResponse
+    public class AuthenticationResponse
     {
         public string Token { get; set; }
         public string LeadLogin { get; set; }

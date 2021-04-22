@@ -7,6 +7,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using powerful_crm.API.Middleware;
+using powerful_crm.Core.Configs;
 using powerful_crm.Core.Settings;
 using SqlKata.Compilers;
 using SqlKata.Execution;
@@ -34,6 +35,7 @@ namespace powerful_crm.API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AuthenticationConfigExtention();
             services.AddControllers();
             services.Configure<AppSettings>(c =>
             {
@@ -63,7 +65,7 @@ namespace powerful_crm.API
                 c.SwaggerEndpoint("v1/swagger.json", "powerful-crm");
             });
             app.UseHttpsRedirection();
-
+            app.UseAuthentication();
             app.UseRouting();
 
             app.UseAuthorization();

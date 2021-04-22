@@ -9,6 +9,6 @@ namespace powerful_crm.Business
     public interface IAuthenticationService
     {
         LeadDto GetAuthenticatedLead(string login);
-        AuthenticateResponse GenerateToken(LeadDto lead);
+        AuthenticationResponse GenerateToken(LeadDto lead);
     }
 }
