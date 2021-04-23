@@ -16,5 +16,6 @@ namespace powerful_crm.Data
         CityDto GetCityById(int id);
         LeadDto GetLeadCredentials(int? id, string login);
 
+        int UpdateLeadRole(int leadId, int roleId);
     }
 }
