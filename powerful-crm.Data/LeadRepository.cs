@@ -7,7 +7,6 @@ using System.Data;
 using powerful_crm.Core.Models;
 using System.Linq;
 using System.Collections.Generic;
-using SqlKata;
 using SqlKata.Execution;
 using SqlKata.Compilers;
 using powerful_crm.Core.Enums;
@@ -40,7 +39,8 @@ namespace powerful_crm.Data
                     dto.Email,
                     dto.Phone,
                     CityId = dto.City.Id,
-                    dto.BirthDate
+                    dto.BirthDate,
+                    roleId=(int)dto.Role
                 },
                 commandType: CommandType.StoredProcedure);
         }

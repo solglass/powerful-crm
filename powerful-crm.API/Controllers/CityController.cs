@@ -12,7 +12,7 @@ using powerful_crm.Core.Settings;
 
 namespace powerful_crm.API.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "Administrator")]
     [Route("api/[controller]")]
     public class CityController : ControllerBase
     {
@@ -28,7 +28,7 @@ namespace powerful_crm.API.Controllers
         /// <returns>Info about created city</returns>
         [ProducesResponseType(typeof(CityOutputModel), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status409Conflict)]
-        [HttpPost("city")]
+        [HttpPost]
         public ActionResult<CityOutputModel> AddCity([FromBody] CityInputModel city)
         {
             if (!ModelState.IsValid)
@@ -48,7 +48,7 @@ namespace powerful_crm.API.Controllers
         [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(string), StatusCodes.Status409Conflict)]
-        [HttpDelete("city/{id}")]
+        [HttpDelete("{id}")]
         public ActionResult DeleteCity(int cityId)
         {
             var city = _cityService.GetCityById(cityId);

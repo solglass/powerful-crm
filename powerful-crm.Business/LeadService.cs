@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using powerful_crm.Core.Enums;
 using powerful_crm.Core.CustomExceptions;
-using powerful_crm.Core;
 
 namespace powerful_crm.Business
 {

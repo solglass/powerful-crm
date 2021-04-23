@@ -13,7 +13,6 @@ namespace powerful_crm.Data
         {
             _connection = new SqlConnection(_connectionString);
         }
-
         public int AddCity(CityDto dto)
         {
             return _connection.QuerySingleOrDefault<int>(

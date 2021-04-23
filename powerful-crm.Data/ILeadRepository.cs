@@ -1,5 +1,4 @@
 ﻿using powerful_crm.Core.Models;
-using System;
 using System.Collections.Generic;
 
 namespace powerful_crm.Data
