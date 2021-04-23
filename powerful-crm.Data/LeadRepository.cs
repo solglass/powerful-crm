@@ -94,6 +94,16 @@ namespace powerful_crm.Data
                 splitOn: "Id",
                 commandType: CommandType.StoredProcedure).FirstOrDefault();
         }
+
+        public int UpdateLeadRole(int leadId, int roleId)
+        {
+            return _connection.Execute("dbo.Lead_UpdateRole", new
+            {
+                leadId,
+                roleId
+            },
+               commandType: CommandType.StoredProcedure);
+        }
         public List<LeadDto> SearchLeads(SearchLeadDto leadDto)
         {
             if (leadDto.FirstName == null && leadDto.LastName == null && leadDto.Email == null && leadDto.Login == null
