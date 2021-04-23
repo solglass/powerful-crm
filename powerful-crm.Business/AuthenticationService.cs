@@ -50,9 +50,9 @@ namespace powerful_crm.Business
                     new Claim(ClaimsIdentity.DefaultNameClaimType, lead.Login),
                     new Claim("id", lead.Id.ToString())
                 };
-            foreach (Roles role in user.Roles)
+            foreach (var role in lead.Roles)
             {
-                claims.Add(new Claim(ClaimsIdentity.DefaultRoleClaimType, FriendlyNames.GetFriendlyRoleName(role)));
+                claims.Add(new Claim(ClaimsIdentity.DefaultRoleClaimType, role.ToString()));
             }
             ClaimsIdentity claimsIdentity =
             new ClaimsIdentity(claims, "Token", ClaimsIdentity.DefaultNameClaimType,

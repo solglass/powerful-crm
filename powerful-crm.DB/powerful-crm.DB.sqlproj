@@ -60,6 +60,7 @@
     <Folder Include="StoredProcedures" />
     <Folder Include="StoredProcedures\Lead" />
     <Folder Include="StoredProcedures\City" />
+    <Folder Include="Scripts" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="Tables\Lead.sql" />
@@ -72,5 +73,14 @@
     <Build Include="StoredProcedures\City\dbo.City_Add.sql" />
     <Build Include="StoredProcedures\City\dbo.City_SelectById.sql" />
     <Build Include="StoredProcedures\Lead\Lead_GetCredentials.sql" />
+    <Build Include="Tables\Lead_Role.sql" />
+    <Build Include="Tables\Role.sql" />
+    <Build Include="Tables\DbVersion.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <PostDeploy Include="Scripts\PostDeployment.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Scripts\InitialData.sql" />
   </ItemGroup>
 </Project>
