@@ -17,7 +17,7 @@ namespace powerful_crm.Core.Models
         public DateTime BirthDate { get; set; }
         public CityDto City { get; set; }
         public bool IsDeleted { get; set; }
-        public List<Role> Roles { get; set; }
+        public Role Role { get; set; }
 
     }
 }

@@ -40,7 +40,7 @@ namespace powerful_crm.Business
             {
                 Token = encodedJwt,
                 LeadLogin = identity.Name, 
-                Roles = identity.Roles
+                Role = lead.Role
             };
         }
         private ClaimsIdentity GetIdentity(LeadDto lead)
@@ -48,12 +48,10 @@ namespace powerful_crm.Business
             var claims = new List<Claim>
                 {
                     new Claim(ClaimsIdentity.DefaultNameClaimType, lead.Login),
-                    new Claim("id", lead.Id.ToString())
+                    new Claim("id", lead.Id.ToString()),
+                    new Claim(ClaimsIdentity.DefaultRoleClaimType, lead.Role.ToString())
                 };
-            foreach (var role in lead.Roles)
-            {
-                claims.Add(new Claim(ClaimsIdentity.DefaultRoleClaimType, role.ToString()));
-            }
+            
             ClaimsIdentity claimsIdentity =
             new ClaimsIdentity(claims, "Token", ClaimsIdentity.DefaultNameClaimType,
                 ClaimsIdentity.DefaultRoleClaimType);

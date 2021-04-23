@@ -9,6 +9,6 @@ namespace powerful_crm.Business.Models
     {
         public string Token { get; set; }
         public string LeadLogin { get; set; }
-        public List<Role> Roles { get; set; }
+        public Role Role { get; set; }
     }
 }
