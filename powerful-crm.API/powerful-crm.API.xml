@@ -9,6 +9,16 @@
             <param name="model">Lead credentials</param>
             <returns>Token</returns>
         </member>
+        <member name="M:powerful_crm.API.Controllers.CityController.AddCity(powerful_crm.API.Models.OutputModels.CityInputModel)">
+            <summary>Creates new city</summary>
+            <param name="city">Information about new city</param>
+            <returns>Info about created city</returns>
+        </member>
+        <member name="M:powerful_crm.API.Controllers.CityController.DeleteCity(System.Int32)">
+            <summary>Deletes the city</summary>
+            <param name="cityId">Id of the city to delete</param>
+            <returns>NoContent result</returns>
+        </member>
         <member name="M:powerful_crm.API.Controllers.LeadController.AddLead(powerful_crm.API.Models.InputModels.LeadInputModel)">
             <summary>Adds new lead</summary>
             <param name="inputModel">Information about lead to add</param>
@@ -45,16 +55,6 @@
             <summary>Changes value of parameter "IsDeleted" to 0(Not deleted)</summary>
             <param name="leadId">Id of lead</param>
             <returns>Info about lead which is recovered</returns>
-        </member>
-        <member name="M:powerful_crm.API.Controllers.LeadController.AddCity(powerful_crm.API.Models.OutputModels.CityInputModel)">
-            <summary>Creates new city</summary>
-            <param name="city">Information about new city</param>
-            <returns>Info about created city</returns>
-        </member>
-        <member name="M:powerful_crm.API.Controllers.LeadController.DeleteCity(System.Int32)">
-            <summary>Deletes the city</summary>
-            <param name="cityId">Id of the city to delete</param>
-            <returns>NoContent result</returns>
         </member>
         <member name="M:powerful_crm.API.Controllers.LeadController.GetBalanceByLeadId(System.Int32)">
             <summary>Gets lead balance</summary>

@@ -42,8 +42,6 @@ namespace powerful_crm.Business
             throw new WrongCredentialsException();
         }
         public LeadDto GetLeadById(int leadId) => _leadRepository.GetLeadById(leadId);
-       
-
         public int UpdateLeadRole(int leadId, int roleId) => _leadRepository.UpdateLeadRole(leadId, roleId);
         public List<LeadDto> SearchLead(SearchLeadDto leadDto)
         {

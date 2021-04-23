@@ -23,12 +23,14 @@ namespace powerful_crm.API.Controllers
     public class LeadController : ControllerBase
     {
         private ILeadService _leadService;
+        private ICityService _cityService;
         private IMapper _mapper;
         private RestClient _client;
 
-        public LeadController(IOptions<AppSettings> options,IMapper mapper, ILeadService leadService)
+        public LeadController(IOptions<AppSettings> options,IMapper mapper, ILeadService leadService, ICityService cityService)
         {
             _leadService = leadService;
+            _cityService = cityService;
             _mapper = mapper;
             _client = new RestClient(options.Value.TSTORE_URL);
         }
@@ -46,7 +48,7 @@ namespace powerful_crm.API.Controllers
             {
                 throw new CustomValidationException(ModelState);
             }
-            if (_leadService.GetCityById(inputModel.CityId) == null)
+            if (_cityService.GetCityById(inputModel.CityId) == null)
             {
                 return NotFound(string.Format(Constants.ERROR_CITY_NOT_FOUND, inputModel.CityId));
             }
@@ -137,7 +139,7 @@ namespace powerful_crm.API.Controllers
             {
                 return NotFound(string.Format(Constants.ERROR_LEAD_NOT_FOUND_BY_ID, leadId));
             }
-            if ( _leadService.GetCityById(inputModel.CityId) == null)
+            if ( _cityService.GetCityById(inputModel.CityId) == null)
             {
                 return NotFound(string.Format(Constants.ERROR_CITY_NOT_FOUND, inputModel.CityId));
             }
@@ -194,45 +196,7 @@ namespace powerful_crm.API.Controllers
             return Ok(dto);
         }
 
-        /// <summary>Creates new city</summary>
-        /// <param name="city">Information about new city</param>
-        /// <returns>Info about created city</returns>
-        [ProducesResponseType(typeof(CityOutputModel), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(string), StatusCodes.Status409Conflict)]
-        [HttpPost("city")]
-        public ActionResult<CityOutputModel> AddCity([FromBody] CityInputModel city)
-        {
-            if (!ModelState.IsValid)
-            {
-                throw new CustomValidationException(ModelState);
-            }
-            var dto = _mapper.Map<CityDto>(city);
-            var addedCityId = _leadService.AddCity(dto);
-            var outputModel = _mapper.Map<CityOutputModel>(_leadService.GetCityById(addedCityId));
-            return Ok(outputModel);
-        }
-
-        /// <summary>Deletes the city</summary>
-        /// <param name="cityId">Id of the city to delete</param>
-        /// <returns>NoContent result</returns>
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
-        [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(string), StatusCodes.Status409Conflict)]
-        [HttpDelete("city/{id}")]
-        public ActionResult<LeadOutputModel> DeleteCity(int cityId)
-        {
-            var city = _leadService.GetCityById(cityId);
-            if (city == null)
-            {
-                return NotFound(string.Format(Constants.ERROR_CITY_NOT_FOUND, cityId));
-            }
-            if (_leadService.DeleteLead(cityId) == 1)
-                return NoContent();
-            else
-                return Conflict(string.Format(Constants.ERROR_CITY_HAS_DEPENDENCIES, cityId));
-        }
-
+       
         /// <summary>Gets lead balance</summary>
         /// <param name="leadId">Id of lead</param>
         /// <returns>Info about balance</returns>
