@@ -7,7 +7,7 @@ begin
 		l.Id,
 		l.[Login],
 		l.[Password],
-		l.RoleId
+		l.RoleId as Id
 	from dbo.[Lead] l
 	where l.Id = @id or l.Login=@login
 end

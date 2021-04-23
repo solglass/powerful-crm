@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using SqlKata;
 using SqlKata.Execution;
 using SqlKata.Compilers;
+using powerful_crm.Core.Enums;
 
 namespace powerful_crm.Data
 {
@@ -83,10 +84,15 @@ namespace powerful_crm.Data
 
         public LeadDto GetLeadCredentials(int? id, string login)
         {
-            return _connection.QueryFirstOrDefault<LeadDto>(
-                "dbo.Lead_GetCredentials", 
+            return _connection.Query<LeadDto, int, LeadDto>(
+                "dbo.Lead_GetCredentials",(lead, role)=>
+                {
+                    lead.Role = (Role)role;
+                    return lead;
+                }, 
                 new { id, login },
-                commandType: CommandType.StoredProcedure);
+                splitOn: "Id",
+                commandType: CommandType.StoredProcedure).FirstOrDefault();
         }
         public List<LeadDto> SearchLeads(SearchLeadDto leadDto)
         {
