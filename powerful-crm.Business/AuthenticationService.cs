@@ -1,6 +1,7 @@
 ﻿using Microsoft.IdentityModel.Tokens;
 using powerful_crm.Business.Models;
 using powerful_crm.Core.Configs;
+using powerful_crm.Core.Enums;
 using powerful_crm.Core.Models;
 using powerful_crm.Data;
 using System;
@@ -38,7 +39,8 @@ namespace powerful_crm.Business
             return new AuthenticationResponse
             {
                 Token = encodedJwt,
-                LeadLogin = identity.Name
+                LeadLogin = identity.Name, 
+                Roles = identity.Roles
             };
         }
         private ClaimsIdentity GetIdentity(LeadDto lead)
@@ -48,6 +50,10 @@ namespace powerful_crm.Business
                     new Claim(ClaimsIdentity.DefaultNameClaimType, lead.Login),
                     new Claim("id", lead.Id.ToString())
                 };
+            foreach (Roles role in user.Roles)
+            {
+                claims.Add(new Claim(ClaimsIdentity.DefaultRoleClaimType, FriendlyNames.GetFriendlyRoleName(role)));
+            }
             ClaimsIdentity claimsIdentity =
             new ClaimsIdentity(claims, "Token", ClaimsIdentity.DefaultNameClaimType,
                 ClaimsIdentity.DefaultRoleClaimType);
