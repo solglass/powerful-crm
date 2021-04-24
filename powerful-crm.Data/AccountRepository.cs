@@ -39,5 +39,12 @@ namespace powerful_crm.Data
                 commandType: System.Data.CommandType.StoredProcedure);
             return result;
         }
+        public AccountDto GetAccountById(int id)
+        {
+            return _connection.QueryFirstOrDefault<AccountDto>(
+                "dbo.Account_SelectById",
+                new { id },
+                commandType: CommandType.StoredProcedure);
+        }
     }
 }

@@ -6,5 +6,6 @@ namespace powerful_crm.Business
     {
         int AddAccount(AccountDto dto);
         int DeleteAccount(int id);
+        AccountDto GetAccountById(int id);
     }
 }

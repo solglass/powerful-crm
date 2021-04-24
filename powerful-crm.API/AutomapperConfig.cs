@@ -3,6 +3,7 @@ using powerful_crm.API.Models.InputModels;
 using powerful_crm.API.Models.MiddleModels;
 using powerful_crm.API.Models.OutputModels;
 using powerful_crm.Core;
+using powerful_crm.Core.Enums;
 using powerful_crm.Core.Models;
 using System;
 using System.Globalization;
@@ -36,6 +37,12 @@ namespace EducationSystem.API
                 .ForMember(dest => dest.CurrencyPair, opt => opt.MapFrom(c => c.CurrentCurrency + c.AccountCurrency));
             CreateMap<TransferInputModel, TransferMiddleModel>()
                 .ForMember(dest => dest.CurrencyPair, opt => opt.MapFrom(c => c.CurrentCurrency + c.AccountCurrency));
+
+            CreateMap<AccountInputModel, AccountDto>()
+              .ForMember(dest => dest.Currency, opts => opts.MapFrom(src => (Currency)src.Currency));
+
+            CreateMap<AccountDto, AccountOutputModel>()
+                .ForMember(dest => dest.Currency, opts => opts.MapFrom(src => FriendlyNames.GetFriendlyCurrency(src.Currency)));
         }
     }
 }

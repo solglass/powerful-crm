@@ -15,5 +15,9 @@ namespace powerful_crm.Business
         {
             return DeleteAccount(id);
         }
+        public AccountDto GetAccountById(int id)
+        {
+            return GetAccountById(id);
+        }
     }
 }

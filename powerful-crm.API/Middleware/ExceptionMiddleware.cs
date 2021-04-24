@@ -61,6 +61,9 @@ namespace powerful_crm.API.Middleware
                 case Constants.EMAIL_UNIQUE_CONSTRAINT:
                     ModifyContextResponse(context, (int)HttpStatusCode.Conflict);
                     return ConstructResponse(context, 409, Constants.ERROR_NOT_UNIQUE_EMAIL);
+                case Constants.CURRENCY_UNIQUE_CONSTRAINT:
+                    ModifyContextResponse(context, (int)HttpStatusCode.Conflict);
+                    return ConstructResponse(context, 409, Constants.ERROR_NOT_UNIQUE_CURRENCY);
                 default:
                     return HandleExceptionAsync(context, exception);
             }
