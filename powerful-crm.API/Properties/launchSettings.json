@@ -14,7 +14,11 @@
       "launchBrowser": true,
       "launchUrl": "weatherforecast",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Testing",
+        "CRM_CONNECTION_STRING": "Data Source=80.78.240.16;Initial Catalog=CRM;Persist Security Info=True;User ID=student;Password=qwe!23",
+        "CRM_TEST_CONNECTION_STRING": "Data Source=80.78.240.16;Initial Catalog=CRM.Test;Persist Security Info=True;User ID=student;Password=qwe!23",
+        "TSTORE_URL": "https://localhost:44329",
+        "TSTORE_TEST_URL": "https://localhost:44329"
       }
     },
     "powerful_crm.API": {

@@ -10,8 +10,10 @@ namespace EducationSystem.Business.Config
         {
             services.AddScoped<ILeadService, LeadService>();
             services.AddScoped<ISecurityService, SecurityService>();
+            services.AddScoped<IAccountService, AccountService>();
 
             services.AddScoped<ILeadRepository, LeadRepository>();
+            services.AddScoped<IAccountRepository, AccountRepository>();
 
         }
     }
