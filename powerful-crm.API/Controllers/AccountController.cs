@@ -16,6 +16,7 @@ using System.Threading.Tasks;
 
 namespace powerful_crm.API.Controllers
 {
+    [Route("api/[controller]")]
     public class AccountController: ControllerBase
     {
         private IAccountService _accountService;

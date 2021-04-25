@@ -12,6 +12,6 @@ namespace powerful_crm.API.Models.OutputModels
         public int Id { get; set; }
         public string Name { get; set; }
         public string Currency { get; set; }
-        public LeadDto LeadDto { get; set; }
+        public LeadOutputModel LeadDto { get; set; }
     }
 }

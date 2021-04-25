@@ -39,6 +39,7 @@ namespace EducationSystem.API
                 .ForMember(dest => dest.CurrencyPair, opt => opt.MapFrom(c => c.CurrentCurrency + c.AccountCurrency));
 
             CreateMap<AccountInputModel, AccountDto>()
+                .ForMember(dest => dest.LeadDto, opts => opts.MapFrom(src => new LeadDto() { Id = src.LeadId }))
               .ForMember(dest => dest.Currency, opts => opts.MapFrom(src => (Currency)src.Currency));
 
             CreateMap<AccountDto, AccountOutputModel>()

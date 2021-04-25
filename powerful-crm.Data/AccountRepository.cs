@@ -32,10 +32,7 @@ namespace powerful_crm.Data
         {
             var result = _connection
                 .Execute("dbo.Account_Delete",
-                new
-                {
-                    id
-                },
+                new { id },
                 commandType: System.Data.CommandType.StoredProcedure);
             return result;
         }
