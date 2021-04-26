@@ -27,6 +27,8 @@ namespace powerful_crm.Core
         public const string ERROR_WRONG_PASSWORD = "Entered password doesn't match current password!";
         public const string ERROR_NOT_UNIQUE_EMAIL = "This email is already in use.";
         public const string ERROR_NOT_UNIQUE_LOGIN = "This login is already in use.";
+        public const string ERROR_NOT_ALLOWED_ACTIONS_WITH_OTHER_LEAD = "There is no permission for that action with someone else's data.";
+        public const string ERROR_NOT_ALLOWED_ACTIONS_WITH_CITY = "There is no permission for that action with city information.";
         public const string GLOBAL_ERROR_MESSAGE = "An error occured while processing the request.";
 
     }

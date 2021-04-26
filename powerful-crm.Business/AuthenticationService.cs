@@ -48,7 +48,7 @@ namespace powerful_crm.Business
             var claims = new List<Claim>
                 {
                     new Claim(ClaimsIdentity.DefaultNameClaimType, lead.Login),
-                    new Claim("id", lead.Id.ToString()),
+                    new Claim(ClaimTypes.NameIdentifier, lead.Id.ToString()),
                     new Claim(ClaimsIdentity.DefaultRoleClaimType, lead.Role.ToString())
                 };
             
