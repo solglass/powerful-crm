@@ -6,8 +6,9 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>C:\Users\yello\source\repos\CRM\powerful-crm\powerful-crm.API\powerful-crm.API.xml</DocumentationFile>
+    <DocumentationFile>obj\Debug\netcoreapp3.1\powerful-crm.API.xml</DocumentationFile>
     <NoWarn>1701;1702;1591</NoWarn>
+    <WarningLevel>5</WarningLevel>
   </PropertyGroup>
 
   <ItemGroup>

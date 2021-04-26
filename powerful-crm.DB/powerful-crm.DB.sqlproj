@@ -72,5 +72,6 @@
     <Build Include="StoredProcedures\City\dbo.City_Add.sql" />
     <Build Include="StoredProcedures\City\dbo.City_SelectById.sql" />
     <Build Include="StoredProcedures\Lead\Lead_GetCredentials.sql" />
+    <Build Include="StoredProcedures\Lead\dbo.Lead_UpdateRole.sql" />
   </ItemGroup>
 </Project>

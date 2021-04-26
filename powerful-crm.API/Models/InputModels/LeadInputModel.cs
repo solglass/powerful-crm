@@ -1,4 +1,5 @@
 ﻿using powerful_crm.API.Attributes;
+using powerful_crm.Core.Enums;
 using System;
 using System.ComponentModel.DataAnnotations;
 

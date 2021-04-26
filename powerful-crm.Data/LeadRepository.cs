@@ -7,9 +7,9 @@ using System.Data;
 using powerful_crm.Core.Models;
 using System.Linq;
 using System.Collections.Generic;
-using SqlKata;
 using SqlKata.Execution;
 using SqlKata.Compilers;
+using powerful_crm.Core.Enums;
 
 namespace powerful_crm.Data
 {
@@ -39,7 +39,8 @@ namespace powerful_crm.Data
                     dto.Email,
                     dto.Phone,
                     CityId = dto.City.Id,
-                    dto.BirthDate
+                    dto.BirthDate,
+                    roleId=(int)dto.Role
                 },
                 commandType: CommandType.StoredProcedure);
         }
@@ -83,10 +84,25 @@ namespace powerful_crm.Data
 
         public LeadDto GetLeadCredentials(int? id, string login)
         {
-            return _connection.QueryFirstOrDefault<LeadDto>(
-                "dbo.Lead_GetCredentials", 
+            return _connection.Query<LeadDto, int, LeadDto>(
+                "dbo.Lead_GetCredentials",(lead, role)=>
+                {
+                    lead.Role = (Role)role;
+                    return lead;
+                }, 
                 new { id, login },
-                commandType: CommandType.StoredProcedure);
+                splitOn: "Id",
+                commandType: CommandType.StoredProcedure).FirstOrDefault();
+        }
+
+        public int UpdateLeadRole(int leadId, int roleId)
+        {
+            return _connection.Execute("dbo.Lead_UpdateRole", new
+            {
+                leadId,
+                roleId
+            },
+               commandType: CommandType.StoredProcedure);
         }
         public List<LeadDto> SearchLeads(SearchLeadDto leadDto)
         {
@@ -150,32 +166,6 @@ namespace powerful_crm.Data
                 .Distinct()
                 .ToList();
         }
-        public int AddCity(CityDto dto)
-        {
-            return _connection.QuerySingleOrDefault<int>(
-                "dbo.City_Add",
-                param: new
-                {
-                    dto.Name
-                },
-                commandType: CommandType.StoredProcedure);
-        }
-        public int DeleteCity(int id)
-        {
-            return _connection.Execute(
-                "dbo.City_Delete",
-                param: new
-                {
-                    id
-                },
-                commandType: CommandType.StoredProcedure);
-        }
-
-        public CityDto GetCityById(int id)
-        {
-            return _connection.QueryFirstOrDefault<CityDto>("dbo.City_SelectById",
-                new { id },
-                commandType: CommandType.StoredProcedure);
-        }
+       
     }
 }

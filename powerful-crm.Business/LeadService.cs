@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using powerful_crm.Core.Enums;
 using powerful_crm.Core.CustomExceptions;
-using powerful_crm.Core;
 
 namespace powerful_crm.Business
 {
@@ -42,9 +41,7 @@ namespace powerful_crm.Business
             throw new WrongCredentialsException();
         }
         public LeadDto GetLeadById(int leadId) => _leadRepository.GetLeadById(leadId);
-        public int AddCity(CityDto city) => _leadRepository.AddCity(city);
-        public int DeleteCity(int id) => _leadRepository.DeleteCity(id);
-        public CityDto GetCityById(int id) => _leadRepository.GetCityById(id);
+        public int UpdateLeadRole(int leadId, int roleId) => _leadRepository.UpdateLeadRole(leadId, roleId);
         public List<LeadDto> SearchLead(SearchLeadDto leadDto)
         {
             if (leadDto.City.Name != null) { leadDto.City.Name = StringWithSearchType.GetStringWithSearchType(leadDto.City.Name, leadDto.TypeSearchCityName); }
