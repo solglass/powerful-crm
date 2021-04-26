@@ -38,9 +38,7 @@ namespace powerful_crm.Business
 
             return new AuthenticationResponse
             {
-                Token = encodedJwt,
-                LeadLogin = identity.Name, 
-                Role = lead.Role
+                Token = encodedJwt
             };
         }
         private ClaimsIdentity GetIdentity(LeadDto lead)
