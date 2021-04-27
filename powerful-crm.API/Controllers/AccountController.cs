@@ -57,7 +57,7 @@ namespace powerful_crm.API.Controllers
             var account = _accountService.GetAccountById(accountId);
             if (account == null)
             {
-                return NotFound(string.Format(Constants.ERROR_ACCOUNTNOTFOUND, accountId));
+                return NotFound(string.Format(Constants.ERROR_ACCOUNT_NOT_FOUND, accountId));
             }
             _accountService.DeleteAccount(accountId);
             var dto = _mapper.Map<AccountOutputModel>(_accountService.GetAccountById(accountId));
