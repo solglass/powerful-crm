@@ -1,4 +1,4 @@
-﻿CREATE PROCEDURE [dbo].[Accounts_SelectByLeadId]
+﻿CREATE PROCEDURE [dbo].[Account_SelectByLeadId]
 	@leadId int
 AS
 begin
