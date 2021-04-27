@@ -46,12 +46,15 @@ namespace powerful_crm.Data
         }
         public List<AccountDto> GetAccountsByLeadId(int leadId)
         {
-            return _connection.Query<AccountDto>(
-                "dbo.Account_SelectByLeadId",
+            return _connection.Query<AccountDto, LeadDto, AccountDto>(
+                "dbo.Account_SelectByLeadId", (account, lead) =>
+                 {
+                     account.LeadDto = lead;
+                     return account;
+                 },
                 new { leadId },
-                commandType: System.Data.CommandType.StoredProcedure)
-               .Distinct()
-           .ToList();
+                splitOn: "Id", commandType: System.Data.CommandType.StoredProcedure)
+                .Distinct().ToList();
         }
     }
 }
