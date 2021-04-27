@@ -73,6 +73,7 @@
     <Build Include="StoredProcedures\City\dbo.City_Add.sql" />
     <Build Include="StoredProcedures\City\dbo.City_SelectById.sql" />
     <Build Include="StoredProcedures\Lead\Lead_GetCredentials.sql" />
+    <Build Include="StoredProcedures\Lead\dbo.Lead_UpdateRole.sql" />
     <Build Include="Tables\Account.sql" />
     <Build Include="StoredProcedures\Account\dbo.Account_Add.sql" />
     <Build Include="StoredProcedures\Account\dbo.Account_Delete.sql" />

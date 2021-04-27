@@ -26,17 +26,13 @@ namespace powerful_crm.API.Middleware
             {
                 await _next(httpContext);
             }
-            catch (CustomValidationException ex)
+            catch (CustomException ex)
             {
                 await HandleCustomExceptionAsync(httpContext, ex);
             }
             catch (SqlException ex)
             {
                 await HandleSqlExceptionAsync(httpContext, ex);
-            }
-            catch(WrongCredentialsException ex)
-            {
-                await HandleCustomExceptionAsync(httpContext, ex);
             }
             catch (Exception ex)
             {

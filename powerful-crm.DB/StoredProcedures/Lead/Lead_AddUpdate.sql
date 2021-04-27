@@ -7,7 +7,8 @@
 	@email nvarchar(100),
 	@phone nvarchar(20),
 	@cityId int,
-	@birthDate datetime
+	@birthDate datetime,
+	@roleId int
 AS
 begin
 MERGE [dbo].[Lead] as ls --Целевая таблица
@@ -19,7 +20,8 @@ MERGE [dbo].[Lead] as ls --Целевая таблица
 					@email,
 					@phone,
 					@cityId,
-					@birthDate) as s (Id,FirstName,LastName,Login,Password,Email,Phone,CityId,BirthDate) --Таблица источник
+					@birthDate,
+					@roleId) as s (Id,FirstName,LastName,Login,Password,Email,Phone,CityId,BirthDate, RoleId) --Таблица источник
         ON (ls.Id = s.Id) --Условие объединения
         WHEN MATCHED THEN --Если истина (UPDATE)
                  Update
@@ -31,8 +33,8 @@ MERGE [dbo].[Lead] as ls --Целевая таблица
 				CityId = s.CityId,
 				BirthDate = s.BirthDate
         WHEN NOT MATCHED THEN --Если НЕ истина (INSERT)
-                 Insert (FirstName,LastName,Login,Password,Email,Phone,CityId,BirthDate,IsDeleted)
-				values(s.FirstName,s.LastName,s.Login,s.Password,s.Email,s.Phone,s.CityId,s.BirthDate,0)
+                 Insert (FirstName,LastName,Login,Password,Email,Phone,CityId,BirthDate,IsDeleted, RoleId)
+				values(s.FirstName,s.LastName,s.Login,s.Password,s.Email,s.Phone,s.CityId,s.BirthDate,0, s.RoleId)
 		OUTPUT Inserted.Id
 				; --Не забываем про точку с запятой
 end
