@@ -1,4 +1,4 @@
-﻿CREATE PROCEDURE [dbo].[Account_SelectByLeadId]
+﻿CREATE PROCEDURE [dbo].[Accounts_SelectByLeadId]
 	@leadId int
 AS
 begin
@@ -7,5 +7,5 @@ begin
 	a.Currency,
 	a.Name
 	from [dbo].[Account] a 
-	where a.LeadId=@LeadId
+	where a.LeadId=@leadId
 end

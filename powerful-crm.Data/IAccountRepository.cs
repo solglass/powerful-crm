@@ -1,4 +1,5 @@
 ﻿using powerful_crm.Core.Models;
+using System.Collections.Generic;
 
 namespace powerful_crm.Data
 {
@@ -7,5 +8,6 @@ namespace powerful_crm.Data
         int AddAccount(AccountDto dto);
         int DeleteAccount(int id);
         AccountDto GetAccountById(int id);
+        List<AccountDto> GetAccountsByLeadId(int leadId);
     }
 }

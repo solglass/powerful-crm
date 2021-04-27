@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Linq;
 using System.Text;
 
 namespace powerful_crm.Data
@@ -42,6 +43,15 @@ namespace powerful_crm.Data
                 "dbo.Account_SelectById",
                 new { id },
                 commandType: CommandType.StoredProcedure);
+        }
+        public List<AccountDto> GetAccountsByLeadId(int leadId)
+        {
+            return _connection.Query<AccountDto>(
+                "dbo.Accounts_SelectAll",
+                new { leadId },
+                commandType: System.Data.CommandType.StoredProcedure)
+               .Distinct()
+           .ToList();
         }
     }
 }

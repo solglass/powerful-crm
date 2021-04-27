@@ -25,5 +25,9 @@ namespace powerful_crm.Business
         {
             return _accountRepository.GetAccountById(id);
         }
+        public List<AccountDto> GetAccountsByLeadId(int leadId)
+        {
+            return _accountRepository.GetAccountsByLeadId(leadId);
+        }
     }
 }
