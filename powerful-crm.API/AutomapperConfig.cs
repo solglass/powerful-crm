@@ -46,7 +46,7 @@ namespace EducationSystem.API
               .ForMember(dest => dest.Currency, opts => opts.MapFrom(src => (Currency)src.Currency));
 
             CreateMap<AccountDto, AccountOutputModel>()
-                .ForMember(dest => dest.Currency, opts => opts.MapFrom(src => FriendlyNames.GetFriendlyCurrency(src.Currency)));
+                .ForMember(dest => dest.Currency, opts => opts.MapFrom(src => src.Currency.ToString()));
         }
     }
 }

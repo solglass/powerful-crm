@@ -5,7 +5,8 @@ begin
 	SELECT 
 	a.Id,
 	a.Currency,
-	a.Name
+	a.Name,
+	a.LeadId
 	from [dbo].[Account] a
 	where a.Id=@id
 end

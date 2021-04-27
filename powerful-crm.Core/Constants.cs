@@ -19,7 +19,6 @@ namespace powerful_crm.Core
         public const string API_WITHDRAW = "/api/Transaction/withdraw";
         public const string API_TRANSFER = "/api/Transaction/transfer";
 
-        public const string ERROR_LEADNOTFOUND = "Lead with id {0} is not found";
         public const string ERROR_ACCOUNT_NOT_FOUND = "Account with id {0} is not found";
         public const string ERROR_ACCOUNT_ALREADY_DELETED = "Account with id {0} has already been deleted";
         public const string ERROR_LEAD_ALREADY_DELETED = "Lead with id {0} has already been deleted";
