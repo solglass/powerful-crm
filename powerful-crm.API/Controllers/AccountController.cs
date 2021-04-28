@@ -21,7 +21,7 @@ namespace powerful_crm.API.Controllers
 {
     [Authorize]
     [Route("api/[controller]")]
-    public class AccountController: ControllerBase
+    public class AccountController : ControllerBase
     {
         private IAccountService _accountService;
         private ILeadService _leadService;
@@ -66,23 +66,21 @@ namespace powerful_crm.API.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(string), StatusCodes.Status409Conflict)]
         [ProducesResponseType(typeof(string), StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [HttpDelete("{accountId}")]
-        public ActionResult DeleteAccount(int accountId)
+        public ActionResult<LeadOutputModel> DeleteAccount(int accountId)
         {
             var account = _accountService.GetAccountById(accountId);
-            if (!_checker.CheckIfUserIsAllowed(account.LeadDto.Id, HttpContext))
-                throw new ForbidException(Constants.ERROR_NOT_ALLOWED_ACTIONS_WITH_OTHER_LEAD);
             if (account == null)
             {
                 return NotFound(string.Format(Constants.ERROR_ACCOUNT_NOT_FOUND, accountId));
             }
-            if (_accountService.DeleteAccount(accountId) == 1)
-                return NoContent();
-            else
-                return Conflict(string.Format(Constants.ERROR_ACCOUNT_HAS_DEPENDENCIES, account.Id));
+            if (!_checker.CheckIfUserIsAllowed(account.LeadDto.Id, HttpContext))
+                throw new ForbidException(Constants.ERROR_NOT_ALLOWED_ACTIONS_WITH_OTHER_LEAD);
+            _accountService.DeleteAccount(accountId);
+            return NoContent();
+
         }
     }
 }

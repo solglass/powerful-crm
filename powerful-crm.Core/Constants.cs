@@ -24,7 +24,6 @@ namespace powerful_crm.Core
         public const string ERROR_LEAD_NOT_DELETED = "Lead with id {0} is not deleted";
         public const string ERROR_CITY_NOT_FOUND = "City with id {0} is not found";
         public const string ERROR_CITY_HAS_DEPENDENCIES = "The city with id {0} can't be deleted because there are some accounts connected with it";
-        public const string ERROR_ACCOUNT_HAS_DEPENDENCIES = "The account with id {0} can't be deleted because there are some accounts connected with it";
         public const string ERROR_WRONG_PASSWORD = "Entered password doesn't match current password!";
         public const string ERROR_NOT_UNIQUE_EMAIL = "This email is already in use.";
         public const string ERROR_NOT_UNIQUE_LOGIN = "This login is already in use.";
