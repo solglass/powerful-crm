@@ -32,5 +32,6 @@ namespace powerful_crm.Core
         public const string ERROR_NOT_ALLOWED_ACTIONS_WITH_CITY = "There is no permission for that action with city information.";
         public const string GLOBAL_ERROR_MESSAGE = "An error occured while processing the request.";
         public const string ERROR_LEAD_NOT_FOUND_BY_ID = "Lead with id {0} is not found";
+        public const string ERROR_LEAD_NOT_FOUND_BY_LOGIN = "Lead with login {0} is not found";
     }
 }

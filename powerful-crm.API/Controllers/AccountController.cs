@@ -24,11 +24,13 @@ namespace powerful_crm.API.Controllers
     public class AccountController: ControllerBase
     {
         private IAccountService _accountService;
+        private ILeadService _leadService;
         private Checker _checker;
         private IMapper _mapper;
-        public AccountController(IOptions<AppSettings> options, IMapper mapper, IAccountService accountService, Checker checker)
+        public AccountController(IOptions<AppSettings> options, IMapper mapper, IAccountService accountService, ILeadService leadService, Checker checker)
         {
             _accountService = accountService;
+            _leadService = leadService;
             _checker = checker;
             _mapper = mapper;
         }
@@ -37,15 +39,21 @@ namespace powerful_crm.API.Controllers
         /// <returns>Information about added account</returns>
         [ProducesResponseType(typeof(AccountOutputModel), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status409Conflict)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status403Forbidden)]
         [HttpPost]
         public ActionResult<AccountOutputModel> AddAccount([FromBody] AccountInputModel inputModel)
         {
+            if (!_checker.CheckIfUserIsAllowed(inputModel.LeadId, HttpContext))
+                throw new ForbidException(Constants.ERROR_NOT_ALLOWED_ACTIONS_WITH_OTHER_LEAD);
             if (!ModelState.IsValid)
             {
                 throw new CustomValidationException(ModelState);
             }
-            if (!_checker.CheckIfUserIsAllowed(inputModel.LeadId, HttpContext))
-                throw new ForbidException(Constants.ERROR_NOT_ALLOWED_ACTIONS_WITH_OTHER_LEAD);
+            if (_leadService.GetLeadById(inputModel.LeadId) == null)
+            {
+                return NotFound(string.Format(Constants.ERROR_LEAD_NOT_FOUND_BY_ID, inputModel.LeadId));
+            }
             var dto = _mapper.Map<AccountDto>(inputModel);
             var addedAccountId = _accountService.AddAccount(dto);
             var outputModel = _mapper.Map<AccountOutputModel>(_accountService.GetAccountById(addedAccountId));
@@ -58,16 +66,17 @@ namespace powerful_crm.API.Controllers
         [ProducesResponseType(typeof(List<LeadOutputModel>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status403Forbidden)]
         [HttpDelete("{accountId}")]
         public ActionResult<LeadOutputModel> DeleteAccount(int accountId)
         {
             var account = _accountService.GetAccountById(accountId);
+            if (!_checker.CheckIfUserIsAllowed(account.LeadDto.Id, HttpContext))
+                throw new ForbidException(Constants.ERROR_NOT_ALLOWED_ACTIONS_WITH_OTHER_LEAD);
             if (account == null)
             {
                 return NotFound(string.Format(Constants.ERROR_ACCOUNT_NOT_FOUND, accountId));
             }
-            if (!_checker.CheckIfUserIsAllowed(account.LeadDto.Id, HttpContext))
-                throw new ForbidException(Constants.ERROR_NOT_ALLOWED_ACTIONS_WITH_OTHER_LEAD);
             _accountService.DeleteAccount(accountId);
             var dto = _mapper.Map<AccountOutputModel>(_accountService.GetAccountById(accountId));
             return Ok(dto);
