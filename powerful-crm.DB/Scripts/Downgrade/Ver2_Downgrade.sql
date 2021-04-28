@@ -1,4 +1,38 @@
-﻿CREATE PROCEDURE [dbo].[Lead_AddUpdate]
+﻿declare @DbVersion int
+
+select top 1 @DbVersion = version
+from dbo.DbVersion order by id desc
+
+if @DbVersion > 2 set noexec on
+begin transaction
+--modify indexes
+DROP INDEX [NonClusteredIndex-Login] ON [dbo].[Lead]
+CREATE NONCLUSTERED INDEX [NonClusteredIndex-Login] ON [dbo].[Lead]
+(
+	[Login] ASC
+)
+INCLUDE([Id]) 
+WHERE ([IsDeleted]=(0))
+WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON ) ON [PRIMARY]
+GO
+-- drop tables
+alter table [dbo].[Lead] drop column [RoleId] 
+go
+drop table [dbo].[Account]
+go
+--drop procedures
+drop procedure [dbo].[Account_Add]
+go
+drop procedure [dbo].[Account_Delete]
+go
+drop procedure [dbo].[Lead_UpdateRole]
+go
+drop procedure [dbo].[Account_SelectById]
+go
+drop procedure [dbo].[Account_SelectByLeadId]
+go
+--modify procedures
+ALTER PROCEDURE [dbo].[Lead_AddUpdate]
 	@Id int null,
 	@firstName nvarchar(100),	
 	@lastName nvarchar(100),
@@ -36,3 +70,21 @@ MERGE [dbo].[Lead] as ls --Целевая таблица
 		OUTPUT Inserted.Id
 				; --Не забываем про точку с запятой
 end
+go
+ALTER PROCEDURE [dbo].[Lead_GetCredentials](
+	 @id int,
+	 @login nvarchar(100)
+)as
+begin
+	select
+		l.Id,
+		l.Login,
+		l.Password
+	from dbo.[Lead] l
+	where l.Id = @id or l.Login=@login
+end
+
+update dbo.DbVersion set [Version] = 1
+commit
+
+set noexec off

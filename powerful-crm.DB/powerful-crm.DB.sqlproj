@@ -60,7 +60,8 @@
     <Folder Include="StoredProcedures" />
     <Folder Include="StoredProcedures\Lead" />
     <Folder Include="StoredProcedures\City" />
-    <Folder Include="StoredProcedures\Account" />
+    <Folder Include="Scripts" />
+    <Folder Include="Scripts\Downgrade" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="Tables\Lead.sql" />
@@ -73,11 +74,13 @@
     <Build Include="StoredProcedures\City\dbo.City_Add.sql" />
     <Build Include="StoredProcedures\City\dbo.City_SelectById.sql" />
     <Build Include="StoredProcedures\Lead\Lead_GetCredentials.sql" />
-    <Build Include="StoredProcedures\Lead\dbo.Lead_UpdateRole.sql" />
-    <Build Include="Tables\Account.sql" />
-    <Build Include="StoredProcedures\Account\dbo.Account_Add.sql" />
-    <Build Include="StoredProcedures\Account\dbo.Account_Delete.sql" />
-    <Build Include="StoredProcedures\Account\dbo.Account_SelectById.sql" />
-    <Build Include="StoredProcedures\Account\dbo.Account_SelectByLeadId.sql" />
+    <Build Include="Tables\DbVersion.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Scripts\Downgrade\Ver2_Downgrade.sql" />
+    <None Include="Scripts\Ver2_Accounts_Added.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <PostDeploy Include="Scripts\Script.PostDeployment1.sql" />
   </ItemGroup>
 </Project>
