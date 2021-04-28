@@ -12,9 +12,12 @@ namespace EducationSystem.Business.Config
             services.AddScoped<ISecurityService, SecurityService>();
             services.AddScoped<ICityService, CityService>();
             services.AddScoped<IAuthenticationService, AuthenticationService>();
+            services.AddScoped<IAccountService, AccountService>();
 
             services.AddScoped<ILeadRepository, LeadRepository>();
             services.AddScoped<ICityRepository, CityRepository>();
+            services.AddScoped<IAccountRepository, AccountRepository>();
+
         }
     }
 }

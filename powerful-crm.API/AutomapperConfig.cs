@@ -22,7 +22,7 @@ namespace EducationSystem.API
             CreateMap<LeadInputModel, LeadDto>()
                 .ForMember(dest => dest.City, opts => opts.MapFrom(src => new CityDto { Id = src.CityId }))
                 .ForMember(dest => dest.BirthDate, opts => opts.MapFrom(src => DateTime.ParseExact(src.BirthDate, Constants.DATE_FORMAT, CultureInfo.InvariantCulture, DateTimeStyles.None)))
-                .ForMember(dest=> dest.Role, opts=>opts.MapFrom(src=> Role.Client));
+                .ForMember(dest => dest.Role, opts => opts.MapFrom(src => Role.Client));
 
             CreateMap<CityDto, CityOutputModel>();
             CreateMap<CityInputModel, CityDto>();
@@ -34,12 +34,20 @@ namespace EducationSystem.API
             CreateMap<SearchLeadInputModel, SearchLeadDto>()
             .ForMember(dest => dest.StartBirthDate, opts => opts.MapFrom(src => DateTime.ParseExact(src.StartBirthDate, Constants.DATE_FORMAT, CultureInfo.InvariantCulture, DateTimeStyles.None)))
             .ForMember(dest => dest.EndBirthDate, opts => opts.MapFrom(src => DateTime.ParseExact(src.EndBirthDate, Constants.DATE_FORMAT, CultureInfo.InvariantCulture, DateTimeStyles.None)))
-         .ForMember(dest => dest.City, opts => opts.MapFrom(src=> new CityDto() {Name = src.CityName }));
-            
+         .ForMember(dest => dest.City, opts => opts.MapFrom(src => new CityDto() { Name = src.CityName }));
+
             CreateMap<TransactionInputModel, TransactionMiddleModel>()
                 .ForMember(dest => dest.CurrencyPair, opt => opt.MapFrom(c => c.CurrentCurrency + c.AccountCurrency));
             CreateMap<TransferInputModel, TransferMiddleModel>()
                 .ForMember(dest => dest.CurrencyPair, opt => opt.MapFrom(c => c.CurrentCurrency + c.AccountCurrency));
+
+            CreateMap<AccountInputModel, AccountDto>()
+                .ForMember(dest => dest.LeadDto, opts => opts.MapFrom(src => new LeadDto() { Id = src.LeadId }))
+              .ForMember(dest => dest.Currency, opts => opts.MapFrom(src => (Currency)src.Currency));
+
+            CreateMap<AccountDto, AccountOutputModel>()
+                .ForMember(dest => dest.LeadId, opts => opts.MapFrom(src => src.LeadDto.Id))
+                .ForMember(dest => dest.Currency, opts => opts.MapFrom(src => src.Currency.ToString()));
         }
     }
 }
