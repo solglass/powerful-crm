@@ -69,7 +69,7 @@ namespace powerful_crm.API.Controllers
         [ProducesResponseType(typeof(string), StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [HttpDelete("{accountId}")]
-        public ActionResult<LeadOutputModel> DeleteAccount(int accountId)
+        public ActionResult DeleteAccount(int accountId)
         {
             var account = _accountService.GetAccountById(accountId);
             if (account == null)
