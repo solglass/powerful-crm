@@ -1,7 +1,4 @@
-﻿using powerful_crm.Core;
-using System;
-
-namespace powerful_crm.Business
+﻿namespace powerful_crm.Business
 {
     class SecurityService:ISecurityService
     {

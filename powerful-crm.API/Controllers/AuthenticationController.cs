@@ -5,10 +5,6 @@ using powerful_crm.Business;
 using powerful_crm.Business.Models;
 using powerful_crm.Core;
 using powerful_crm.Core.CustomExceptions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace powerful_crm.API.Controllers
 {

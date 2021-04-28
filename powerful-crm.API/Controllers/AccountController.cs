@@ -2,20 +2,12 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.Extensions.Options;
 using powerful_crm.API.Models.InputModels;
 using powerful_crm.API.Models.OutputModels;
 using powerful_crm.Business;
 using powerful_crm.Core;
 using powerful_crm.Core.CustomExceptions;
-using powerful_crm.Core.Enums;
 using powerful_crm.Core.Models;
-using powerful_crm.Core.Settings;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Claims;
-using System.Threading.Tasks;
 
 namespace powerful_crm.API.Controllers
 {
@@ -27,7 +19,7 @@ namespace powerful_crm.API.Controllers
         private ILeadService _leadService;
         private Checker _checker;
         private IMapper _mapper;
-        public AccountController(IOptions<AppSettings> options, IMapper mapper, IAccountService accountService, ILeadService leadService, Checker checker)
+        public AccountController(IMapper mapper, IAccountService accountService, ILeadService leadService, Checker checker)
         {
             _accountService = accountService;
             _leadService = leadService;

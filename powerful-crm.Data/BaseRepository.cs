@@ -1,9 +1,6 @@
 ﻿using Microsoft.Extensions.Options;
 using powerful_crm.Core.Settings;
-using System;
-using System.Collections.Generic;
 using System.Data.SqlClient;
-using System.Text;
 
 namespace powerful_crm.Data
 {

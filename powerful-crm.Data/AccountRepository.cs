@@ -2,12 +2,10 @@
 using Microsoft.Extensions.Options;
 using powerful_crm.Core.Models;
 using powerful_crm.Core.Settings;
-using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
-using System.Text;
 
 namespace powerful_crm.Data
 {
@@ -34,7 +32,7 @@ namespace powerful_crm.Data
             var result = _connection
                 .Execute("dbo.Account_Delete",
                 new { id },
-                commandType: System.Data.CommandType.StoredProcedure);
+                commandType: CommandType.StoredProcedure);
             return result;
         }
         public AccountDto GetAccountById(int id)

@@ -9,14 +9,10 @@ using powerful_crm.API.Models.OutputModels;
 using powerful_crm.Business;
 using powerful_crm.Core;
 using powerful_crm.Core.CustomExceptions;
-using powerful_crm.Core.Enums;
 using powerful_crm.Core.Models;
 using powerful_crm.Core.Settings;
 using RestSharp;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Security.Claims;
 using System.Text.Json;
 
 namespace powerful_crm.API.Controllers

@@ -1,14 +1,12 @@
 ﻿using Microsoft.IdentityModel.Tokens;
 using powerful_crm.Business.Models;
 using powerful_crm.Core.Configs;
-using powerful_crm.Core.Enums;
 using powerful_crm.Core.Models;
 using powerful_crm.Data;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Text;
 
 namespace powerful_crm.Business
 {

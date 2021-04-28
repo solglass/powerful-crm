@@ -2,7 +2,6 @@
 using powerful_crm.Core;
 using powerful_crm.Core.CustomExceptions;
 using System;
-using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Net;

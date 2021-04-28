@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace powerful_crm.API.Models.OutputModels
+﻿namespace powerful_crm.API.Models.OutputModels
 {
     public class LeadOutputModel
     {

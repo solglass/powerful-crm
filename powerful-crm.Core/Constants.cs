@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace powerful_crm.Core
+﻿namespace powerful_crm.Core
 {
     public static class Constants
     {
