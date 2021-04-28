@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Options;
 using powerful_crm.API.Models.InputModels;
 using powerful_crm.API.Models.OutputModels;
@@ -18,6 +19,7 @@ using System.Threading.Tasks;
 
 namespace powerful_crm.API.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     public class AccountController: ControllerBase
     {

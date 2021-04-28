@@ -57,7 +57,7 @@ namespace powerful_crm.Data
                      return account;
                  },
                 new { leadId },
-                splitOn: "Id", commandType: System.Data.CommandType.StoredProcedure)
+                splitOn: "Id", commandType: CommandType.StoredProcedure)
                 .Distinct().ToList();
         }
     }

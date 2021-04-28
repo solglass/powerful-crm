@@ -22,7 +22,6 @@ namespace powerful_crm.Core
         public const string ERROR_ACCOUNT_NOT_FOUND = "Account with id {0} is not found";
         public const string ERROR_LEAD_ALREADY_DELETED = "Lead with id {0} has already been deleted";
         public const string ERROR_LEAD_NOT_DELETED = "Lead with id {0} is not deleted";
-        public const string ERROR_ACCOUNT_NOT_DELETED = "Account with id {0} is not deleted";
         public const string ERROR_CITY_NOT_FOUND = "City with id {0} is not found";
         public const string ERROR_CITY_HAS_DEPENDENCIES = "The city with id {0} can't be deleted because there are some accounts connected with it";
         public const string ERROR_WRONG_PASSWORD = "Entered password doesn't match current password!";
@@ -33,6 +32,5 @@ namespace powerful_crm.Core
         public const string ERROR_NOT_ALLOWED_ACTIONS_WITH_CITY = "There is no permission for that action with city information.";
         public const string GLOBAL_ERROR_MESSAGE = "An error occured while processing the request.";
         public const string ERROR_LEAD_NOT_FOUND_BY_ID = "Lead with id {0} is not found";
-        public const string ERROR_LEAD_NOT_FOUND_BY_LOGIN = "Lead with login {0} is not found";
     }
 }
