@@ -13,21 +13,9 @@ namespace powerful_crm.Business
         {
             _accountRepository = accountRepository;
         }
-        public int AddAccount(AccountDto dto)
-        {
-            return _accountRepository.AddAccount(dto);
-        }
-        public int DeleteAccount(int id)
-        {
-            return _accountRepository.DeleteAccount(id);
-        }
-        public AccountDto GetAccountById(int id)
-        {
-            return _accountRepository.GetAccountById(id);
-        }
-        public List<AccountDto> GetAccountsByLeadId(int leadId)
-        {
-            return _accountRepository.GetAccountsByLeadId(leadId);
-        }
+        public int DeleteAccount(int id) => _accountRepository.DeleteAccount(id);
+        public int AddAccount(AccountDto dto) => _accountRepository.AddAccount(dto);
+        public AccountDto GetAccountById(int id) => _accountRepository.GetAccountById(id);
+        public List<AccountDto> GetAccountsByLeadId(int leadId) => _accountRepository.GetAccountsByLeadId(leadId);
     }
 }

@@ -27,13 +27,15 @@ namespace powerful_crm.API.Controllers
     {
         private ILeadService _leadService;
         private ICityService _cityService;
+        private Checker _checker;
         private IMapper _mapper;
         private RestClient _client;
 
-        public LeadController(IOptions<AppSettings> options,IMapper mapper, ILeadService leadService, ICityService cityService)
+        public LeadController(IOptions<AppSettings> options,IMapper mapper, ILeadService leadService, ICityService cityService, Checker checker)
         {
             _leadService = leadService;
             _cityService = cityService;
+            _checker = checker;
             _mapper = mapper;
             _client = new RestClient(options.Value.TSTORE_URL);
         }
@@ -74,7 +76,7 @@ namespace powerful_crm.API.Controllers
         [HttpPut("{leadId}/change-password")]
         public ActionResult ChangePassword(int leadId, [FromBody]ChangePasswordInputModel inputModel)
         {
-            if (!CheckIfUserIsAllowed(leadId))
+            if (!_checker.CheckIfUserIsAllowed(leadId, HttpContext))
                 throw new ForbidException(Constants.ERROR_NOT_ALLOWED_ACTIONS_WITH_OTHER_LEAD);
 
             if (!ModelState.IsValid)
@@ -140,7 +142,7 @@ namespace powerful_crm.API.Controllers
         [HttpPut("{leadId}")]
         public ActionResult<LeadOutputModel> UpdateLead(int leadId, [FromBody] UpdateLeadInputModel inputModel)
         {
-            if (!CheckIfUserIsAllowed(leadId))
+            if (!_checker.CheckIfUserIsAllowed(leadId, HttpContext))
                 throw new ForbidException(Constants.ERROR_NOT_ALLOWED_ACTIONS_WITH_OTHER_LEAD);
 
             if (!ModelState.IsValid)
@@ -174,7 +176,7 @@ namespace powerful_crm.API.Controllers
         [HttpDelete("{leadId}")]
         public ActionResult<LeadOutputModel> DeleteLead(int leadId)
         {
-            if (!CheckIfUserIsAllowed(leadId))
+            if (!_checker.CheckIfUserIsAllowed(leadId, HttpContext))
                 throw new ForbidException(Constants.ERROR_NOT_ALLOWED_ACTIONS_WITH_OTHER_LEAD);
 
             var lead = _leadService.GetLeadById(leadId);
@@ -202,7 +204,7 @@ namespace powerful_crm.API.Controllers
         [HttpPut("{leadId}/recover")]
         public ActionResult<LeadOutputModel> RecoverLead(int leadId)
         {
-            if (!CheckIfUserIsAllowed(leadId))
+            if (!_checker.CheckIfUserIsAllowed(leadId, HttpContext))
                 throw new ForbidException(Constants.ERROR_NOT_ALLOWED_ACTIONS_WITH_OTHER_LEAD);
 
             var lead = _leadService.GetLeadById(leadId);
@@ -230,7 +232,7 @@ namespace powerful_crm.API.Controllers
         [HttpGet("{leadId}/balance")]
         public ActionResult<List<BalanceOutputModel>> GetBalanceByLeadId(int leadId)
         {
-            if (!CheckIfUserIsAllowed(leadId))
+            if (!_checker.CheckIfUserIsAllowed(leadId, HttpContext))
                 throw new ForbidException(Constants.ERROR_NOT_ALLOWED_ACTIONS_WITH_OTHER_LEAD);
 
             var lead = _leadService.GetLeadById(leadId);
@@ -256,7 +258,7 @@ namespace powerful_crm.API.Controllers
         [HttpGet("{leadId}/transactions")]
         public ActionResult<List<TransactionOutputModel>> GetTransactionsByLeadId(int leadId)
         {
-            if (!CheckIfUserIsAllowed(leadId))
+            if (!_checker.CheckIfUserIsAllowed(leadId, HttpContext))
                 throw new ForbidException(Constants.ERROR_NOT_ALLOWED_ACTIONS_WITH_OTHER_LEAD);
 
             var lead = _leadService.GetLeadById(leadId);
@@ -282,7 +284,7 @@ namespace powerful_crm.API.Controllers
         [HttpPost("deposit")]
         public ActionResult<int> AddDeposit([FromBody] TransactionInputModel inputModel)
         {
-            if (!CheckIfUserIsAllowed(inputModel.LeadId))
+            if (!_checker.CheckIfUserIsAllowed(inputModel.LeadId, HttpContext))
                 throw new ForbidException(Constants.ERROR_NOT_ALLOWED_ACTIONS_WITH_OTHER_LEAD);
 
             if (!ModelState.IsValid)
@@ -309,7 +311,7 @@ namespace powerful_crm.API.Controllers
         [HttpPost("withdraw")]
         public ActionResult<int> AddWithdraw([FromBody] TransactionInputModel inputModel)
         {
-           if (!CheckIfUserIsAllowed(inputModel.LeadId))
+           if (!_checker.CheckIfUserIsAllowed(inputModel.LeadId, HttpContext))
                 throw new ForbidException(Constants.ERROR_NOT_ALLOWED_ACTIONS_WITH_OTHER_LEAD);
 
             if (!ModelState.IsValid)
@@ -336,7 +338,7 @@ namespace powerful_crm.API.Controllers
         [HttpPost("transfer")]
         public ActionResult<int> AddTransfer([FromBody] TransferInputModel inputModel)
         {
-            if (!CheckIfUserIsAllowed(inputModel.SenderId))
+            if (!_checker.CheckIfUserIsAllowed(inputModel.SenderId,HttpContext))
                 throw new ForbidException(Constants.ERROR_NOT_ALLOWED_ACTIONS_WITH_OTHER_LEAD);
 
             if (!ModelState.IsValid)
@@ -355,12 +357,6 @@ namespace powerful_crm.API.Controllers
             request.AddParameter("application/json", JsonSerializer.Serialize(middle), ParameterType.RequestBody);
             var queryResult = _client.Execute<int>(request).Data;
             return Ok(queryResult);
-        }
-
-        private bool CheckIfUserIsAllowed(int leadId)
-        {
-            return leadId.ToString() == HttpContext.User.Claims.Where(t=>t.Type==ClaimTypes.NameIdentifier).FirstOrDefault().Value 
-                || HttpContext.User.IsInRole(Role.Administrator.ToString());
         }
     }
 }
