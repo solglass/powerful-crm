@@ -46,7 +46,7 @@ namespace powerful_crm.Data
                     return account;
                 },
                 new { id },
-                commandType: CommandType.StoredProcedure).FirstOrDefault();
+                splitOn: "Id", commandType: CommandType.StoredProcedure).FirstOrDefault();
         }
         public List<AccountDto> GetAccountsByLeadId(int leadId)
         {

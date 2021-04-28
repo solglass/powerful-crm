@@ -6,7 +6,7 @@ begin
 	a.Id,
 	a.Currency,
 	a.Name,
-	a.LeadId
+	a.LeadId as [Id]
 	from [dbo].[Account] a
 	where a.Id=@id
 end
