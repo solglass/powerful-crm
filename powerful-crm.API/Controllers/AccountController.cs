@@ -63,12 +63,14 @@ namespace powerful_crm.API.Controllers
         /// <summary>Delete Account</summary>
         /// <param name="accountId">Id of lead</param>
         /// <returns>Info about account which is deleted</returns>
-        [ProducesResponseType(typeof(List<LeadOutputModel>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status409Conflict)]
         [ProducesResponseType(typeof(string), StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [HttpDelete("{accountId}")]
-        public ActionResult<LeadOutputModel> DeleteAccount(int accountId)
+        public ActionResult DeleteAccount(int accountId)
         {
             var account = _accountService.GetAccountById(accountId);
             if (!_checker.CheckIfUserIsAllowed(account.LeadDto.Id, HttpContext))
@@ -77,9 +79,10 @@ namespace powerful_crm.API.Controllers
             {
                 return NotFound(string.Format(Constants.ERROR_ACCOUNT_NOT_FOUND, accountId));
             }
-            _accountService.DeleteAccount(accountId);
-            var dto = _mapper.Map<AccountOutputModel>(_accountService.GetAccountById(accountId));
-            return Ok(dto);
+            if (_accountService.DeleteAccount(accountId) == 1)
+                return NoContent();
+            else
+                return Conflict(string.Format(Constants.ERROR_ACCOUNT_HAS_DEPENDENCIES, account.Id));
         }
     }
 }
