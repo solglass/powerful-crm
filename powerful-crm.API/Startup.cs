@@ -44,6 +44,7 @@ namespace powerful_crm.API
             services.RegistrateServicesConfig();
             services.AddAutoMapper(typeof(Startup));
             services.SwaggerExtention();
+            services.AddScoped<Checker>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
