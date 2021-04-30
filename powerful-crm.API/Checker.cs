@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using powerful_crm.Core.Enums;
+using System;
 using System.Linq;
 using System.Security.Claims;
 
@@ -11,6 +12,11 @@ namespace powerful_crm.API
         {
             return leadId.ToString() == httpContext.User.Claims.Where(t=>t.Type==ClaimTypes.NameIdentifier).FirstOrDefault().Value 
                 || httpContext.User.IsInRole(Role.Administrator.ToString());
+        }
+
+        public bool CheckCurrencyAllowed(string currency)
+        {
+            return Enum.IsDefined(typeof(Currency), currency);
         }
     }
 }
