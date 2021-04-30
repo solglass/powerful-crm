@@ -1,0 +1,85 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>powerful-crm.API</name>
+    </assembly>
+    <members>
+        <member name="M:powerful_crm.API.Controllers.AuthenticationController.Authentificate(powerful_crm.API.Models.InputModels.LoginInputModel)">
+            <summary>Log in</summary>
+            <param name="model">Lead credentials</param>
+            <returns>Token</returns>
+        </member>
+        <member name="M:powerful_crm.API.Controllers.CityController.AddCity(powerful_crm.API.Models.OutputModels.CityInputModel)">
+            <summary>Creates new city</summary>
+            <param name="city">Information about new city</param>
+            <returns>Info about created city</returns>
+        </member>
+        <member name="M:powerful_crm.API.Controllers.CityController.DeleteCity(System.Int32)">
+            <summary>Deletes the city</summary>
+            <param name="cityId">Id of the city to delete</param>
+            <returns>NoContent result</returns>
+        </member>
+        <member name="M:powerful_crm.API.Controllers.LeadController.AddLead(powerful_crm.API.Models.InputModels.LeadInputModel)">
+            <summary>Adds new lead</summary>
+            <param name="inputModel">Information about lead to add</param>
+            <returns>Information about added lead</returns>
+        </member>
+        <member name="M:powerful_crm.API.Controllers.LeadController.ChangePassword(System.Int32,powerful_crm.API.Models.InputModels.ChangePasswordInputModel)">
+            <summary>Changes password of lead</summary>
+            <param name="leadId">Id of lead for whom we are changing the password</param>
+            <param name="inputModel">Old and new password of lead</param>
+            <returns>NoContent response</returns>
+        </member>
+        <member name="M:powerful_crm.API.Controllers.LeadController.GetLead(System.Int32)">
+            <summary>Gets info about lead</summary>
+            <param name="leadId">Id of lead</param>
+            <returns>Info about lead</returns>
+        </member>
+        <member name="M:powerful_crm.API.Controllers.LeadController.SearchLeads(powerful_crm.API.Models.InputModels.SearchLeadInputModel)">
+            <summary>Searches leads by parameters</summary>
+            <param name="inputModel"> Parameters for searching</param>
+            <returns>List of leads that suit the parameters</returns>
+        </member>
+        <member name="M:powerful_crm.API.Controllers.LeadController.UpdateLead(System.Int32,powerful_crm.API.Models.InputModels.UpdateLeadInputModel)">
+            <summary>Updates information about lead</summary>
+            <param name="leadId">Id of lead</param>
+            <param name="inputModel">Updated info about lead</param>
+            <returns>Updated info about lead</returns>
+        </member>
+        <member name="M:powerful_crm.API.Controllers.LeadController.DeleteLead(System.Int32)">
+            <summary>Changes value of parameter "IsDeleted" to 1(Deleted)</summary>
+            <param name="leadId">Id of lead</param>
+            <returns>Info about lead which is deleted</returns>
+        </member>
+        <member name="M:powerful_crm.API.Controllers.LeadController.RecoverLead(System.Int32)">
+            <summary>Changes value of parameter "IsDeleted" to 0(Not deleted)</summary>
+            <param name="leadId">Id of lead</param>
+            <returns>Info about lead which is recovered</returns>
+        </member>
+        <member name="M:powerful_crm.API.Controllers.LeadController.GetBalanceByLeadId(System.Int32)">
+            <summary>Gets lead balance</summary>
+            <param name="leadId">Id of lead</param>
+            <returns>Info about balance</returns>
+        </member>
+        <member name="M:powerful_crm.API.Controllers.LeadController.GetTransactionsByLeadId(System.Int32)">
+            <summary>Gets lead transactions</summary>
+            <param name="leadId">Id of lead</param>
+            <returns>Info about transactions</returns>
+        </member>
+        <member name="M:powerful_crm.API.Controllers.LeadController.AddDeposit(powerful_crm.API.Models.InputModels.TransactionInputModel)">
+            <summary>Adds deposit</summary>
+            <param name="inputModel">Information about deposit</param>
+            <returns>Id of added deposit</returns>
+        </member>
+        <member name="M:powerful_crm.API.Controllers.LeadController.AddWithdraw(powerful_crm.API.Models.InputModels.TransactionInputModel)">
+            <summary>Adds withdraw</summary>
+            <param name="inputModel">Information about withdraw</param>
+            <returns>Id of added withdraw</returns>
+        </member>
+        <member name="M:powerful_crm.API.Controllers.LeadController.AddTransfer(powerful_crm.API.Models.InputModels.TransferInputModel)">
+            <summary>Adds transfer</summary>
+            <param name="inputModel">Information about transfer</param>
+            <returns>Id of added transfer</returns>
+        </member>
+    </members>
+</doc>

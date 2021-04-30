@@ -1,17 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using powerful_crm.API.Attributes;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace powerful_crm.API.Models.InputModels
 {
     public class TransactionInputModel
     {
-        [Range(0, int.MaxValue)]
+        [Required]
+        [Range(1, int.MaxValue)]
         public int LeadId { get; set; }
+        [Required]
         public decimal Amount { get; set; }
-        public string Type { get; set; }
-        public DateTime Timestamp { get; set; }
+        [Required]
+        [CustomCurrencyValidation]
+        public string CurrentCurrency { get; set; }
+        [Required]
+        [CustomCurrencyValidation]
+        public string AccountCurrency { get; set; }
     }
 }

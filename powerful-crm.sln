@@ -3,15 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31112.23
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "powerful-crm.API", "powerful-crm.API\powerful-crm.API.csproj", "{C3DF93F9-38B8-4D4A-B0AF-D6CEDEF6E3D8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "powerful-crm.API", "powerful-crm.API\powerful-crm.API.csproj", "{C3DF93F9-38B8-4D4A-B0AF-D6CEDEF6E3D8}"
 EndProject
 Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "powerful-crm.DB", "powerful-crm.DB\powerful-crm.DB.sqlproj", "{6E00E475-EE9E-4984-B3D7-AE778FB3AEAE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "powerful-crm.Data", "powerful-crm.Data\powerful-crm.Data.csproj", "{0057D7DB-E3DF-475D-BAA1-904ACED8020E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "powerful-crm.Data", "powerful-crm.Data\powerful-crm.Data.csproj", "{0057D7DB-E3DF-475D-BAA1-904ACED8020E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "powerful-crm.Business", "powerful-crm.Business\powerful-crm.Business.csproj", "{3F52310D-3088-4888-90F5-D5628E867FDC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "powerful-crm.Business", "powerful-crm.Business\powerful-crm.Business.csproj", "{3F52310D-3088-4888-90F5-D5628E867FDC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "powerful-crm.Core", "powerful-crm.Core\powerful-crm.Core.csproj", "{DAF3593A-B34A-4BE7-96CA-676D3BFE5D19}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "powerful-crm.Core", "powerful-crm.Core\powerful-crm.Core.csproj", "{DAF3593A-B34A-4BE7-96CA-676D3BFE5D19}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

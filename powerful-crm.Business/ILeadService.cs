@@ -1,4 +1,5 @@
 ﻿using powerful_crm.Core.Models;
+using System.Collections.Generic;
 
 namespace powerful_crm.Business
 {
@@ -8,10 +9,9 @@ namespace powerful_crm.Business
         int ChangePassword(int leadId, string oldPassword, string newPassword);
         int DeleteLead(int leadId);
         LeadDto GetLeadById(int leadId);
+        List<LeadDto> SearchLead(SearchLeadDto leadDto);
         int RecoverLead(int leadId);
         int UpdateLead(int leadId, LeadDto dto);
-        int AddCity(CityDto city);
-        int DeleteCity(int id);
-        CityDto GetCityById(int id);
+        int UpdateLeadRole(int leadId, int roleId);
     }
 }

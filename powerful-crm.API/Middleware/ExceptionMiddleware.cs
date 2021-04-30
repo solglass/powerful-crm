@@ -2,7 +2,6 @@
 using powerful_crm.Core;
 using powerful_crm.Core.CustomExceptions;
 using System;
-using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Net;
@@ -15,7 +14,7 @@ namespace powerful_crm.API.Middleware
     public class ExceptionMiddleware
     {
         private readonly RequestDelegate _next;
-        private const string GlobalErrorMessage = "An error occured while processing the request.";
+       
         public ExceptionMiddleware(RequestDelegate next)
         {
             _next = next;
@@ -26,9 +25,9 @@ namespace powerful_crm.API.Middleware
             {
                 await _next(httpContext);
             }
-            catch (ValidationException ex)
+            catch (CustomException ex)
             {
-                await HandleValidationExceptionAsync(httpContext, ex);
+                await HandleCustomExceptionAsync(httpContext, ex);
             }
             catch (SqlException ex)
             {
@@ -40,30 +39,35 @@ namespace powerful_crm.API.Middleware
             }
         }
 
-        private Task HandleValidationExceptionAsync(HttpContext context, ValidationException exception)
+        private Task HandleCustomExceptionAsync(HttpContext context, CustomException exception)
         {
             ModifyContextResponse(context, exception.StatusCode);
-
             return ConstructResponse(context, exception.StatusCode, exception.ErrorMessage);
         }
         private Task HandleSqlExceptionAsync(HttpContext context, SqlException exception)
         {
-            ModifyContextResponse(context, (int)HttpStatusCode.BadRequest);
-            var keys = new string[] { Constants.EMAIL_UNIQUE_CONSTRAINT, Constants.EMAIL_UNIQUE_CONSTRAINT };
+            var keys = new string[] { Constants.EMAIL_UNIQUE_CONSTRAINT, Constants.LOGIN_UNIQUE_CONSTRAINT, Constants.CURRENCY_UNIQUE_CONSTRAINT };
             var result = keys.FirstOrDefault<string>(s => exception.Message.Contains(s));
-            return result switch
-            {
-                Constants.LOGIN_UNIQUE_CONSTRAINT => ConstructResponse(context, 409, "This login is already in use."),
-                Constants.EMAIL_UNIQUE_CONSTRAINT => ConstructResponse(context, 409, "This email is already in use."),
-                _ => ConstructResponse(context, 400, GlobalErrorMessage),
-            };
+            switch (result)
+                {
+                case Constants.LOGIN_UNIQUE_CONSTRAINT:
+                    ModifyContextResponse(context, (int)HttpStatusCode.Conflict);
+                    return ConstructResponse(context, 409, Constants.ERROR_NOT_UNIQUE_LOGIN);
+                case Constants.EMAIL_UNIQUE_CONSTRAINT:
+                    ModifyContextResponse(context, (int)HttpStatusCode.Conflict);
+                    return ConstructResponse(context, 409, Constants.ERROR_NOT_UNIQUE_EMAIL);
+                case Constants.CURRENCY_UNIQUE_CONSTRAINT:
+                    ModifyContextResponse(context, (int)HttpStatusCode.Conflict);
+                    return ConstructResponse(context, 409, Constants.ERROR_NOT_UNIQUE_CURRENCY);
+                default:
+                    return HandleExceptionAsync(context, exception);
+            }
         }
 
         private Task HandleExceptionAsync(HttpContext context, Exception exception)
         {
             ModifyContextResponse(context, (int)HttpStatusCode.BadRequest);
-
-            return ConstructResponse(context, (int)HttpStatusCode.BadRequest, GlobalErrorMessage);
+            return ConstructResponse(context, (int)HttpStatusCode.BadRequest, Constants.GLOBAL_ERROR_MESSAGE);
         }
 
         private void ModifyContextResponse(HttpContext context, int statusCode)

@@ -6,6 +6,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="BCrypt-Official" Version="0.1.109" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.10.2" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\powerful-crm.Core\powerful-crm.Core.csproj" />
     <ProjectReference Include="..\powerful-crm.Data\powerful-crm.Data.csproj" />
   </ItemGroup>

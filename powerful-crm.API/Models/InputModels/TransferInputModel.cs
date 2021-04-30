@@ -1,17 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using powerful_crm.API.Attributes;
+using System.ComponentModel.DataAnnotations;
 
 namespace powerful_crm.API.Models.InputModels
 {
     public class TransferInputModel
     {
-        public int Id { get; set; }
+        [Required]
+        [Range(1, int.MaxValue)]
         public int SenderId { get; set; }
+        [Required]
+        [Range(1, int.MaxValue)]
         public int RecipientId { get; set; }
+        [Required]
         public decimal Amount { get; set; }
-        public string Type { get; set; }
-        public DateTime Timestamp { get; set; }
+        [Required]
+        [CustomCurrencyValidation]
+        public string CurrentCurrency { get; set; }
+        [Required]
+        [CustomCurrencyValidation]
+        public string AccountCurrency { get; set; }
     }
 }

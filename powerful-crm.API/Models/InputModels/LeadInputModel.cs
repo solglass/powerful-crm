@@ -1,5 +1,4 @@
 ﻿using powerful_crm.API.Attributes;
-using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace powerful_crm.API.Models.InputModels

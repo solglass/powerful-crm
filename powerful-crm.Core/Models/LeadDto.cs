@@ -1,6 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using powerful_crm.Core.Enums;
+using System;
 
 namespace powerful_crm.Core.Models
 {
@@ -16,6 +15,7 @@ namespace powerful_crm.Core.Models
         public DateTime BirthDate { get; set; }
         public CityDto City { get; set; }
         public bool IsDeleted { get; set; }
-        
+        public Role Role { get; set; }
+
     }
 }
