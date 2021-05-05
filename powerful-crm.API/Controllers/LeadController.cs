@@ -229,12 +229,12 @@ namespace powerful_crm.API.Controllers
         /// <param name="leadId">Id of lead</param>
         /// <param name="currency">presentation currency</param>
         /// <returns>Info about balance</returns>
-        [ProducesResponseType(typeof(List<BalanceOutputModel>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(LeadBalanceOutputModel), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(string), StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [HttpGet("{leadId}/balance/{currency}")]
-        public ActionResult<List<BalanceOutputModel>> GetBalanceByLeadId(int leadId, string currency)
+        public ActionResult<LeadBalanceOutputModel> GetBalanceByLeadId(int leadId, string currency)
         {
             if (!_checker.CheckIfUserIsAllowed(leadId, HttpContext))
                 throw new ForbidException(Constants.ERROR_NOT_ALLOWED_ACTIONS_WITH_OTHER_LEAD);
@@ -247,11 +247,14 @@ namespace powerful_crm.API.Controllers
                 return NotFound(string.Format(Constants.ERROR_LEAD_NOT_FOUND_BY_ID, leadId));
             }
 
-            var middle = new BalanceMiddleModel { AccountIds = _accountService.GetAccountsByLeadId(leadId).ConvertAll<int>(acc => acc.Id), Currency = currency };
+            var middle = new BalanceMiddleModel { 
+                AccountIds = _accountService.GetAccountsByLeadId(leadId).ConvertAll(acc => acc.Id),
+                Currency = currency
+            };
 
             var request = new RestRequest(Constants.API_GET_BALANCE, Method.POST);
             request.AddParameter("application/json", JsonSerializer.Serialize(middle), ParameterType.RequestBody);
-            var queryResult = _client.Execute<List<BalanceOutputModel>>(request).Data;
+            var queryResult = _client.Execute<LeadBalanceOutputModel>(request).Data;
 
             return Ok(queryResult);
         }
