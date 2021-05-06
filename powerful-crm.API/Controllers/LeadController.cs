@@ -23,13 +23,21 @@ namespace powerful_crm.API.Controllers
     {
         private ILeadService _leadService;
         private ICityService _cityService;
+        private IAccountService _accountService;
         private Checker _checker;
         private IMapper _mapper;
         private RestClient _client;
 
-        public LeadController(IOptions<AppSettings> options,IMapper mapper, ILeadService leadService, ICityService cityService, Checker checker)
+        public LeadController(IOptions<AppSettings> options, 
+                                            IMapper mapper, 
+                                            ILeadService leadService, 
+                                            ICityService cityService, 
+                                            Checker checker,
+                                            IAccountService accountService)
         {
             _leadService = leadService;
+            _accountService = accountService;
+            _checker = checker;
             _cityService = cityService;
             _mapper = mapper;
             _client = new RestClient(options.Value.TSTORE_URL);
