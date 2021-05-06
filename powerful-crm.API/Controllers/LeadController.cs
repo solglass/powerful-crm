@@ -63,6 +63,7 @@ namespace powerful_crm.API.Controllers
             var dto = _mapper.Map<LeadDto>(inputModel);
             var addedLeadId = _leadService.AddLead(dto);
             var outputModel = _mapper.Map<LeadOutputModel>(_leadService.GetLeadById(addedLeadId));
+            outputModel.Accounts = _mapper.Map<List<AccountOutputModel>>(_accountService.GetAccountsByLeadId(addedLeadId));
             return Ok(outputModel);
 
         }
@@ -165,6 +166,7 @@ namespace powerful_crm.API.Controllers
             var dto = _mapper.Map<LeadDto>(inputModel);
             _leadService.UpdateLead(leadId, dto);
             var outputModel = _mapper.Map<LeadOutputModel>(_leadService.GetLeadById(leadId));
+            outputModel.Accounts = _mapper.Map<List<AccountOutputModel>>(_accountService.GetAccountsByLeadId(leadId));
             return Ok(outputModel);
 
         }
@@ -194,6 +196,7 @@ namespace powerful_crm.API.Controllers
             }
             _leadService.DeleteLead(leadId);
             var dto = _mapper.Map<LeadOutputModel>(_leadService.GetLeadById(leadId));
+            dto.Accounts = _mapper.Map<List<AccountOutputModel>>(_accountService.GetAccountsByLeadId(leadId));
             return Ok(dto);
         }
 
@@ -222,6 +225,7 @@ namespace powerful_crm.API.Controllers
             }
             _leadService.RecoverLead(leadId);
             var dto = _mapper.Map<LeadOutputModel>(_leadService.GetLeadById(leadId));
+            dto.Accounts = _mapper.Map<List<AccountOutputModel>>(_accountService.GetAccountsByLeadId(leadId));
             return Ok(dto);
         }
 

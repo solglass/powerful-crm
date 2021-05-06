@@ -37,7 +37,7 @@ namespace powerful_crm.API
                 Configuration.GetValue<string>("CRM_CONNECTION_STRING") :
                 Configuration.GetValue<string>("CRM_TEST_CONNECTION_STRING");
 
-                c.TSTORE_URL = _env.IsProduction() ?
+                c.TSTORE_URL =_env.IsProduction() ?
                 Configuration.GetValue<string>("TSTORE_URL") :
                 Configuration.GetValue<string>("TSTORE_TEST_URL");
             });
