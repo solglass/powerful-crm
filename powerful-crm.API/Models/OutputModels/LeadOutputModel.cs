@@ -1,4 +1,6 @@
-﻿namespace powerful_crm.API.Models.OutputModels
+﻿using System;
+
+namespace powerful_crm.API.Models.OutputModels
 {
     public class LeadOutputModel
     {
@@ -10,5 +12,6 @@
         public string Phone { get; set; }
         public string BirthDate { get; set; }
         public CityOutputModel City { get; set; }
+        public List<AccountOutputModel> Accounts { get; set; }
     }
 }

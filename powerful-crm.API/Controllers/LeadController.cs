@@ -31,7 +31,6 @@ namespace powerful_crm.API.Controllers
         {
             _leadService = leadService;
             _cityService = cityService;
-            _checker = checker;
             _mapper = mapper;
             _client = new RestClient(options.Value.TSTORE_URL);
         }
@@ -100,6 +99,7 @@ namespace powerful_crm.API.Controllers
             }
 
             var outputModel = _mapper.Map<LeadOutputModel>(lead);
+            outputModel.Accounts = _mapper.Map<List<AccountOutputModel>>(_accountService.GetAccountsByLeadId(leadId));
             return Ok(outputModel);
         }
         /// <summary>Searches leads by parameters</summary>
