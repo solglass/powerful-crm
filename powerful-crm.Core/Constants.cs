@@ -10,7 +10,7 @@
         public const string CURRENCY_UNIQUE_CONSTRAINT = "UQAccount5E55825B7B2276C4";
 
         public const string API_GET_TRANSACTION = "/api/Transaction/{0}";
-        public const string API_GET_BALANCE = "/api/Transaction/balance/{0}";
+        public const string API_GET_BALANCE = "/api/Transaction/balance";
         public const string API_DEPOSIT = "/api/Transaction/deposite";
         public const string API_WITHDRAW = "/api/Transaction/withdraw";
         public const string API_TRANSFER = "/api/Transaction/transfer";
@@ -29,5 +29,6 @@
         public const string GLOBAL_ERROR_MESSAGE = "An error occured while processing the request.";
         public const string ERROR_LEAD_NOT_FOUND_BY_ID = "Lead with id {0} is not found";
         public const string ERROR_LEAD_NOT_FOUND_BY_LOGIN = "Lead with login {0} is not found";
+        public const string ERROR_CURRENCY_NOT_SUPPORT = "Currency not supported";
     }
 }

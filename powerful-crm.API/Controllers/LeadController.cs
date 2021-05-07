@@ -21,6 +21,7 @@ namespace powerful_crm.API.Controllers
     [Route("api/[controller]")]
     public class LeadController : ControllerBase
     {
+        private IAccountService _accountService;
         private ILeadService _leadService;
         private ICityService _cityService;
         private IAccountService _accountService;
@@ -28,13 +29,14 @@ namespace powerful_crm.API.Controllers
         private IMapper _mapper;
         private RestClient _client;
 
-        public LeadController(IOptions<AppSettings> options, 
-                                            IMapper mapper, 
-                                            ILeadService leadService, 
-                                            ICityService cityService, 
-                                            Checker checker,
-                                            IAccountService accountService)
+        public LeadController(IOptions<AppSettings> options,
+                              IMapper mapper,
+                              ILeadService leadService,
+                              ICityService cityService,
+                              Checker checker,
+                              IAccountService accountService)
         {
+            _accountService = accountService;
             _leadService = leadService;
             _accountService = accountService;
             _checker = checker;
@@ -224,19 +226,22 @@ namespace powerful_crm.API.Controllers
             return Ok(dto);
         }
 
-       
+
         /// <summary>Gets lead balance</summary>
         /// <param name="leadId">Id of lead</param>
+        /// <param name="currency">presentation currency</param>
         /// <returns>Info about balance</returns>
-        [ProducesResponseType(typeof(List<BalanceOutputModel>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(LeadBalanceOutputModel), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(string), StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [HttpGet("{leadId}/balance")]
-        public ActionResult<List<BalanceOutputModel>> GetBalanceByLeadId(int leadId)
+        [HttpGet("{leadId}/balance/{currency}")]
+        public ActionResult<LeadBalanceOutputModel> GetBalanceByLeadId(int leadId, string currency)
         {
             if (!_checker.CheckIfUserIsAllowed(leadId, HttpContext))
                 throw new ForbidException(Constants.ERROR_NOT_ALLOWED_ACTIONS_WITH_OTHER_LEAD);
+            if (!_checker.CheckCurrencyIsDefined(currency))
+                return Conflict(Constants.ERROR_CURRENCY_NOT_SUPPORT);
 
             var lead = _leadService.GetLeadById(leadId);
             if (lead == null)
@@ -244,11 +249,16 @@ namespace powerful_crm.API.Controllers
                 return NotFound(string.Format(Constants.ERROR_LEAD_NOT_FOUND_BY_ID, leadId));
             }
 
-            var request = new RestRequest(string.Format(Constants.API_GET_BALANCE, leadId), Method.GET);
-            var queryResult = _client.Execute<List<BalanceInputModel>>(request).Data;
+            var middle = new BalanceMiddleModel { 
+                AccountIds = _accountService.GetAccountsByLeadId(leadId).ConvertAll(acc => acc.Id),
+                Currency = currency
+            };
 
-            var result = _mapper.Map<List<BalanceOutputModel>>(queryResult);
-            return Ok(result);
+            var request = new RestRequest(Constants.API_GET_BALANCE, Method.POST);
+            request.AddParameter("application/json", JsonSerializer.Serialize(middle), ParameterType.RequestBody);
+            var queryResult = _client.Execute<LeadBalanceOutputModel>(request).Data;
+
+            return Ok(queryResult);
         }
 
         /// <summary>Gets lead transactions</summary>
