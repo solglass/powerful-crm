@@ -11,9 +11,11 @@ namespace powerful_crm.Business
     {
         private ILeadRepository _leadRepository;
         private ISecurityService _securityService;
-        public LeadService(ILeadRepository leadRepository, ISecurityService securityService)
+        private IAccountRepository _accountRepository;
+        public LeadService(ILeadRepository leadRepository, ISecurityService securityService, IAccountRepository accountRepository)
         {
             _leadRepository = leadRepository;
+            _accountRepository = accountRepository;
             _securityService = securityService;
         }
 
@@ -40,7 +42,16 @@ namespace powerful_crm.Business
             }
             throw new WrongCredentialsException();
         }
-        public LeadDto GetLeadById(int leadId) => _leadRepository.GetLeadById(leadId);
+        public LeadDto GetLeadById(int leadId)
+        {
+          var lead =  _leadRepository.GetLeadById(leadId);
+            if(lead!=null)
+            {
+                lead.Accounts = _accountRepository.GetAccountsByLeadId(leadId);
+            }
+            return lead;
+
+        }
         public int UpdateLeadRole(int leadId, int roleId) => _leadRepository.UpdateLeadRole(leadId, roleId);
         public List<LeadDto> SearchLead(SearchLeadDto leadDto)
         {

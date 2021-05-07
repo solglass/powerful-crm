@@ -1,5 +1,6 @@
 ﻿using powerful_crm.Core.Enums;
 using System;
+using System.Collections.Generic;
 
 namespace powerful_crm.Core.Models
 {
@@ -16,6 +17,7 @@ namespace powerful_crm.Core.Models
         public CityDto City { get; set; }
         public bool IsDeleted { get; set; }
         public Role Role { get; set; }
+        public List<AccountDto> Accounts { get; set; }
 
     }
 }

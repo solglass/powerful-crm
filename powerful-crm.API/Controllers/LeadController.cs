@@ -37,8 +37,8 @@ namespace powerful_crm.API.Controllers
         {
             _accountService = accountService;
             _leadService = leadService;
-            _cityService = cityService;
             _checker = checker;
+            _cityService = cityService;
             _mapper = mapper;
             _client = new RestClient(options.Value.TSTORE_URL);
         }
