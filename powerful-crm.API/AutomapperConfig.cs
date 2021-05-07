@@ -30,7 +30,7 @@ namespace EducationSystem.API
                 .ForMember(dest => dest.BirthDate, opts => opts.MapFrom(src => DateTime.ParseExact(src.BirthDate, Constants.DATE_FORMAT, CultureInfo.InvariantCulture, DateTimeStyles.None)))
              .ForMember(dest => dest.City, opts => opts.MapFrom(src => new CityDto { Id = src.CityId }));
 
-            CreateMap<BalanceInputModel, BalanceOutputModel>();
+            CreateMap<BalanceInputModel, AccountBalanceOutputModel>();
             CreateMap<SearchLeadInputModel, SearchLeadDto>()
             .ForMember(dest => dest.StartBirthDate, opts => opts.MapFrom(src => DateTime.ParseExact(src.StartBirthDate, Constants.DATE_FORMAT, CultureInfo.InvariantCulture, DateTimeStyles.None)))
             .ForMember(dest => dest.EndBirthDate, opts => opts.MapFrom(src => DateTime.ParseExact(src.EndBirthDate, Constants.DATE_FORMAT, CultureInfo.InvariantCulture, DateTimeStyles.None)))
