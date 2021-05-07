@@ -14,7 +14,7 @@ namespace powerful_crm.API
                 || httpContext.User.IsInRole(Role.Administrator.ToString());
         }
 
-        public bool CheckCurrencyAllowed(string currency)
+        public bool CheckCurrencyIsDefined(string currency)
         {
             return Enum.IsDefined(typeof(Currency), currency);
         }

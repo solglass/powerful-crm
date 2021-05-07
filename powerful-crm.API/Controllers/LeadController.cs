@@ -238,8 +238,8 @@ namespace powerful_crm.API.Controllers
         {
             if (!_checker.CheckIfUserIsAllowed(leadId, HttpContext))
                 throw new ForbidException(Constants.ERROR_NOT_ALLOWED_ACTIONS_WITH_OTHER_LEAD);
-            if (!_checker.CheckCurrencyAllowed(currency))
-                throw new ForbidException(Constants.ERROR_CURRENCY_NOT_SUPPORT);
+            if (!_checker.CheckCurrencyIsDefined(currency))
+                return Conflict(Constants.ERROR_CURRENCY_NOT_SUPPORT);
 
             var lead = _leadService.GetLeadById(leadId);
             if (lead == null)
