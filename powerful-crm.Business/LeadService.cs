@@ -11,7 +11,7 @@ namespace powerful_crm.Business
     {
         private ILeadRepository _leadRepository;
         private ISecurityService _securityService;
-        IAccountRepository _accountRepository;
+        private IAccountRepository _accountRepository;
         public LeadService(ILeadRepository leadRepository, ISecurityService securityService, IAccountRepository accountRepository)
         {
             _leadRepository = leadRepository;
@@ -45,7 +45,10 @@ namespace powerful_crm.Business
         public LeadDto GetLeadById(int leadId)
         {
           var lead =  _leadRepository.GetLeadById(leadId);
-            lead.Accounts = _accountRepository.GetAccountsByLeadId(leadId);
+            if(lead!=null)
+            {
+                lead.Accounts = _accountRepository.GetAccountsByLeadId(leadId);
+            }
             return lead;
 
         }

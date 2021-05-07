@@ -28,7 +28,7 @@ namespace powerful_crm.API.Controllers
         private IMapper _mapper;
         private RestClient _client;
 
-        public LeadController(IOptions<AppSettings> options,
+        private LeadController(IOptions<AppSettings> options,
                               IMapper mapper,
                               ILeadService leadService,
                               ICityService cityService,
