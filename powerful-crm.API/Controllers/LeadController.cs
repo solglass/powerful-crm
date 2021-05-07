@@ -24,7 +24,6 @@ namespace powerful_crm.API.Controllers
         private IAccountService _accountService;
         private ILeadService _leadService;
         private ICityService _cityService;
-        private IAccountService _accountService;
         private Checker _checker;
         private IMapper _mapper;
         private RestClient _client;
@@ -38,7 +37,6 @@ namespace powerful_crm.API.Controllers
         {
             _accountService = accountService;
             _leadService = leadService;
-            _accountService = accountService;
             _checker = checker;
             _cityService = cityService;
             _mapper = mapper;
