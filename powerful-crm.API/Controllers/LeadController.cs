@@ -159,7 +159,11 @@ namespace powerful_crm.API.Controllers
             }
             if ( _cityService.GetCityById(inputModel.CityId) == null)
             {
-                return NotFound(string.Format(Constants.ERROR_CITY_NOT_FOUND, inputModel.CityId));
+                return NotFound(new CustomExceptionOutputModel
+                {
+                    Code = StatusCodes.Status404NotFound,
+                    Message = string.Format(Constants.ERROR_CITY_NOT_FOUND, inputModel.CityId)
+                });
             }
             var dto = _mapper.Map<LeadDto>(inputModel);
             _leadService.UpdateLead(leadId, dto);
