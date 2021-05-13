@@ -12,7 +12,7 @@ namespace powerful_crm.Core.CustomExceptions
             ErrorMessage = ""; 
             foreach (var state in modelState)
             {
-                ErrorMessage += $"Invalid format {state.Key}{System.Environment.NewLine}";
+                ErrorMessage += state.Value.ValidationState == ModelValidationState.Invalid ?  $"Invalid format {state.Key}{System.Environment.NewLine}":"";
             }
         }
     }
