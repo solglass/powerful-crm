@@ -8,6 +8,7 @@ using powerful_crm.Business;
 using powerful_crm.Core;
 using powerful_crm.Core.CustomExceptions;
 using powerful_crm.Core.Models;
+using System.Threading.Tasks;
 
 namespace powerful_crm.API.Controllers
 {
@@ -34,7 +35,7 @@ namespace powerful_crm.API.Controllers
         [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(string), StatusCodes.Status403Forbidden)]
         [HttpPost]
-        public ActionResult<AccountOutputModel> AddAccount([FromBody] AccountInputModel inputModel)
+        public async Task<ActionResult<AccountOutputModel>> AddAccountAsync([FromBody] AccountInputModel inputModel)
         {
             if (!_checker.CheckIfUserIsAllowed(inputModel.LeadId, HttpContext))
                 throw new ForbidException(Constants.ERROR_NOT_ALLOWED_ACTIONS_WITH_OTHER_LEAD);
@@ -42,13 +43,13 @@ namespace powerful_crm.API.Controllers
             {
                 throw new CustomValidationException(ModelState);
             }
-            if (_leadService.GetLeadById(inputModel.LeadId) == null)
+            if (await _leadService.GetLeadByIdAsync(inputModel.LeadId) == null)
             {
                 return NotFound(string.Format(Constants.ERROR_LEAD_NOT_FOUND_BY_ID, inputModel.LeadId));
             }
             var dto = _mapper.Map<AccountDto>(inputModel);
-            var addedAccountId = _accountService.AddAccount(dto);
-            var outputModel = _mapper.Map<AccountOutputModel>(_accountService.GetAccountById(addedAccountId));
+            var addedAccountId = await _accountService.AddAccountAsync(dto);
+            var outputModel = _mapper.Map<AccountOutputModel>(await _accountService.GetAccountByIdAsync(addedAccountId));
             return Ok(outputModel);
 
         }
@@ -61,16 +62,16 @@ namespace powerful_crm.API.Controllers
         [ProducesResponseType(typeof(string), StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [HttpDelete("{accountId}")]
-        public ActionResult DeleteAccount(int accountId)
+        public async Task<ActionResult> DeleteAccount(int accountId)
         {
-            var account = _accountService.GetAccountById(accountId);
+            var account = await _accountService.GetAccountByIdAsync(accountId);
             if (account == null)
             {
                 return NotFound(string.Format(Constants.ERROR_ACCOUNT_NOT_FOUND, accountId));
             }
             if (!_checker.CheckIfUserIsAllowed(account.LeadDto.Id, HttpContext))
                 throw new ForbidException(Constants.ERROR_NOT_ALLOWED_ACTIONS_WITH_OTHER_LEAD);
-            _accountService.DeleteAccount(accountId);
+            await _accountService.DeleteAccountAsync(accountId);
             return NoContent();
 
         }
