@@ -1,17 +1,18 @@
 ﻿using powerful_crm.Core.Models;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace powerful_crm.Business
 {
     public interface ILeadService
     {
-        int AddLead(LeadDto dto);
-        int ChangePassword(int leadId, string oldPassword, string newPassword);
-        int DeleteLead(int leadId);
-        LeadDto GetLeadById(int leadId);
-        List<LeadDto> SearchLead(SearchLeadDto leadDto);
-        int RecoverLead(int leadId);
-        int UpdateLead(int leadId, LeadDto dto);
-        int UpdateLeadRole(int leadId, int roleId);
+        Task<int> AddLeadAsync(LeadDto dto);
+        Task<int> ChangePasswordAsync(int leadId, string oldPassword, string newPassword);
+        Task<int> DeleteLeadAsync(int leadId);
+        Task<LeadDto> GetLeadByIdAsync(int leadId);
+        Task<List<LeadDto>> SearchLeadAsync(SearchLeadDto leadDto);
+        Task<int> RecoverLeadAsync(int leadId);
+        Task<int> UpdateLeadAsync(int leadId, LeadDto dto);
+        Task<int> UpdateLeadRoleAsync(int leadId, int roleId);
     }
 }

@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using SqlKata.Execution;
 using SqlKata.Compilers;
 using powerful_crm.Core.Enums;
+using System.Threading.Tasks;
 
 namespace powerful_crm.Data
 {
@@ -25,9 +26,9 @@ namespace powerful_crm.Data
             db = new QueryFactory(_connection, _compiler);
         }
 
-        public int AddUpdateLead(LeadDto dto)
+        public async Task<int> AddUpdateLeadAsync(LeadDto dto)
         {
-            return _connection.QuerySingleOrDefault<int>(
+            return await _connection.QuerySingleOrDefaultAsync<int>(
                 "dbo.Lead_AddUpdate",
                 param: new
                 {
@@ -45,10 +46,10 @@ namespace powerful_crm.Data
                 commandType: CommandType.StoredProcedure);
         }
 
-        public int DeleteOrRecoverLead(int id, bool isDeleted)
+        public async Task<int> DeleteOrRecoverLeadAsync(int id, bool isDeleted)
         {
-            return _connection
-                .Execute("dbo.Lead_DeleteOrRecover",
+            return await _connection
+                .ExecuteAsync("dbo.Lead_DeleteOrRecover",
                 new
                 {
                     id,
@@ -57,10 +58,10 @@ namespace powerful_crm.Data
                 commandType: CommandType.StoredProcedure);
         }
 
-        public int ChangePasswordLead(int id, string oldPassword, string newPassword)
+        public async Task<int> ChangePasswordLeadAsync(int id, string oldPassword, string newPassword)
         {
-            return _connection
-               .Execute("dbo.Lead_ChangePassword", new
+            return await _connection
+               .ExecuteAsync("dbo.Lead_ChangePassword", new
                {
                    id,
                    oldPassword,
@@ -69,9 +70,9 @@ namespace powerful_crm.Data
                commandType: CommandType.StoredProcedure);
         }
 
-        public LeadDto GetLeadById(int id)
+        public async Task<LeadDto> GetLeadByIdAsync(int id)
         {
-            return _connection.Query<LeadDto, CityDto, LeadDto>(
+            return (await _connection.QueryAsync<LeadDto, CityDto, LeadDto>(
                 "dbo.Lead_SelectById", (lead, city) =>
                 {
                     lead.City = city;
@@ -79,12 +80,12 @@ namespace powerful_crm.Data
                 },
                 new { id },
                 splitOn: "Id",
-                commandType: CommandType.StoredProcedure).FirstOrDefault();
+                commandType: CommandType.StoredProcedure)).FirstOrDefault();
         }
 
-        public LeadDto GetLeadCredentials(int? id, string login)
+        public async Task<LeadDto> GetLeadCredentialsAsync(int? id, string login)
         {
-            return _connection.Query<LeadDto, int, LeadDto>(
+            return (await _connection.QueryAsync<LeadDto, int, LeadDto>(
                 "dbo.Lead_GetCredentials",(lead, role)=>
                 {
                     lead.Role = (Role)role;
@@ -92,25 +93,25 @@ namespace powerful_crm.Data
                 }, 
                 new { id, login },
                 splitOn: "Id",
-                commandType: CommandType.StoredProcedure).FirstOrDefault();
+                commandType: CommandType.StoredProcedure)).FirstOrDefault();
         }
 
-        public int UpdateLeadRole(int leadId, int roleId)
+        public async Task<int> UpdateLeadRoleAsync(int leadId, int roleId)
         {
-            return _connection.Execute("dbo.Lead_UpdateRole", new
+            return await _connection.ExecuteAsync("dbo.Lead_UpdateRole", new
             {
                 leadId,
                 roleId
             },
                commandType: CommandType.StoredProcedure);
         }
-        public List<LeadDto> SearchLeads(SearchLeadDto leadDto)
+        public async Task<List<LeadDto>> SearchLeadsAsync(SearchLeadDto leadDto)
         {
             if (leadDto.FirstName == null && leadDto.LastName == null && leadDto.Email == null && leadDto.Login == null
                 && leadDto.Phone == null && leadDto.StartBirthDate == null && leadDto.City.Name == null)
                 throw new ArgumentNullException();
 
-            var query = db.Query("Lead as l").Join("City as c", "c.Id","l.CityId").Select("l.Id",
+            var query =  db.Query("Lead as l").Join("City as c", "c.Id","l.CityId").Select("l.Id",
                                                 "l.FirstName",
                                                 "l.LastName",
                                                 "l.Login",
@@ -156,13 +157,13 @@ namespace powerful_crm.Data
                 query = query.WhereDate("l.BirthDate", "<", leadDto.EndBirthDate);
             }
 
-            var sql = _compiler.Compile(query).ToString();
-            return _connection.Query<LeadDto, CityDto, LeadDto>(
+            var sql =  _compiler.Compile(query).ToString();
+            return (await _connection.QueryAsync<LeadDto, CityDto, LeadDto>(
                 sql, (lead, city) =>
                 {
                     lead.City = city;
                     return lead;
-                }, splitOn: "Id")
+                }, splitOn: "Id"))
                 .Distinct()
                 .ToList();
         }
