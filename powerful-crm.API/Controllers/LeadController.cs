@@ -63,7 +63,7 @@ namespace powerful_crm.API.Controllers
             }
             var dto = _mapper.Map<LeadDto>(inputModel);
             var addedLeadId = await _leadService.AddLeadAsync(dto);
-            var outputModel = _mapper.Map<LeadOutputModel>(_leadService.GetLeadByIdAsync(addedLeadId));
+            var outputModel = _mapper.Map<LeadOutputModel>(await _leadService.GetLeadByIdAsync(addedLeadId));
             return Ok(outputModel);
 
         }
