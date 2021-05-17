@@ -7,7 +7,7 @@ namespace powerful_crm.Data
     public interface ILeadRepository
     {
         Task<int> AddUpdateLeadAsync(LeadDto dto);
-        Task<int> ChangePasswordLeadAsync(int id, string oldPassword, string newPassword);
+        Task<bool> ChangePasswordLeadAsync(int id, string oldPassword, string newPassword);
         Task<int> DeleteOrRecoverLeadAsync(int id, bool isDeleted);
         Task<LeadDto> GetLeadByIdAsync(int id);
         Task<List<LeadDto>> SearchLeadsAsync(SearchLeadDto leadDto);

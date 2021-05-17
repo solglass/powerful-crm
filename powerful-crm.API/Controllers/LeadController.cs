@@ -78,7 +78,7 @@ namespace powerful_crm.API.Controllers
         [ProducesResponseType(typeof(string), StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [HttpPut("{leadId}/change-password")]
-        public async Task<ActionResult> ChangePasswordAsync(int leadId, [FromBody]ChangePasswordInputModel inputModel)
+        public async Task<ActionResult> ChangePasswordAsync(int leadId, [FromBody] ChangePasswordInputModel inputModel)
         {
             if (!_checker.CheckIfUserIsAllowed(leadId, HttpContext))
                 throw new ForbidException(Constants.ERROR_NOT_ALLOWED_ACTIONS_WITH_OTHER_LEAD);
@@ -89,7 +89,7 @@ namespace powerful_crm.API.Controllers
             if (await _leadService.GetLeadByIdAsync(leadId) == null)
                 return NotFound(string.Format(Constants.ERROR_LEAD_NOT_FOUND_BY_ID, leadId));
 
-           await _leadService.ChangePasswordAsync(leadId, inputModel.OldPassword, inputModel.NewPassword);
+            await _leadService.ChangePasswordAsync(leadId, inputModel.OldPassword, inputModel.NewPassword);
             return NoContent();
         }
         /// <summary>Gets info about lead</summary>
@@ -118,7 +118,7 @@ namespace powerful_crm.API.Controllers
         [ProducesResponseType(typeof(string), StatusCodes.Status409Conflict)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [HttpPost("search")]
-        public async Task<ActionResult<List<LeadOutputModel>>> SearchLeadsAsync ([FromBody] SearchLeadInputModel inputModel)
+        public async Task<ActionResult<List<LeadOutputModel>>> SearchLeadsAsync([FromBody] SearchLeadInputModel inputModel)
         {
 
             if (!ModelState.IsValid)
@@ -127,7 +127,7 @@ namespace powerful_crm.API.Controllers
             }
             var dto = _mapper.Map<SearchLeadDto>(inputModel);
             var leads = await _leadService.SearchLeadAsync(dto);
-            if (leads.Count==0)
+            if (leads.Count == 0)
             {
                 return NotFound($"Leads is not found");
             }
@@ -144,7 +144,7 @@ namespace powerful_crm.API.Controllers
         [ProducesResponseType(typeof(string), StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [HttpPut("{leadId}")]
-        public async Task<ActionResult<LeadOutputModel>> UpdateLeadAsync([FromRoute]int leadId, [FromBody] UpdateLeadInputModel inputModel)
+        public async Task<ActionResult<LeadOutputModel>> UpdateLeadAsync([FromRoute] int leadId, [FromBody] UpdateLeadInputModel inputModel)
         {
             if (!_checker.CheckIfUserIsAllowed(leadId, HttpContext))
                 throw new ForbidException(Constants.ERROR_NOT_ALLOWED_ACTIONS_WITH_OTHER_LEAD);
@@ -196,7 +196,7 @@ namespace powerful_crm.API.Controllers
             {
                 return BadRequest(string.Format(Constants.ERROR_LEAD_ALREADY_DELETED, leadId));
             }
-           await _leadService.DeleteLeadAsync(leadId);
+            await _leadService.DeleteLeadAsync(leadId);
             var dto = _mapper.Map<LeadOutputModel>(await _leadService.GetLeadByIdAsync(leadId));
             return Ok(dto);
         }
@@ -252,15 +252,12 @@ namespace powerful_crm.API.Controllers
                 return NotFound(string.Format(Constants.ERROR_LEAD_NOT_FOUND_BY_ID, leadId));
             }
 
-            var middle = new BalanceMiddleModel { 
+            var middle = new BalanceMiddleModel
+            {
                 AccountIds = (await _accountService.GetAccountsByLeadIdAsync(leadId)).ConvertAll(acc => acc.Id),
                 Currency = currency
             };
-
-            var request = new RestRequest(Constants.API_GET_BALANCE, Method.POST);
-            request.AddParameter("application/json", JsonSerializer.Serialize(middle), ParameterType.RequestBody);
-            var queryResult = _client.Execute<LeadBalanceOutputModel>(request).Data;
-
+            var queryResult = RequestToTransactionStore(middle, Constants.API_GET_BALANCE);
             return Ok(queryResult);
         }
 
@@ -282,9 +279,8 @@ namespace powerful_crm.API.Controllers
             {
                 return NotFound(string.Format(Constants.ERROR_LEAD_NOT_FOUND_BY_ID, leadId));
             }
-
             var request = new RestRequest(string.Format(Constants.API_GET_TRANSACTION, leadId), Method.GET);
-            var queryResult = _client.Execute<string>(request).Data;
+            var queryResult = (await _client.ExecuteAsync<string>(request)).Data;
 
             return Ok(queryResult);
         }
@@ -310,9 +306,7 @@ namespace powerful_crm.API.Controllers
                 return NotFound(string.Format(Constants.ERROR_LEAD_NOT_FOUND_BY_ID, inputModel.LeadId));
             }
             var middle = _mapper.Map<TransactionMiddleModel>(inputModel);
-            var request = new RestRequest(Constants.API_DEPOSIT, Method.POST);
-            request.AddParameter("application/json", JsonSerializer.Serialize(middle), ParameterType.RequestBody);
-            var queryResult = _client.Execute<int>(request).Data;
+            var queryResult = RequestToTransactionStore(middle, Constants.API_DEPOSIT);
             return Ok(queryResult);
         }
 
@@ -327,7 +321,7 @@ namespace powerful_crm.API.Controllers
         [HttpPost("withdraw")]
         public async Task<ActionResult<int>> AddWithdrawAsync([FromBody] TransactionInputModel inputModel)
         {
-           if (!_checker.CheckIfUserIsAllowed(inputModel.LeadId, HttpContext))
+            if (!_checker.CheckIfUserIsAllowed(inputModel.LeadId, HttpContext))
                 throw new ForbidException(Constants.ERROR_NOT_ALLOWED_ACTIONS_WITH_OTHER_LEAD);
 
             if (!ModelState.IsValid)
@@ -337,9 +331,7 @@ namespace powerful_crm.API.Controllers
                 return NotFound(string.Format(Constants.ERROR_LEAD_NOT_FOUND_BY_ID, inputModel.LeadId));
             }
             var middle = _mapper.Map<TransactionMiddleModel>(inputModel);
-            var request = new RestRequest(Constants.API_WITHDRAW, Method.POST);
-            request.AddParameter("application/json", JsonSerializer.Serialize(middle), ParameterType.RequestBody);
-            var queryResult = _client.Execute<int>(request).Data;
+            var queryResult = RequestToTransactionStore(middle, Constants.API_WITHDRAW);
             return Ok(queryResult);
         }
 
@@ -354,7 +346,7 @@ namespace powerful_crm.API.Controllers
         [HttpPost("transfer")]
         public async Task<ActionResult<int>> AddTransferAsync([FromBody] TransferInputModel inputModel)
         {
-            if (!_checker.CheckIfUserIsAllowed(inputModel.SenderId,HttpContext))
+            if (!_checker.CheckIfUserIsAllowed(inputModel.SenderId, HttpContext))
                 throw new ForbidException(Constants.ERROR_NOT_ALLOWED_ACTIONS_WITH_OTHER_LEAD);
 
             if (!ModelState.IsValid)
@@ -369,10 +361,15 @@ namespace powerful_crm.API.Controllers
                 return NotFound(string.Format(Constants.ERROR_LEAD_NOT_FOUND_BY_ID, inputModel.SenderId));
             }
             var middle = _mapper.Map<TransferMiddleModel>(inputModel);
-            var request = new RestRequest(Constants.API_TRANSFER, Method.POST);
-            request.AddParameter("application/json", JsonSerializer.Serialize(middle), ParameterType.RequestBody);
-            var queryResult = _client.Execute<int>(request).Data;
+            var queryResult = RequestToTransactionStore(inputModel, Constants.API_TRANSFER);
             return Ok(queryResult);
+        }
+       
+        private async Task<int> RequestToTransactionStore<T>(T middle, string apiUrl)
+        {
+            var request = new RestRequest(apiUrl, Method.POST);
+            request.AddParameter("application/json", JsonSerializer.Serialize(middle), ParameterType.RequestBody);
+            return (await _client.ExecuteAsync<int>(request)).Data;
         }
     }
 }

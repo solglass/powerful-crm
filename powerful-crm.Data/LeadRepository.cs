@@ -16,14 +16,15 @@ namespace powerful_crm.Data
 {
     public class LeadRepository : BaseRepository, ILeadRepository
     {
-        private readonly QueryFactory db;
+        private readonly QueryFactory _db;
         private SqlServerCompiler _compiler;
+        private const int _expectedChangedRowsCount = 1;
 
         public LeadRepository(IOptions<AppSettings> options) : base(options)
         {
             _compiler = new SqlServerCompiler();
             _connection = new SqlConnection(_connectionString);
-            db = new QueryFactory(_connection, _compiler);
+            _db = new QueryFactory(_connection, _compiler);
         }
 
         public async Task<int> AddUpdateLeadAsync(LeadDto dto)
@@ -58,16 +59,16 @@ namespace powerful_crm.Data
                 commandType: CommandType.StoredProcedure);
         }
 
-        public async Task<int> ChangePasswordLeadAsync(int id, string oldPassword, string newPassword)
+        public async Task<bool> ChangePasswordLeadAsync(int id, string oldPassword, string newPassword)
         {
-            return await _connection
+            return (await _connection
                .ExecuteAsync("dbo.Lead_ChangePassword", new
                {
                    id,
                    oldPassword,
                    newPassword
                },
-               commandType: CommandType.StoredProcedure);
+               commandType: CommandType.StoredProcedure)) == _expectedChangedRowsCount;
         }
 
         public async Task<LeadDto> GetLeadByIdAsync(int id)
@@ -111,7 +112,7 @@ namespace powerful_crm.Data
                 && leadDto.Phone == null && leadDto.StartBirthDate == null && leadDto.City.Name == null)
                 throw new ArgumentNullException();
 
-            var query =  db.Query("Lead as l").Join("City as c", "c.Id","l.CityId").Select("l.Id",
+            var query =  _db.Query("Lead as l").Join("City as c", "c.Id","l.CityId").Select("l.Id",
                                                 "l.FirstName",
                                                 "l.LastName",
                                                 "l.Login",

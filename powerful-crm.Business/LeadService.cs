@@ -32,14 +32,12 @@ namespace powerful_crm.Business
         }
         public async Task<int> DeleteLeadAsync(int leadId) => await _leadRepository.DeleteOrRecoverLeadAsync(leadId, true);
         public async Task<int> RecoverLeadAsync(int leadId) => await _leadRepository.DeleteOrRecoverLeadAsync(leadId, false);
-        public async Task<int> ChangePasswordAsync(int leadId, string oldPassword, string newPassword)
+        public async Task<bool> ChangePasswordAsync(int leadId, string oldPassword, string newPassword)
         {
             if (_securityService.VerifyPassword((await _leadRepository.GetLeadCredentialsAsync(leadId, null)).Password, oldPassword))
             {
                 newPassword = _securityService.GetHash(newPassword);
-                if(await _leadRepository.ChangePasswordLeadAsync(leadId, oldPassword, newPassword)==1)
-                    return 1;
-                throw new Exception();
+                return await _leadRepository.ChangePasswordLeadAsync(leadId, oldPassword, newPassword);
             }
             throw new WrongCredentialsException();
         }
