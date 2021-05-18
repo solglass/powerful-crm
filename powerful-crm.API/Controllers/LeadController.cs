@@ -1,4 +1,5 @@
 using AutoMapper;
+using Google.Authenticator;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -17,7 +18,7 @@ using System.Text.Json;
 
 namespace powerful_crm.API.Controllers
 {
-    [Authorize]
+    //[Authorize]
     [Route("api/[controller]")]
     public class LeadController : ControllerBase
     {
@@ -41,6 +42,32 @@ namespace powerful_crm.API.Controllers
             _cityService = cityService;
             _mapper = mapper;
             _client = new RestClient(options.Value.TSTORE_URL);
+        }
+        [HttpGet]
+        public ActionResult<string> GetCode(string email)
+        {
+            TwoFactorAuthenticator twoFactor = new TwoFactorAuthenticator();
+            var setupInfo = twoFactor.GenerateSetupCode("myapp", email, TwoFactorKey(email), false, 3);
+            var setupCode = setupInfo.ManualEntryKey;
+            var barcodeImageUrl = setupInfo.QrCodeSetupImageUrl;
+            return setupCode;
+        }
+
+        [HttpPost("/Verify")]
+        public ActionResult<string> VerifyCode(string email, string inputCode)
+        {
+            TwoFactorAuthenticator twoFactor = new TwoFactorAuthenticator();
+            bool isValid = twoFactor.ValidateTwoFactorPIN(TwoFactorKey(email), inputCode);
+            if (!isValid)
+            {
+                return BadRequest("Tobi jopa");
+            }
+            return Ok("Ok");
+        }
+
+        private static string TwoFactorKey(string email)
+        {
+            return $"myverysecretkey+{email}";
         }
         /// <summary>Adds new lead</summary>
         /// <param name="inputModel">Information about lead to add</param>
