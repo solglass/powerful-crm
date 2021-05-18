@@ -64,6 +64,38 @@ namespace powerful_crm.API.Controllers
             }
             return Ok("Ok");
         }
+        /// <summary>Adds withdraw</summary>
+        /// <param name="inputModel">Information about withdraw</param>
+        /// <returns>Id of added withdraw</returns>
+        [ProducesResponseType(typeof(int), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [HttpPost("withdraw")]
+        public ActionResult<int> AddWithdraw([FromBody] TransactionInputModel inputModel, string inputCode)
+        {
+            if (!_checker.CheckIfUserIsAllowed(inputModel.LeadId, HttpContext))
+                throw new ForbidException(Constants.ERROR_NOT_ALLOWED_ACTIONS_WITH_OTHER_LEAD);
+
+            if (!ModelState.IsValid)
+                throw new CustomValidationException(ModelState);
+            var lead = _leadService.GetLeadById(inputModel.LeadId);
+            if (lead == null)
+            {
+                return NotFound(string.Format(Constants.ERROR_LEAD_NOT_FOUND_BY_ID, inputModel.LeadId));
+            }
+            TwoFactorAuthenticator twoFactor = new TwoFactorAuthenticator();
+            bool isValid = twoFactor.ValidateTwoFactorPIN(TwoFactorKey(lead.Email), inputCode);
+            if (!isValid)
+                throw new ForbidException("Tobi Jopa");
+
+            var middle = _mapper.Map<TransactionMiddleModel>(inputModel);
+            var request = new RestRequest(Constants.API_WITHDRAW, Method.POST);
+            request.AddParameter("application/json", JsonSerializer.Serialize(middle), ParameterType.RequestBody);
+            var queryResult = _client.Execute<int>(request).Data;
+            return Ok(queryResult);
+        }
 
         private static string TwoFactorKey(string email)
         {
@@ -338,32 +370,6 @@ namespace powerful_crm.API.Controllers
             return Ok(queryResult);
         }
 
-        /// <summary>Adds withdraw</summary>
-        /// <param name="inputModel">Information about withdraw</param>
-        /// <returns>Id of added withdraw</returns>
-        [ProducesResponseType(typeof(int), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status409Conflict)]
-        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
-        [ProducesResponseType(typeof(string), StatusCodes.Status403Forbidden)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [HttpPost("withdraw")]
-        public ActionResult<int> AddWithdraw([FromBody] TransactionInputModel inputModel)
-        {
-           if (!_checker.CheckIfUserIsAllowed(inputModel.LeadId, HttpContext))
-                throw new ForbidException(Constants.ERROR_NOT_ALLOWED_ACTIONS_WITH_OTHER_LEAD);
-
-            if (!ModelState.IsValid)
-                throw new CustomValidationException(ModelState);
-            if (_leadService.GetLeadById(inputModel.LeadId) == null)
-            {
-                return NotFound(string.Format(Constants.ERROR_LEAD_NOT_FOUND_BY_ID, inputModel.LeadId));
-            }
-            var middle = _mapper.Map<TransactionMiddleModel>(inputModel);
-            var request = new RestRequest(Constants.API_WITHDRAW, Method.POST);
-            request.AddParameter("application/json", JsonSerializer.Serialize(middle), ParameterType.RequestBody);
-            var queryResult = _client.Execute<int>(request).Data;
-            return Ok(queryResult);
-        }
 
         /// <summary>Adds transfer</summary>
         /// <param name="inputModel">Information about transfer</param>
