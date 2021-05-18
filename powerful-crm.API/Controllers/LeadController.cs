@@ -257,7 +257,7 @@ namespace powerful_crm.API.Controllers
                 AccountIds = (await _accountService.GetAccountsByLeadIdAsync(leadId)).ConvertAll(acc => acc.Id),
                 Currency = currency
             };
-            var queryResult = RequestToTransactionStore(middle, Constants.API_GET_BALANCE);
+            var queryResult = await RequestToTransactionStore(middle, Constants.API_GET_BALANCE);
             return Ok(queryResult);
         }
 
@@ -306,7 +306,7 @@ namespace powerful_crm.API.Controllers
                 return NotFound(string.Format(Constants.ERROR_LEAD_NOT_FOUND_BY_ID, inputModel.LeadId));
             }
             var middle = _mapper.Map<TransactionMiddleModel>(inputModel);
-            var queryResult = RequestToTransactionStore(middle, Constants.API_DEPOSIT);
+            var queryResult = await RequestToTransactionStore(middle, Constants.API_DEPOSIT);
             return Ok(queryResult);
         }
 
@@ -331,7 +331,7 @@ namespace powerful_crm.API.Controllers
                 return NotFound(string.Format(Constants.ERROR_LEAD_NOT_FOUND_BY_ID, inputModel.LeadId));
             }
             var middle = _mapper.Map<TransactionMiddleModel>(inputModel);
-            var queryResult = RequestToTransactionStore(middle, Constants.API_WITHDRAW);
+            var queryResult = await RequestToTransactionStore(middle, Constants.API_WITHDRAW);
             return Ok(queryResult);
         }
 
@@ -361,7 +361,7 @@ namespace powerful_crm.API.Controllers
                 return NotFound(string.Format(Constants.ERROR_LEAD_NOT_FOUND_BY_ID, inputModel.SenderId));
             }
             var middle = _mapper.Map<TransferMiddleModel>(inputModel);
-            var queryResult = RequestToTransactionStore(inputModel, Constants.API_TRANSFER);
+            var queryResult = await RequestToTransactionStore(inputModel, Constants.API_TRANSFER);
             return Ok(queryResult);
         }
        
