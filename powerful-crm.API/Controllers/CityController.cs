@@ -63,7 +63,7 @@ namespace powerful_crm.API.Controllers
             if (!CheckIfUserIsAllowed())
                 throw new ForbidException(Constants.ERROR_NOT_ALLOWED_ACTIONS_WITH_CITY);
 
-            var city = _cityService.GetCityByIdAsync(cityId);
+            var city = await _cityService.GetCityByIdAsync(cityId);
             if (city == null)
             {
                 return NotFound(string.Format(Constants.ERROR_CITY_NOT_FOUND, cityId));
