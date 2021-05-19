@@ -7,7 +7,7 @@ namespace powerful_crm.Data
     public interface IAccountRepository
     {
         Task<int> AddAccountAsync(AccountDto dto);
-        Task<int> DeleteAccountAsync(int id);
+        Task<bool> DeleteAccountAsync(int id);
         Task<AccountDto> GetAccountByIdAsync(int id);
         Task<List<AccountDto>> GetAccountsByLeadIdAsync(int leadId);
     }

@@ -11,6 +11,7 @@ using SqlKata.Execution;
 using SqlKata.Compilers;
 using powerful_crm.Core.Enums;
 using System.Threading.Tasks;
+using powerful_crm.Core;
 
 namespace powerful_crm.Data
 {
@@ -18,7 +19,6 @@ namespace powerful_crm.Data
     {
         private readonly QueryFactory _db;
         private SqlServerCompiler _compiler;
-        private const int _expectedChangedRowsCount = 1;
 
         public LeadRepository(IOptions<AppSettings> options) : base(options)
         {
@@ -68,7 +68,7 @@ namespace powerful_crm.Data
                    oldPassword,
                    newPassword
                },
-               commandType: CommandType.StoredProcedure)) == _expectedChangedRowsCount;
+               commandType: CommandType.StoredProcedure)) == Constants.EXPECTED_CHANGED_ROWS_COUNT;
         }
 
         public async Task<LeadDto> GetLeadByIdAsync(int id)

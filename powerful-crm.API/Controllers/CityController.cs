@@ -31,8 +31,8 @@ namespace powerful_crm.API.Controllers
         /// <param name="city">Information about new city</param>
         /// <returns>Info about created city</returns>
         [ProducesResponseType(typeof(CityOutputModel), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(string), StatusCodes.Status409Conflict)]
-        [ProducesResponseType(typeof(string), StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(CustomExceptionOutputModel), StatusCodes.Status409Conflict)]
+        [ProducesResponseType(typeof(CustomExceptionOutputModel), StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [HttpPost]
         public async Task<ActionResult<CityOutputModel>> AddCityAsync([FromBody] CityInputModel city)
@@ -41,9 +41,8 @@ namespace powerful_crm.API.Controllers
                 throw new ForbidException(Constants.ERROR_NOT_ALLOWED_ACTIONS_WITH_CITY);
 
             if (!ModelState.IsValid)
-            {
                 throw new CustomValidationException(ModelState);
-            }
+
             var dto = _mapper.Map<CityDto>(city);
             var addedCityId = await _cityService.AddCityAsync(dto);
             var outputModel = _mapper.Map<CityOutputModel>(await _cityService.GetCityByIdAsync(addedCityId));
@@ -54,12 +53,11 @@ namespace powerful_crm.API.Controllers
         /// <param name="cityId">Id of the city to delete</param>
         /// <returns>NoContent result</returns>
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
-        [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(string), StatusCodes.Status409Conflict)]
-        [ProducesResponseType(typeof(string), StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(CustomExceptionOutputModel), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(CustomExceptionOutputModel), StatusCodes.Status409Conflict)]
+        [ProducesResponseType(typeof(CustomExceptionOutputModel), StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [HttpDelete("{id}")]
+        [HttpDelete("{cityId}")]
         public async Task<ActionResult> DeleteCityAsync(int cityId)
         {
             if (!_checker.CheckIfUserIsAllowed(HttpContext))
@@ -68,12 +66,21 @@ namespace powerful_crm.API.Controllers
             var city = await _cityService.GetCityByIdAsync(cityId);
             if (city == null)
             {
-                return NotFound(string.Format(Constants.ERROR_CITY_NOT_FOUND, cityId));
+                return NotFound(new CustomExceptionOutputModel
+                {
+                    Code = StatusCodes.Status404NotFound,
+                    Message = string.Format(Constants.ERROR_CITY_NOT_FOUND, cityId)
+                });
             }
-            if (await _cityService.DeleteCityAsync(cityId) == 1)
-                return NoContent();
-            else
-                return Conflict(string.Format(Constants.ERROR_CITY_HAS_DEPENDENCIES, cityId));
+
+            if (!await _cityService.DeleteCityAsync(cityId))
+                return Conflict(new CustomExceptionOutputModel
+                {
+                    Code = StatusCodes.Status409Conflict,
+                    Message = string.Format(Constants.ERROR_CITY_HAS_DEPENDENCIES, cityId)
+                });
+
+            return NoContent();
         }
     }
 }
