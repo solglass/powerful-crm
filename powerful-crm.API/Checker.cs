@@ -8,7 +8,7 @@ namespace powerful_crm.API
 {
     public class Checker
     {
-        public bool CheckIfUserIsAllowed(int leadId,HttpContext httpContext)
+        public bool CheckIfUserIsAllowed(int? leadId,HttpContext httpContext)
         {
             return leadId.ToString() == httpContext.User.Claims.Where(t=>t.Type==ClaimTypes.NameIdentifier).FirstOrDefault().Value 
                 || httpContext.User.IsInRole(Role.Administrator.ToString());
@@ -17,6 +17,10 @@ namespace powerful_crm.API
         public bool CheckCurrencyIsDefined(string currency)
         {
             return Enum.IsDefined(typeof(Currency), currency);
+        }
+        public bool CheckIfUserIsAllowed(HttpContext httpContext)
+        {
+            return httpContext.User.IsInRole(Role.Administrator.ToString());
         }
     }
 }

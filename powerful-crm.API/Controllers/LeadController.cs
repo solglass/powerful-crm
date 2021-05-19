@@ -139,7 +139,7 @@ namespace powerful_crm.API.Controllers
         /// <param name="inputModel">Updated info about lead</param>
         /// <returns>Updated info about lead</returns>
         [ProducesResponseType(typeof(LeadOutputModel), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(CustomExceptionOutputModel), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(string), StatusCodes.Status409Conflict)]
         [ProducesResponseType(typeof(string), StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -168,7 +168,7 @@ namespace powerful_crm.API.Controllers
             }
             var dto = _mapper.Map<LeadDto>(inputModel);
             await _leadService.UpdateLeadAsync(leadId, dto);
-            var outputModel = _mapper.Map<LeadOutputModel>(_leadService.GetLeadByIdAsync(leadId));
+            var outputModel = _mapper.Map<LeadOutputModel>(await _leadService.GetLeadByIdAsync(leadId));
             return Ok(outputModel);
 
         }
@@ -257,7 +257,7 @@ namespace powerful_crm.API.Controllers
                 AccountIds = (await _accountService.GetAccountsByLeadIdAsync(leadId)).ConvertAll(acc => acc.Id),
                 Currency = currency
             };
-            var queryResult = await RequestToTransactionStore(middle, Constants.API_GET_BALANCE);
+            var queryResult = await RequestToTransactionStoreAsync(middle, Constants.API_GET_BALANCE);
             return Ok(queryResult);
         }
 
@@ -306,7 +306,7 @@ namespace powerful_crm.API.Controllers
                 return NotFound(string.Format(Constants.ERROR_LEAD_NOT_FOUND_BY_ID, inputModel.LeadId));
             }
             var middle = _mapper.Map<TransactionMiddleModel>(inputModel);
-            var queryResult = await RequestToTransactionStore(middle, Constants.API_DEPOSIT);
+            var queryResult = await RequestToTransactionStoreAsync(middle, Constants.API_DEPOSIT);
             return Ok(queryResult);
         }
 
@@ -331,7 +331,7 @@ namespace powerful_crm.API.Controllers
                 return NotFound(string.Format(Constants.ERROR_LEAD_NOT_FOUND_BY_ID, inputModel.LeadId));
             }
             var middle = _mapper.Map<TransactionMiddleModel>(inputModel);
-            var queryResult = await RequestToTransactionStore(middle, Constants.API_WITHDRAW);
+            var queryResult = await RequestToTransactionStoreAsync(middle, Constants.API_WITHDRAW);
             return Ok(queryResult);
         }
 
@@ -361,11 +361,11 @@ namespace powerful_crm.API.Controllers
                 return NotFound(string.Format(Constants.ERROR_LEAD_NOT_FOUND_BY_ID, inputModel.SenderId));
             }
             var middle = _mapper.Map<TransferMiddleModel>(inputModel);
-            var queryResult = await RequestToTransactionStore(inputModel, Constants.API_TRANSFER);
+            var queryResult = await RequestToTransactionStoreAsync(inputModel, Constants.API_TRANSFER);
             return Ok(queryResult);
         }
        
-        private async Task<int> RequestToTransactionStore<T>(T middle, string apiUrl)
+        private async Task<int> RequestToTransactionStoreAsync<T>(T middle, string apiUrl)
         {
             var request = new RestRequest(apiUrl, Method.POST);
             request.AddParameter("application/json", JsonSerializer.Serialize(middle), ParameterType.RequestBody);

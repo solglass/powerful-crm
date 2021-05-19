@@ -20,9 +20,11 @@ namespace powerful_crm.API.Controllers
     {
         private ICityService _cityService;
         private IMapper _mapper;
-        public CityController(IOptions<AppSettings> options, IMapper mapper,  ICityService cityService)
+        private Checker _checker;
+        public CityController(IOptions<AppSettings> options, IMapper mapper, Checker checker, ICityService cityService)
         {
             _cityService = cityService;
+            _checker = checker;
             _mapper = mapper;
         }
         /// <summary>Creates new city</summary>
@@ -35,7 +37,7 @@ namespace powerful_crm.API.Controllers
         [HttpPost]
         public async Task<ActionResult<CityOutputModel>> AddCityAsync([FromBody] CityInputModel city)
         {
-            if (!CheckIfUserIsAllowed())
+            if (!_checker.CheckIfUserIsAllowed(HttpContext))
                 throw new ForbidException(Constants.ERROR_NOT_ALLOWED_ACTIONS_WITH_CITY);
 
             if (!ModelState.IsValid)
@@ -60,7 +62,7 @@ namespace powerful_crm.API.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteCityAsync(int cityId)
         {
-            if (!CheckIfUserIsAllowed())
+            if (!_checker.CheckIfUserIsAllowed(HttpContext))
                 throw new ForbidException(Constants.ERROR_NOT_ALLOWED_ACTIONS_WITH_CITY);
 
             var city = await _cityService.GetCityByIdAsync(cityId);
@@ -72,10 +74,6 @@ namespace powerful_crm.API.Controllers
                 return NoContent();
             else
                 return Conflict(string.Format(Constants.ERROR_CITY_HAS_DEPENDENCIES, cityId));
-        }
-        private bool CheckIfUserIsAllowed()
-        {
-            return HttpContext.User.IsInRole(Role.Administrator.ToString());
         }
     }
 }
