@@ -8,7 +8,7 @@ namespace powerful_crm.API
 {
     public class Checker
     {
-        public bool CheckIfUserIsAllowed(int? leadId,HttpContext httpContext)
+        public bool CheckIfUserIsAllowed(int leadId,HttpContext httpContext)
         {
             return leadId.ToString() == httpContext.User.Claims.Where(t=>t.Type==ClaimTypes.NameIdentifier).FirstOrDefault().Value 
                 || httpContext.User.IsInRole(Role.Administrator.ToString());
