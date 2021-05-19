@@ -56,7 +56,11 @@ namespace powerful_crm.API.Controllers
                 throw new ForbidException(Constants.ERROR_NOT_ALLOWED_ACTIONS_WITH_OTHER_LEAD);
 
             if (!_checker.CheckCurrencyIsDefined(currency))
-                return Conflict(Constants.ERROR_CURRENCY_NOT_SUPPORT);
+                return Conflict( new CustomExceptionOutputModel
+                {
+                    Code = StatusCodes.Status409Conflict,
+                   Message= Constants.ERROR_CURRENCY_NOT_SUPPORT
+                });
 
             var lead = await _leadService.GetLeadByIdAsync(leadId);
             if (lead == null)
