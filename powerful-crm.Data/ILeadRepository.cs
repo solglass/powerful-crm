@@ -8,10 +8,10 @@ namespace powerful_crm.Data
     {
         Task<int> AddUpdateLeadAsync(LeadDto dto);
         Task<bool> ChangePasswordLeadAsync(int id, string oldPassword, string newPassword);
-        Task<int> DeleteOrRecoverLeadAsync(int id, bool isDeleted);
+        Task<bool> DeleteOrRecoverLeadAsync(int id, bool isDeleted);
         Task<LeadDto> GetLeadByIdAsync(int id);
         Task<List<LeadDto>> SearchLeadsAsync(SearchLeadDto leadDto);
         Task<LeadDto> GetLeadCredentialsAsync(int? id, string login);
-        Task<int> UpdateLeadRoleAsync(int leadId, int roleId);
+        Task<bool> UpdateLeadRoleAsync(int leadId, int roleId);
     }
 }
