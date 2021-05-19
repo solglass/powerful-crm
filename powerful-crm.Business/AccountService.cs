@@ -12,7 +12,7 @@ namespace powerful_crm.Business
         {
             _accountRepository = accountRepository;
         }
-        public async Task<int> DeleteAccountAsync(int id) => await _accountRepository.DeleteAccountAsync(id);
+        public async Task<bool> DeleteAccountAsync(int id) => await _accountRepository.DeleteAccountAsync(id);
         public async Task<int> AddAccountAsync(AccountDto dto) => await _accountRepository.AddAccountAsync(dto);
         public async Task<AccountDto> GetAccountByIdAsync(int id) => await _accountRepository.GetAccountByIdAsync(id);
         public async Task<List<AccountDto>> GetAccountsByLeadIdAsync(int leadId) => await _accountRepository.GetAccountsByLeadIdAsync(leadId);

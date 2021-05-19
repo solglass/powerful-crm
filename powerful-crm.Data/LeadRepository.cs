@@ -11,6 +11,7 @@ using SqlKata.Execution;
 using SqlKata.Compilers;
 using powerful_crm.Core.Enums;
 using System.Threading.Tasks;
+using powerful_crm.Core;
 
 namespace powerful_crm.Data
 {
@@ -18,7 +19,6 @@ namespace powerful_crm.Data
     {
         private readonly QueryFactory _db;
         private SqlServerCompiler _compiler;
-        private const int _expectedChangedRowsCount = 1;
 
         public LeadRepository(IOptions<AppSettings> options) : base(options)
         {
@@ -47,7 +47,7 @@ namespace powerful_crm.Data
                 commandType: CommandType.StoredProcedure);
         }
 
-        public async Task<int> DeleteOrRecoverLeadAsync(int id, bool isDeleted)
+        public async Task<bool> DeleteOrRecoverLeadAsync(int id, bool isDeleted)
         {
             return await _connection
                 .ExecuteAsync("dbo.Lead_DeleteOrRecover",
@@ -56,7 +56,7 @@ namespace powerful_crm.Data
                     id,
                     isDeleted
                 },
-                commandType: CommandType.StoredProcedure);
+                commandType: CommandType.StoredProcedure) == Constants.EXPECTED_CHANGED_ROWS_COUNT;
         }
 
         public async Task<bool> ChangePasswordLeadAsync(int id, string oldPassword, string newPassword)
@@ -68,7 +68,7 @@ namespace powerful_crm.Data
                    oldPassword,
                    newPassword
                },
-               commandType: CommandType.StoredProcedure)) == _expectedChangedRowsCount;
+               commandType: CommandType.StoredProcedure)) == Constants.EXPECTED_CHANGED_ROWS_COUNT;
         }
 
         public async Task<LeadDto> GetLeadByIdAsync(int id)
@@ -97,14 +97,14 @@ namespace powerful_crm.Data
                 commandType: CommandType.StoredProcedure)).FirstOrDefault();
         }
 
-        public async Task<int> UpdateLeadRoleAsync(int leadId, int roleId)
+        public async Task<bool> UpdateLeadRoleAsync(int leadId, int roleId)
         {
             return await _connection.ExecuteAsync("dbo.Lead_UpdateRole", new
             {
                 leadId,
                 roleId
             },
-               commandType: CommandType.StoredProcedure);
+               commandType: CommandType.StoredProcedure) == Constants.EXPECTED_CHANGED_ROWS_COUNT;
         }
         public async Task<List<LeadDto>> SearchLeadsAsync(SearchLeadDto leadDto)
         {

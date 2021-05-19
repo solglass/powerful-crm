@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using Microsoft.Extensions.Options;
+using powerful_crm.Core;
 using powerful_crm.Core.Models;
 using powerful_crm.Core.Settings;
 using System.Data;
@@ -24,7 +25,7 @@ namespace powerful_crm.Data
                 },
                 commandType: CommandType.StoredProcedure);
         }
-        public async Task<int> DeleteCityAsync(int id)
+        public async Task<bool> DeleteCityAsync(int id)
         {
             return await _connection.ExecuteAsync(
                 "dbo.City_Delete",
@@ -32,7 +33,7 @@ namespace powerful_crm.Data
                 {
                     id
                 },
-                commandType: CommandType.StoredProcedure);
+                commandType: CommandType.StoredProcedure) == Constants.EXPECTED_CHANGED_ROWS_COUNT;
         }
 
         public async Task<CityDto> GetCityByIdAsync(int id)

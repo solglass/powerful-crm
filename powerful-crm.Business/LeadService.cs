@@ -30,8 +30,8 @@ namespace powerful_crm.Business
             dto.Id = leadId;
             return await _leadRepository.AddUpdateLeadAsync(dto);
         }
-        public async Task<int> DeleteLeadAsync(int leadId) => await _leadRepository.DeleteOrRecoverLeadAsync(leadId, true);
-        public async Task<int> RecoverLeadAsync(int leadId) => await _leadRepository.DeleteOrRecoverLeadAsync(leadId, false);
+        public async Task<bool> DeleteLeadAsync(int leadId) => await _leadRepository.DeleteOrRecoverLeadAsync(leadId, true);
+        public async Task<bool> RecoverLeadAsync(int leadId) => await _leadRepository.DeleteOrRecoverLeadAsync(leadId, false);
         public async Task<bool> ChangePasswordAsync(int leadId, string oldPassword, string newPassword)
         {
             if (_securityService.VerifyPassword((await _leadRepository.GetLeadCredentialsAsync(leadId, null)).Password, oldPassword))
@@ -51,7 +51,7 @@ namespace powerful_crm.Business
             return lead;
 
         }
-        public async Task<int> UpdateLeadRoleAsync(int leadId, int roleId) => await _leadRepository.UpdateLeadRoleAsync(leadId, roleId);
+        public async Task<bool> UpdateLeadRoleAsync(int leadId, int roleId) => await _leadRepository.UpdateLeadRoleAsync(leadId, roleId);
         public async Task<List<LeadDto>> SearchLeadAsync(SearchLeadDto leadDto)
         {
             if (leadDto.City.Name != null) { leadDto.City.Name = StringWithSearchType.GetStringWithSearchType(leadDto.City.Name, leadDto.TypeSearchCityName); }

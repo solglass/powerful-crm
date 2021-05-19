@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using Microsoft.Extensions.Options;
+using powerful_crm.Core;
 using powerful_crm.Core.Models;
 using powerful_crm.Core.Settings;
 using System.Collections.Generic;
@@ -28,13 +29,13 @@ namespace powerful_crm.Data
                 },
                 commandType: CommandType.StoredProcedure);
         }
-        public async Task<int> DeleteAccountAsync(int id)
+        public async Task<bool> DeleteAccountAsync(int id)
         {
-            var result = await _connection
+          return  (await _connection
                 .ExecuteAsync("dbo.Account_Delete",
                 new { id },
-                commandType: CommandType.StoredProcedure);
-            return result;
+                commandType: CommandType.StoredProcedure)) == Constants.EXPECTED_CHANGED_ROWS_COUNT;
+            
         }
         public async Task<AccountDto> GetAccountByIdAsync(int id)
         {
