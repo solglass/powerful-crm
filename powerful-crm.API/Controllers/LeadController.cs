@@ -13,12 +13,13 @@ using powerful_crm.Core.CustomExceptions;
 using powerful_crm.Core.Models;
 using powerful_crm.Core.Settings;
 using RestSharp;
+using System;
 using System.Collections.Generic;
 using System.Text.Json;
 
 namespace powerful_crm.API.Controllers
 {
-    //[Authorize]
+    [Authorize]
     [Route("api/[controller]")]
     public class LeadController : ControllerBase
     {
@@ -28,6 +29,7 @@ namespace powerful_crm.API.Controllers
         private Checker _checker;
         private IMapper _mapper;
         private RestClient _client;
+        private ValidatedModels _models;
 
         public LeadController(IOptions<AppSettings> options,
                               IMapper mapper,
@@ -42,8 +44,12 @@ namespace powerful_crm.API.Controllers
             _cityService = cityService;
             _mapper = mapper;
             _client = new RestClient(options.Value.TSTORE_URL);
+            _models = ValidatedModels.GetValidatedModelInstance();
         }
-        [HttpGet]
+        /// <summary>GetManualGA Code</summary>
+        /// <param name="email">lead email</param>
+        /// <returns>Manual GA setup code</returns>
+        [HttpGet("getcode")]
         public ActionResult<string> GetCode(string email)
         {
             TwoFactorAuthenticator twoFactor = new TwoFactorAuthenticator();
@@ -53,7 +59,7 @@ namespace powerful_crm.API.Controllers
             return setupCode;
         }
 
-        [HttpPost("/Verify")]
+        [HttpPost("Verify")]
         public ActionResult<string> VerifyCode(string email, string inputCode)
         {
             TwoFactorAuthenticator twoFactor = new TwoFactorAuthenticator();
@@ -64,19 +70,20 @@ namespace powerful_crm.API.Controllers
             }
             return Ok("Ok");
         }
+
         /// <summary>Adds withdraw</summary>
         /// <param name="inputModel">Information about withdraw</param>
-        /// <returns>Id of added withdraw</returns>
+        /// <returns>Key of validated and added to Dictionary input model</returns>
         [ProducesResponseType(typeof(int), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
         [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(string), StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [HttpPost("withdraw")]
-        public ActionResult<int> AddWithdraw([FromBody] TransactionInputModel inputModel, string inputCode)
+        public ActionResult<int> AddWithdraw([FromBody] TransactionInputModel inputModel)
         {
-            if (!_checker.CheckIfUserIsAllowed(inputModel.LeadId, HttpContext))
-                throw new ForbidException(Constants.ERROR_NOT_ALLOWED_ACTIONS_WITH_OTHER_LEAD);
+            //if (!_checker.CheckIfUserIsAllowed(inputModel.LeadId, HttpContext))
+            //    throw new ForbidException(Constants.ERROR_NOT_ALLOWED_ACTIONS_WITH_OTHER_LEAD);
 
             if (!ModelState.IsValid)
                 throw new CustomValidationException(ModelState);
@@ -85,10 +92,36 @@ namespace powerful_crm.API.Controllers
             {
                 return NotFound(string.Format(Constants.ERROR_LEAD_NOT_FOUND_BY_ID, inputModel.LeadId));
             }
+
+            var dKey = (int)DateTime.Now.Ticks;
+            _models.ValidModels.Add(dKey, inputModel);
+            
+            return Ok(dKey);
+        }
+
+        /// <summary>Provide withdraw into DB if user confirm operation by GA</summary>
+        /// <param name="dkey">key to ValidatedInputModels Dictionary</param>
+        /// <param name="inputCode">Code from Google Authentificator</param>
+        /// <returns>Id of added withdraw</returns>
+        [ProducesResponseType(typeof(int), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [HttpPost("providewithdraw")]
+        public ActionResult<int> ProvideWithdraw(int dkey, string inputCode)
+        {
+            if (!_models.ValidModels.TryGetValue(dkey, out TransactionInputModel inputModel))
+            {
+                return NotFound("operation not found");
+            }
+            
+            var lead = _leadService.GetLeadById(inputModel.LeadId);
+
             TwoFactorAuthenticator twoFactor = new TwoFactorAuthenticator();
             bool isValid = twoFactor.ValidateTwoFactorPIN(TwoFactorKey(lead.Email), inputCode);
             if (!isValid)
-                throw new ForbidException("Tobi Jopa");
+                throw new ForbidException("Operation not confirmed");
 
             var middle = _mapper.Map<TransactionMiddleModel>(inputModel);
             var request = new RestRequest(Constants.API_WITHDRAW, Method.POST);
