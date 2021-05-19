@@ -10,6 +10,7 @@ using powerful_crm.Core.CustomExceptions;
 using powerful_crm.Core.Enums;
 using powerful_crm.Core.Models;
 using powerful_crm.Core.Settings;
+using System.Threading.Tasks;
 
 namespace powerful_crm.API.Controllers
 {
@@ -19,9 +20,11 @@ namespace powerful_crm.API.Controllers
     {
         private ICityService _cityService;
         private IMapper _mapper;
-        public CityController(IOptions<AppSettings> options, IMapper mapper,  ICityService cityService)
+        private Checker _checker;
+        public CityController(IOptions<AppSettings> options, IMapper mapper, Checker checker, ICityService cityService)
         {
             _cityService = cityService;
+            _checker = checker;
             _mapper = mapper;
         }
         /// <summary>Creates new city</summary>
@@ -32,9 +35,9 @@ namespace powerful_crm.API.Controllers
         [ProducesResponseType(typeof(string), StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [HttpPost]
-        public ActionResult<CityOutputModel> AddCity([FromBody] CityInputModel city)
+        public async Task<ActionResult<CityOutputModel>> AddCityAsync([FromBody] CityInputModel city)
         {
-            if (!CheckIfUserIsAllowed())
+            if (!_checker.CheckIfUserIsAllowed(HttpContext))
                 throw new ForbidException(Constants.ERROR_NOT_ALLOWED_ACTIONS_WITH_CITY);
 
             if (!ModelState.IsValid)
@@ -42,8 +45,8 @@ namespace powerful_crm.API.Controllers
                 throw new CustomValidationException(ModelState);
             }
             var dto = _mapper.Map<CityDto>(city);
-            var addedCityId = _cityService.AddCity(dto);
-            var outputModel = _mapper.Map<CityOutputModel>(_cityService.GetCityById(addedCityId));
+            var addedCityId = await _cityService.AddCityAsync(dto);
+            var outputModel = _mapper.Map<CityOutputModel>(await _cityService.GetCityByIdAsync(addedCityId));
             return Ok(outputModel);
         }
 
@@ -57,24 +60,20 @@ namespace powerful_crm.API.Controllers
         [ProducesResponseType(typeof(string), StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [HttpDelete("{id}")]
-        public ActionResult DeleteCity(int cityId)
+        public async Task<ActionResult> DeleteCityAsync(int cityId)
         {
-            if (!CheckIfUserIsAllowed())
+            if (!_checker.CheckIfUserIsAllowed(HttpContext))
                 throw new ForbidException(Constants.ERROR_NOT_ALLOWED_ACTIONS_WITH_CITY);
 
-            var city = _cityService.GetCityById(cityId);
+            var city = await _cityService.GetCityByIdAsync(cityId);
             if (city == null)
             {
                 return NotFound(string.Format(Constants.ERROR_CITY_NOT_FOUND, cityId));
             }
-            if (_cityService.DeleteCity(cityId) == 1)
+            if (await _cityService.DeleteCityAsync(cityId) == 1)
                 return NoContent();
             else
                 return Conflict(string.Format(Constants.ERROR_CITY_HAS_DEPENDENCIES, cityId));
-        }
-        private bool CheckIfUserIsAllowed()
-        {
-            return HttpContext.User.IsInRole(Role.Administrator.ToString());
         }
     }
 }

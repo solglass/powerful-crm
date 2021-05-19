@@ -5,6 +5,7 @@ using powerful_crm.Business;
 using powerful_crm.Business.Models;
 using powerful_crm.Core;
 using powerful_crm.Core.CustomExceptions;
+using System.Threading.Tasks;
 
 namespace powerful_crm.API.Controllers
 {
@@ -25,9 +26,9 @@ namespace powerful_crm.API.Controllers
         [HttpPost]
         [ProducesResponseType(typeof(AuthenticationResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
-        public ActionResult<AuthenticationResponse> Authentificate([FromBody] LoginInputModel model)
+        public async Task<ActionResult<AuthenticationResponse>> Authentificate([FromBody] LoginInputModel model)
         {    
-            var lead = _authService.GetAuthenticatedLead(model.Login);
+            var lead = await _authService.GetAuthenticatedLeadAsync(model.Login);
             if (lead == null)
                 return NotFound(string.Format(Constants.ERROR_LEAD_NOT_FOUND_BY_LOGIN, model.Login));
 

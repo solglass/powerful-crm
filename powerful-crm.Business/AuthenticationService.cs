@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Threading.Tasks;
 
 namespace powerful_crm.Business
 {
@@ -17,9 +18,9 @@ namespace powerful_crm.Business
         {
             _repo = repository;
         }
-        public LeadDto GetAuthenticatedLead(string login)
+        public async Task<LeadDto> GetAuthenticatedLeadAsync(string login)
         {
-            return _repo.GetLeadCredentials(null, login);
+            return await _repo.GetLeadCredentialsAsync(null, login);
         }
         public AuthenticationResponse GenerateToken(LeadDto lead)
         {
