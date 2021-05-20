@@ -19,6 +19,8 @@
     <PackageReference Include="AutoMapper" Version="10.1.1" />
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="8.1.1" />
     <PackageReference Include="GoogleAuthenticator" Version="2.1.1" />
+    <PackageReference Include="MassTransit.AspNetCore" Version="7.1.8" />
+    <PackageReference Include="MassTransit.RabbitMQ" Version="7.1.8" />
     <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="5.0.0" />
     <PackageReference Include="RestSharp" Version="106.11.7" />
     <PackageReference Include="SqlKata" Version="2.3.2" />
@@ -34,6 +36,12 @@
   <ItemGroup>
     <ProjectReference Include="..\powerful-crm.Business\powerful-crm.Business.csproj" />
     <ProjectReference Include="..\powerful-crm.Core\powerful-crm.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Properties\launchSettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 

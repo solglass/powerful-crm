@@ -1,5 +1,6 @@
 using AutoMapper;
 using Google.Authenticator;
+using MassTransit;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -17,6 +18,7 @@ using RestSharp;
 using System;
 using System.Collections.Generic;
 using System.Text.Json;
+using System.Threading.Tasks;
 
 namespace powerful_crm.API.Controllers
 {
@@ -31,13 +33,15 @@ namespace powerful_crm.API.Controllers
         private IMapper _mapper;
         private RestClient _client;
         private MemoryCacheSingleton _validatedModelCache;
+        private IPublishEndpoint _publishEndpoint;
 
         public LeadController(IOptions<AppSettings> options,
                               IMapper mapper,
                               ILeadService leadService,
                               ICityService cityService,
                               Checker checker,
-                              IAccountService accountService)
+                              IAccountService accountService,
+                              IPublishEndpoint publishEndpoint)
         {
             _accountService = accountService;
             _leadService = leadService;
@@ -46,31 +50,25 @@ namespace powerful_crm.API.Controllers
             _mapper = mapper;
             _client = new RestClient(options.Value.TSTORE_URL);
             _validatedModelCache = MemoryCacheSingleton.GetCacheInstance();
+            _publishEndpoint = publishEndpoint;
         }
         /// <summary>GetManualGA Code</summary>
         /// <param name="email">lead email</param>
         /// <returns>Manual GA setup code</returns>
         [HttpGet("getcode")]
-        public ActionResult<string> GetCode(string email)
+        public async Task<ActionResult<SetupCode>> GetCodeAsync(string email)
         {
             TwoFactorAuthenticator twoFactor = new TwoFactorAuthenticator();
             var setupInfo = twoFactor.GenerateSetupCode("myapp", email, TwoFactorKey(email), false, 3);
             var setupCode = setupInfo.ManualEntryKey;
             var barcodeImageUrl = setupInfo.QrCodeSetupImageUrl;
-            return setupCode;
+            await _publishEndpoint.Publish<SetupCode>(new
+            {
+                Value = setupInfo
+            });
+            return setupInfo;
         }
 
-        //[HttpPost("Verify")]
-        //public ActionResult<string> VerifyCode(string email, string inputCode)
-        //{
-        //    TwoFactorAuthenticator twoFactor = new TwoFactorAuthenticator();
-        //    bool isValid = twoFactor.ValidateTwoFactorPIN(TwoFactorKey(email), inputCode);
-        //    if (!isValid)
-        //    {
-        //        return BadRequest("Tobi jopa");
-        //    }
-        //    return Ok("Ok");
-        //}
 
         /// <summary>Adds withdraw</summary>
         /// <param name="inputModel">Information about withdraw</param>
