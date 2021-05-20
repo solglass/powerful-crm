@@ -3,6 +3,7 @@ using Google.Authenticator;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using powerful_crm.API.Models.InputModels;
 using powerful_crm.API.Models.MiddleModels;
@@ -29,7 +30,7 @@ namespace powerful_crm.API.Controllers
         private Checker _checker;
         private IMapper _mapper;
         private RestClient _client;
-        private ValidatedModels _models;
+        private MemoryCacheSingleton _validatedModelCache;
 
         public LeadController(IOptions<AppSettings> options,
                               IMapper mapper,
@@ -44,7 +45,7 @@ namespace powerful_crm.API.Controllers
             _cityService = cityService;
             _mapper = mapper;
             _client = new RestClient(options.Value.TSTORE_URL);
-            _models = ValidatedModels.GetValidatedModelInstance();
+            _validatedModelCache = MemoryCacheSingleton.GetCacheInstance();
         }
         /// <summary>GetManualGA Code</summary>
         /// <param name="email">lead email</param>
@@ -59,21 +60,21 @@ namespace powerful_crm.API.Controllers
             return setupCode;
         }
 
-        [HttpPost("Verify")]
-        public ActionResult<string> VerifyCode(string email, string inputCode)
-        {
-            TwoFactorAuthenticator twoFactor = new TwoFactorAuthenticator();
-            bool isValid = twoFactor.ValidateTwoFactorPIN(TwoFactorKey(email), inputCode);
-            if (!isValid)
-            {
-                return BadRequest("Tobi jopa");
-            }
-            return Ok("Ok");
-        }
+        //[HttpPost("Verify")]
+        //public ActionResult<string> VerifyCode(string email, string inputCode)
+        //{
+        //    TwoFactorAuthenticator twoFactor = new TwoFactorAuthenticator();
+        //    bool isValid = twoFactor.ValidateTwoFactorPIN(TwoFactorKey(email), inputCode);
+        //    if (!isValid)
+        //    {
+        //        return BadRequest("Tobi jopa");
+        //    }
+        //    return Ok("Ok");
+        //}
 
         /// <summary>Adds withdraw</summary>
         /// <param name="inputModel">Information about withdraw</param>
-        /// <returns>Key of validated and added to Dictionary input model</returns>
+        /// <returns>Key of validated and added to MemoryCache input model </returns>
         [ProducesResponseType(typeof(int), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
         [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
@@ -82,8 +83,8 @@ namespace powerful_crm.API.Controllers
         [HttpPost("withdraw")]
         public ActionResult<int> AddWithdraw([FromBody] TransactionInputModel inputModel)
         {
-            //if (!_checker.CheckIfUserIsAllowed(inputModel.LeadId, HttpContext))
-            //    throw new ForbidException(Constants.ERROR_NOT_ALLOWED_ACTIONS_WITH_OTHER_LEAD);
+            if (!_checker.CheckIfUserIsAllowed(inputModel.LeadId, HttpContext))
+                throw new ForbidException(Constants.ERROR_NOT_ALLOWED_ACTIONS_WITH_OTHER_LEAD);
 
             if (!ModelState.IsValid)
                 throw new CustomValidationException(ModelState);
@@ -93,14 +94,14 @@ namespace powerful_crm.API.Controllers
                 return NotFound(string.Format(Constants.ERROR_LEAD_NOT_FOUND_BY_ID, inputModel.LeadId));
             }
 
-            var dKey = (int)DateTime.Now.Ticks;
-            _models.ValidModels.Add(dKey, inputModel);
+            var memoryCacheKey = (int)DateTime.Now.Ticks;
+            _validatedModelCache.Cache.Set<TransactionInputModel>(memoryCacheKey, inputModel);
             
-            return Ok(dKey);
+            return Ok(memoryCacheKey);
         }
 
         /// <summary>Provide withdraw into DB if user confirm operation by GA</summary>
-        /// <param name="dkey">key to ValidatedInputModels Dictionary</param>
+        /// <param name="memoryCacheKey">key to ValidatedInputModels Dictionary</param>
         /// <param name="inputCode">Code from Google Authentificator</param>
         /// <returns>Id of added withdraw</returns>
         [ProducesResponseType(typeof(int), StatusCodes.Status200OK)]
@@ -109,12 +110,16 @@ namespace powerful_crm.API.Controllers
         [ProducesResponseType(typeof(string), StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [HttpPost("providewithdraw")]
-        public ActionResult<int> ProvideWithdraw(int dkey, string inputCode)
+        public ActionResult<int> ProvideWithdraw(int memoryCacheKey, string inputCode)
         {
-            if (!_models.ValidModels.TryGetValue(dkey, out TransactionInputModel inputModel))
+
+            if (!_validatedModelCache.Cache.TryGetValue(memoryCacheKey, out TransactionInputModel inputModel))
             {
                 return NotFound("operation not found");
             }
+
+            if (!_checker.CheckIfUserIsAllowed(inputModel.LeadId, HttpContext))
+                throw new ForbidException(Constants.ERROR_NOT_ALLOWED_ACTIONS_WITH_OTHER_LEAD);
             
             var lead = _leadService.GetLeadById(inputModel.LeadId);
 
@@ -127,6 +132,9 @@ namespace powerful_crm.API.Controllers
             var request = new RestRequest(Constants.API_WITHDRAW, Method.POST);
             request.AddParameter("application/json", JsonSerializer.Serialize(middle), ParameterType.RequestBody);
             var queryResult = _client.Execute<int>(request).Data;
+
+            _validatedModelCache.Cache.Remove(memoryCacheKey);
+
             return Ok(queryResult);
         }
 
