@@ -49,17 +49,17 @@ namespace powerful_crm.API.Controllers
         [ProducesResponseType(typeof(CustomExceptionOutputModel), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(CustomExceptionOutputModel), StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [HttpGet("{leadId}/balance/{currency}")]
+        [HttpGet("lead/{leadId}/balance/{currency}")]
         public async Task<ActionResult<LeadBalanceOutputModel>> GetBalanceByLeadIdAsync(int leadId, string currency)
         {
             if (!_checker.CheckIfUserIsAllowed(leadId, HttpContext))
                 throw new ForbidException(Constants.ERROR_NOT_ALLOWED_ACTIONS_WITH_OTHER_LEAD);
 
             if (!_checker.CheckCurrencyIsDefined(currency))
-                return Conflict( new CustomExceptionOutputModel
+                return Conflict(new CustomExceptionOutputModel
                 {
                     Code = StatusCodes.Status409Conflict,
-                   Message= Constants.ERROR_CURRENCY_NOT_SUPPORT
+                    Message = Constants.ERROR_CURRENCY_NOT_SUPPORT
                 });
 
             var lead = await _leadService.GetLeadByIdAsync(leadId);
@@ -76,7 +76,7 @@ namespace powerful_crm.API.Controllers
                 AccountIds = (await _accountService.GetAccountsByLeadIdAsync(leadId)).ConvertAll(acc => acc.Id),
                 Currency = currency
             };
-            var queryResult = await RequestToTransactionStoreAsync(balanceModel, Constants.API_GET_BALANCE);
+            var queryResult = await GetResponseAsync<LeadBalanceOutputModel>(Constants.API_GET_BALANCE, Method.POST, balanceModel);
             return Ok(queryResult);
         }
 
@@ -87,7 +87,7 @@ namespace powerful_crm.API.Controllers
         [ProducesResponseType(typeof(CustomExceptionOutputModel), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(CustomExceptionOutputModel), StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [HttpGet("{leadId}/transactions")]
+        [HttpGet("lead/{leadId}")]
         public async Task<ActionResult<List<TransactionOutputModel>>> GetTransactionsByLeadIdAsync(int leadId)
         {
             if (!_checker.CheckIfUserIsAllowed(leadId, HttpContext))
@@ -101,13 +101,13 @@ namespace powerful_crm.API.Controllers
                     Message = string.Format(Constants.ERROR_LEAD_NOT_FOUND_BY_ID, leadId)
                 });
 
-            var request = new RestRequest(string.Format(Constants.API_GET_TRANSACTION, leadId), Method.GET);
-            var queryResult = (await _client.ExecuteAsync<string>(request)).Data;
+            var queryResult = (await GetResponseAsync<string>(Constants.API_GET_TRANSACTION, Method.POST, lead.Accounts.ConvertAll((acc) => acc.Id))).Data;
 
             return Ok(queryResult);
         }
 
         /// <summary>Adds deposit</summary>
+        /// <param name="leadId"></param>
         /// <param name="inputModel">Information about deposit</param>
         /// <returns>Id of added deposit</returns>
         [ProducesResponseType(typeof(int), StatusCodes.Status200OK)]
@@ -115,28 +115,40 @@ namespace powerful_crm.API.Controllers
         [ProducesResponseType(typeof(CustomExceptionOutputModel), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(CustomExceptionOutputModel), StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [HttpPost("deposit")]
-        public async Task<ActionResult<int>> AddDepositAsync([FromBody] TransactionInputModel inputModel)
+        [HttpPost("lead/{leadId}/deposit")]
+        public async Task<ActionResult<int>> AddDepositAsync(int leadId, [FromBody] TransactionInputModel inputModel)
         {
-            if (!_checker.CheckIfUserIsAllowed(inputModel.LeadId, HttpContext))
+            if (!_checker.CheckIfUserIsAllowed(leadId, HttpContext))
                 throw new ForbidException(Constants.ERROR_NOT_ALLOWED_ACTIONS_WITH_OTHER_LEAD);
 
             if (!ModelState.IsValid)
                 throw new CustomValidationException(ModelState);
-
-            if (await _leadService.GetLeadByIdAsync(inputModel.LeadId) == null)
+            var lead = await _leadService.GetLeadByIdAsync(leadId);
+            if (lead == null)
                 return NotFound(new CustomExceptionOutputModel
                 {
                     Code = StatusCodes.Status404NotFound,
-                    Message = string.Format(Constants.ERROR_LEAD_NOT_FOUND_BY_ID, inputModel.LeadId)
+                    Message = string.Format(Constants.ERROR_LEAD_NOT_FOUND_BY_ID, leadId)
                 });
 
+            var account = lead.Accounts.Find((acc) => acc.Id == inputModel.AccountId);
+            if (account == null)
+            {
+                return NotFound(new CustomExceptionOutputModel
+                {
+                    Code = StatusCodes.Status404NotFound,
+                    Message = string.Format(Constants.ERROR_ACCOUNT_NOT_FOUND, inputModel.AccountId)
+                });
+            }
+
             var transactionModel = _mapper.Map<TransactionMiddleModel>(inputModel);
-            var queryResult = await RequestToTransactionStoreAsync(transactionModel, Constants.API_DEPOSIT);
+            transactionModel.Account.Currency = account.Currency.ToString();
+            var queryResult = (await GetResponseAsync<int>(Constants.API_DEPOSIT, Method.POST, transactionModel)).Data;
             return Ok(queryResult);
         }
 
         /// <summary>Adds withdraw</summary>
+        /// <param name="leadId"></param>
         /// <param name="inputModel">Information about withdraw</param>
         /// <returns>Id of added withdraw</returns>
         [ProducesResponseType(typeof(int), StatusCodes.Status200OK)]
@@ -144,28 +156,40 @@ namespace powerful_crm.API.Controllers
         [ProducesResponseType(typeof(CustomExceptionOutputModel), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(CustomExceptionOutputModel), StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [HttpPost("withdraw")]
-        public async Task<ActionResult<int>> AddWithdrawAsync([FromBody] TransactionInputModel inputModel)
+        [HttpPost("lead/{leadId}/withdraw")]
+        public async Task<ActionResult<int>> AddWithdrawAsync(int leadId, [FromBody] TransactionInputModel inputModel)
         {
-            if (!_checker.CheckIfUserIsAllowed(inputModel.LeadId, HttpContext))
+            if (!_checker.CheckIfUserIsAllowed(leadId, HttpContext))
                 throw new ForbidException(Constants.ERROR_NOT_ALLOWED_ACTIONS_WITH_OTHER_LEAD);
 
             if (!ModelState.IsValid)
                 throw new CustomValidationException(ModelState);
-
-            if (await _leadService.GetLeadByIdAsync(inputModel.LeadId) == null)
+            var lead = await _leadService.GetLeadByIdAsync(leadId);
+            if (lead == null)
                 return NotFound(new CustomExceptionOutputModel
                 {
                     Code = StatusCodes.Status404NotFound,
-                    Message = string.Format(Constants.ERROR_LEAD_NOT_FOUND_BY_ID, inputModel.LeadId)
+                    Message = string.Format(Constants.ERROR_LEAD_NOT_FOUND_BY_ID, leadId)
                 });
 
+            var account = lead.Accounts.Find((acc) => acc.Id == inputModel.AccountId);
+            if (account == null)
+            {
+                return NotFound(new CustomExceptionOutputModel
+                {
+                    Code = StatusCodes.Status404NotFound,
+                    Message = string.Format(Constants.ERROR_ACCOUNT_NOT_FOUND, inputModel.AccountId)
+                });
+            }
+
             var transactionModel = _mapper.Map<TransactionMiddleModel>(inputModel);
-            var queryResult = await RequestToTransactionStoreAsync(transactionModel, Constants.API_WITHDRAW);
+            transactionModel.Account.Currency = account.Currency.ToString();
+            var queryResult = (await GetResponseAsync<int>(Constants.API_WITHDRAW, Method.POST, transactionModel)).Data;
             return Ok(queryResult);
         }
 
         /// <summary>Adds transfer</summary>
+        /// <param name="leadId"></param>
         /// <param name="inputModel">Information about transfer</param>
         /// <returns>Id of added transfer</returns>
         [ProducesResponseType(typeof(int), StatusCodes.Status200OK)]
@@ -173,39 +197,55 @@ namespace powerful_crm.API.Controllers
         [ProducesResponseType(typeof(CustomExceptionOutputModel), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(CustomExceptionOutputModel), StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [HttpPost("transfer")]
-        public async Task<ActionResult<int>> AddTransferAsync([FromBody] TransferInputModel inputModel)
+        [HttpPost("lead/{leadId}/transfer")]
+        public async Task<ActionResult<int>> AddTransferAsync(int leadId, [FromBody] TransferInputModel inputModel)
         {
-            if (!_checker.CheckIfUserIsAllowed(inputModel.SenderId, HttpContext))
+            if (!_checker.CheckIfUserIsAllowed(leadId, HttpContext))
                 throw new ForbidException(Constants.ERROR_NOT_ALLOWED_ACTIONS_WITH_OTHER_LEAD);
 
             if (!ModelState.IsValid)
                 throw new CustomValidationException(ModelState);
-
-            if (await _leadService.GetLeadByIdAsync(inputModel.RecipientId) == null)
+            var lead = await _leadService.GetLeadByIdAsync(leadId);
+            if (lead == null)
                 return NotFound(new CustomExceptionOutputModel
                 {
                     Code = StatusCodes.Status404NotFound,
-                    Message = string.Format(Constants.ERROR_LEAD_NOT_FOUND_BY_ID, inputModel.RecipientId)
+                    Message = string.Format(Constants.ERROR_LEAD_NOT_FOUND_BY_ID, leadId)
                 });
 
-            if (await _leadService.GetLeadByIdAsync(inputModel.SenderId) == null)
+            var accountSender = lead.Accounts.Find((acc) => acc.Id == inputModel.SenderAccountId);
+            var accountRecepient = await _accountService.GetAccountByIdAsync(inputModel.RecipientAccountId);
+            if (accountSender == null || accountRecepient == null)
+            {
                 return NotFound(new CustomExceptionOutputModel
                 {
                     Code = StatusCodes.Status404NotFound,
-                    Message = string.Format(Constants.ERROR_LEAD_NOT_FOUND_BY_ID, inputModel.SenderId)
+                    Message = string.Format(Constants.ERROR_ACCOUNT_NOT_FOUND, accountSender == null ? inputModel.SenderAccountId : inputModel.RecipientAccountId)
                 });
+            }
 
-            var transferModel = _mapper.Map<TransferMiddleModel>(inputModel);
-            var queryResult = await RequestToTransactionStoreAsync(transferModel, Constants.API_TRANSFER);
+            var transferModel = new TransferMiddleModel
+            {
+                SenderAccount = _mapper.Map<AccountMiddleModel>(accountSender),
+                RecipientAccount = _mapper.Map<AccountMiddleModel>(accountRecepient),
+                Amount = inputModel.Amount
+            };
+
+            var queryResult = (await GetResponseAsync<int>(Constants.API_TRANSFER, Method.POST, transferModel)).Data;
             return Ok(queryResult);
         }
 
-        private async Task<int> RequestToTransactionStoreAsync<T>(T middleModel, string apiUrl)
+        private async Task<IRestResponse<T>> GetResponseAsync<T>(string url, Method method, object requestBodyObject = null, string token = null)
         {
-            var request = new RestRequest(apiUrl, Method.POST);
-            request.AddParameter("application/json", JsonSerializer.Serialize(middleModel), ParameterType.RequestBody);
-            return (await _client.ExecuteAsync<int>(request)).Data;
+            var request = new RestRequest(url, method);
+
+            if (token != null)
+                request.AddHeader("Authorization", $"Bearer {token}");
+
+            if (requestBodyObject != null)
+                request.AddParameter("application/json", JsonSerializer.Serialize(requestBodyObject), ParameterType.RequestBody);
+
+            return await _client.ExecuteAsync<T>(request);
         }
     }
 }

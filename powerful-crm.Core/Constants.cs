@@ -11,7 +11,7 @@
         public const string EMAIL_UNIQUE_CONSTRAINT = "UQLeadA9D10534BF185160";
         public const string CURRENCY_UNIQUE_CONSTRAINT = "UQAccount5E55825B7B2276C4";
 
-        public const string API_GET_TRANSACTION = "/api/Transaction/{0}";
+        public const string API_GET_TRANSACTION = "/api/Transaction";
         public const string API_GET_BALANCE = "/api/Transaction/balance";
         public const string API_DEPOSIT = "/api/Transaction/deposite";
         public const string API_WITHDRAW = "/api/Transaction/withdraw";
