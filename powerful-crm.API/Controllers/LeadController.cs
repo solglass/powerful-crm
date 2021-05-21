@@ -19,6 +19,8 @@ using System;
 using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading.Tasks;
+using System.Linq;
+using System.Security.Claims;
 
 namespace powerful_crm.API.Controllers
 {
@@ -53,15 +55,16 @@ namespace powerful_crm.API.Controllers
             _publishEndpoint = publishEndpoint;
         }
         /// <summary>GetManualGA Code</summary>
-        /// <param name="email">lead email</param>
         /// <returns>Manual GA setup code</returns>
         [HttpGet("getcode")]
-        public async Task<ActionResult<SetupCode>> GetCodeAsync(string email)
+        public async Task<ActionResult<SetupCode>> GetCodeAsync()
         {
+            var leadId= Convert.ToInt32(HttpContext.User.Claims.Where(t => t.Type == ClaimTypes.NameIdentifier).FirstOrDefault().Value);
+            var lead = _leadService.GetLeadById(leadId);
+
             TwoFactorAuthenticator twoFactor = new TwoFactorAuthenticator();
-            var setupInfo = twoFactor.GenerateSetupCode("myapp", email, TwoFactorKey(email), false, 3);
-            var setupCode = setupInfo.ManualEntryKey;
-            var barcodeImageUrl = setupInfo.QrCodeSetupImageUrl;
+            var setupInfo = twoFactor.GenerateSetupCode("myapp", lead.Email, TwoFactorKey(lead.Email), false, 3);
+
             await _publishEndpoint.Publish<SetupCode>(new
             {
                 Value = setupInfo
