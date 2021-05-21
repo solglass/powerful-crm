@@ -49,7 +49,7 @@ namespace powerful_crm.API.Controllers
         [ProducesResponseType(typeof(CustomExceptionOutputModel), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(CustomExceptionOutputModel), StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [HttpGet("{leadId}/balance/{currency}")]
+        [HttpGet("lead/{leadId}/balance/{currency}")]
         public async Task<ActionResult<LeadBalanceOutputModel>> GetBalanceByLeadIdAsync(int leadId, string currency)
         {
             if (!_checker.CheckIfUserIsAllowed(leadId, HttpContext))
@@ -87,7 +87,7 @@ namespace powerful_crm.API.Controllers
         [ProducesResponseType(typeof(CustomExceptionOutputModel), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(CustomExceptionOutputModel), StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [HttpGet("{leadId}/transactions")]
+        [HttpGet("lead/{leadId}")]
         public async Task<ActionResult<List<TransactionOutputModel>>> GetTransactionsByLeadIdAsync(int leadId)
         {
             if (!_checker.CheckIfUserIsAllowed(leadId, HttpContext))
@@ -235,7 +235,7 @@ namespace powerful_crm.API.Controllers
             return Ok(queryResult);
         }
 
-        protected async Task<IRestResponse<T>> GetResponseAsync<T>(string url, Method method, object requestBodyObject = null, string token = null)
+        private async Task<IRestResponse<T>> GetResponseAsync<T>(string url, Method method, object requestBodyObject = null, string token = null)
         {
             var request = new RestRequest(url, method);
 
