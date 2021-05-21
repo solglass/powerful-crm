@@ -227,7 +227,8 @@ namespace powerful_crm.API.Controllers
             var transferModel = new TransferMiddleModel
             {
                 SenderAccount = _mapper.Map<AccountMiddleModel>(accountSender),
-                RecipientAccount = _mapper.Map<AccountMiddleModel>(accountRecepient)
+                RecipientAccount = _mapper.Map<AccountMiddleModel>(accountRecepient),
+                Amount = inputModel.Amount
             };
 
             var queryResult = (await GetResponseAsync<int>(Constants.API_TRANSFER, Method.POST, transferModel)).Data;
