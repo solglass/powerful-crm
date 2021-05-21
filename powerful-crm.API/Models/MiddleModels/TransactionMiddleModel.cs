@@ -2,8 +2,7 @@
 {
     public class TransactionMiddleModel
     {
-        public int LeadId { get; set; }
-        public decimal Amount { get; set; }
-        public string CurrencyPair { get; set; }
+        public AccountMiddleModel Account { get; set; }        
+        public ValueMiddleModel Value { get; set; }
     }
 }
