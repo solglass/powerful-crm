@@ -1,11 +1,13 @@
 ﻿using Dapper;
 using Microsoft.Extensions.Options;
+using powerful_crm.Core;
 using powerful_crm.Core.Models;
 using powerful_crm.Core.Settings;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace powerful_crm.Data
 {
@@ -15,9 +17,9 @@ namespace powerful_crm.Data
         {
             _connection = new SqlConnection(_connectionString);
         }
-        public int AddAccount(AccountDto dto)
+        public async Task<int> AddAccountAsync(AccountDto dto)
         {
-            return _connection.QuerySingleOrDefault<int>(
+            return await _connection.QuerySingleOrDefaultAsync<int>(
                 "dbo.Account_Add",
                 param: new
                 {
@@ -27,35 +29,35 @@ namespace powerful_crm.Data
                 },
                 commandType: CommandType.StoredProcedure);
         }
-        public int DeleteAccount(int id)
+        public async Task<bool> DeleteAccountAsync(int id)
         {
-            var result = _connection
-                .Execute("dbo.Account_Delete",
+          return  (await _connection
+                .ExecuteAsync("dbo.Account_Delete",
                 new { id },
-                commandType: CommandType.StoredProcedure);
-            return result;
+                commandType: CommandType.StoredProcedure)) == Constants.EXPECTED_CHANGED_ROWS_COUNT;
+            
         }
-        public AccountDto GetAccountById(int id)
+        public async Task<AccountDto> GetAccountByIdAsync(int id)
         {
-            return _connection.Query<AccountDto, LeadDto, AccountDto>(
+            return (await _connection.QueryAsync<AccountDto, LeadDto, AccountDto>(
                 "dbo.Account_SelectById", (account, lead) =>
                 {
                     account.LeadDto = lead;
                     return account;
                 },
                 new { id },
-                splitOn: "Id", commandType: CommandType.StoredProcedure).FirstOrDefault();
+                splitOn: "Id", commandType: CommandType.StoredProcedure)).FirstOrDefault();
         }
-        public List<AccountDto> GetAccountsByLeadId(int leadId)
+        public async Task<List<AccountDto>> GetAccountsByLeadIdAsync(int leadId)
         {
-            return _connection.Query<AccountDto, LeadDto, AccountDto>(
+            return (await _connection.QueryAsync<AccountDto, LeadDto, AccountDto>(
                 "dbo.Account_SelectByLeadId", (account, lead) =>
                  {
                      account.LeadDto = lead;
                      return account;
                  },
                 new { leadId },
-                splitOn: "Id", commandType: CommandType.StoredProcedure)
+                splitOn: "Id", commandType: CommandType.StoredProcedure))
                 .Distinct().ToList();
         }
     }

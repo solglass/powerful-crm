@@ -7,14 +7,12 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using powerful_crm.API.Models.InputModels;
-using powerful_crm.API.Models.MiddleModels;
 using powerful_crm.API.Models.OutputModels;
 using powerful_crm.Business;
 using powerful_crm.Core;
 using powerful_crm.Core.CustomExceptions;
 using powerful_crm.Core.Models;
 using powerful_crm.Core.Settings;
-using RestSharp;
 using System;
 using System.Collections.Generic;
 using System.Text.Json;
@@ -28,29 +26,23 @@ namespace powerful_crm.API.Controllers
     [Route("api/[controller]")]
     public class LeadController : ControllerBase
     {
-        private IAccountService _accountService;
         private ILeadService _leadService;
         private ICityService _cityService;
         private Checker _checker;
         private IMapper _mapper;
-        private RestClient _client;
-        private MemoryCacheSingleton _validatedModelCache;
         private IPublishEndpoint _publishEndpoint;
+        private MemoryCacheSingleton _validatedModelCache;
 
-        public LeadController(IOptions<AppSettings> options,
-                              IMapper mapper,
+        public LeadController(IMapper mapper,
                               ILeadService leadService,
                               ICityService cityService,
                               Checker checker,
-                              IAccountService accountService,
                               IPublishEndpoint publishEndpoint)
         {
-            _accountService = accountService;
             _leadService = leadService;
             _checker = checker;
             _cityService = cityService;
             _mapper = mapper;
-            _client = new RestClient(options.Value.TSTORE_URL);
             _validatedModelCache = MemoryCacheSingleton.GetCacheInstance();
             _publishEndpoint = publishEndpoint;
         }
@@ -147,23 +139,25 @@ namespace powerful_crm.API.Controllers
         /// <param name="inputModel">Information about lead to add</param>
         /// <returns>Information about added lead</returns>
         [ProducesResponseType(typeof(LeadOutputModel), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(string), StatusCodes.Status409Conflict)]
-        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(CustomExceptionOutputModel), StatusCodes.Status409Conflict)]
+        [ProducesResponseType(typeof(CustomExceptionOutputModel), StatusCodes.Status404NotFound)]
         [AllowAnonymous]
         [HttpPost]
-        public ActionResult<LeadOutputModel> AddLead([FromBody] LeadInputModel inputModel)
+        public async Task<ActionResult<LeadOutputModel>> AddLeadAsync([FromBody] LeadInputModel inputModel)
         {
             if (!ModelState.IsValid)
-            {
                 throw new CustomValidationException(ModelState);
-            }
-            if (_cityService.GetCityById(inputModel.CityId) == null)
-            {
-                return NotFound(string.Format(Constants.ERROR_CITY_NOT_FOUND, inputModel.CityId));
-            }
+            
+            if (await _cityService.GetCityByIdAsync(inputModel.CityId) == null)
+                return NotFound(new CustomExceptionOutputModel
+                {
+                    Code = StatusCodes.Status404NotFound,
+                    Message = string.Format(Constants.ERROR_CITY_NOT_FOUND, inputModel.CityId)
+                });
+            
             var dto = _mapper.Map<LeadDto>(inputModel);
-            var addedLeadId = _leadService.AddLead(dto);
-            var outputModel = _mapper.Map<LeadOutputModel>(_leadService.GetLeadById(addedLeadId));
+            var addedLeadId = await _leadService.AddLeadAsync(dto);
+            var outputModel = _mapper.Map<LeadOutputModel>(await _leadService.GetLeadByIdAsync(addedLeadId));
             return Ok(outputModel);
 
         }
@@ -173,12 +167,12 @@ namespace powerful_crm.API.Controllers
         /// <param name="inputModel">Old and new password of lead</param>
         /// <returns>NoContent response</returns>
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
-        [ProducesResponseType(typeof(string), StatusCodes.Status409Conflict)]
-        [ProducesResponseType(typeof(string), StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(CustomExceptionOutputModel), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(CustomExceptionOutputModel), StatusCodes.Status409Conflict)]
+        [ProducesResponseType(typeof(CustomExceptionOutputModel), StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [HttpPut("{leadId}/change-password")]
-        public ActionResult ChangePassword(int leadId, [FromBody]ChangePasswordInputModel inputModel)
+        public async Task<ActionResult> ChangePasswordAsync(int leadId, [FromBody] ChangePasswordInputModel inputModel)
         {
             if (!_checker.CheckIfUserIsAllowed(leadId, HttpContext))
                 throw new ForbidException(Constants.ERROR_NOT_ALLOWED_ACTIONS_WITH_OTHER_LEAD);
@@ -186,27 +180,33 @@ namespace powerful_crm.API.Controllers
             if (!ModelState.IsValid)
                 throw new CustomValidationException(ModelState);
 
-            if (_leadService.GetLeadById(leadId) == null)
-                return NotFound(string.Format(Constants.ERROR_LEAD_NOT_FOUND_BY_ID, leadId));
+            if (await _leadService.GetLeadByIdAsync(leadId) == null)
+                return NotFound(new CustomExceptionOutputModel
+                {
+                    Code= StatusCodes.Status404NotFound,
+                    Message = string.Format(Constants.ERROR_LEAD_NOT_FOUND_BY_ID, leadId)
+                });
 
-            _leadService.ChangePassword(leadId, inputModel.OldPassword, inputModel.NewPassword);
+            await _leadService.ChangePasswordAsync(leadId, inputModel.OldPassword, inputModel.NewPassword);
             return NoContent();
         }
         /// <summary>Gets info about lead</summary>
         /// <param name="leadId">Id of lead</param>
         /// <returns>Info about lead</returns>
         [ProducesResponseType(typeof(LeadOutputModel), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(CustomExceptionOutputModel), StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [HttpGet("{leadId}")]
-        public ActionResult<LeadOutputModel> GetLead(int leadId)
+        public async Task<ActionResult<LeadOutputModel>> GetLeadAsync(int leadId)
         {
-            var lead = _leadService.GetLeadById(leadId);
+            var lead = await _leadService.GetLeadByIdAsync(leadId);
             if (lead == null)
-            {
-                return NotFound(string.Format(Constants.ERROR_LEAD_NOT_FOUND_BY_ID, leadId));
-            }
-
+                return NotFound(new CustomExceptionOutputModel
+                {
+                    Code = StatusCodes.Status404NotFound,
+                    Message = string.Format(Constants.ERROR_LEAD_NOT_FOUND_BY_ID, leadId)
+                });
+            
             var outputModel = _mapper.Map<LeadOutputModel>(lead);
             return Ok(outputModel);
         }
@@ -214,11 +214,11 @@ namespace powerful_crm.API.Controllers
         /// <param name="inputModel"> Parameters for searching</param>
         /// <returns>List of leads that suit the parameters</returns>
         [ProducesResponseType(typeof(LeadOutputModel), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
-        [ProducesResponseType(typeof(string), StatusCodes.Status409Conflict)]
+        [ProducesResponseType(typeof(CustomExceptionOutputModel), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(CustomExceptionOutputModel), StatusCodes.Status409Conflict)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [HttpPost("search")]
-        public ActionResult<List<LeadOutputModel>> SearchLeads ([FromBody] SearchLeadInputModel inputModel)
+        public async Task<ActionResult<List<LeadOutputModel>>> SearchLeadsAsync([FromBody] SearchLeadInputModel inputModel)
         {
 
             if (!ModelState.IsValid)
@@ -226,11 +226,15 @@ namespace powerful_crm.API.Controllers
                 throw new CustomValidationException(ModelState);
             }
             var dto = _mapper.Map<SearchLeadDto>(inputModel);
-            var leads = _leadService.SearchLead(dto);
-            if (leads.Count==0)
-            {
-                return NotFound($"Leads is not found");
-            }
+            var leads = await _leadService.SearchLeadAsync(dto);
+
+            if (leads.Count == 0)
+                return NotFound( new CustomExceptionOutputModel 
+                { 
+                    Code = StatusCodes.Status404NotFound,
+                    Message = Constants.ERROR_LEADS_NOT_FOUND
+                });
+            
             var outputModels = _mapper.Map<List<LeadOutputModel>>(leads);
             return Ok(outputModels);
         }
@@ -239,32 +243,37 @@ namespace powerful_crm.API.Controllers
         /// <param name="inputModel">Updated info about lead</param>
         /// <returns>Updated info about lead</returns>
         [ProducesResponseType(typeof(LeadOutputModel), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
-        [ProducesResponseType(typeof(string), StatusCodes.Status409Conflict)]
-        [ProducesResponseType(typeof(string), StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(CustomExceptionOutputModel), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(CustomExceptionOutputModel), StatusCodes.Status409Conflict)]
+        [ProducesResponseType(typeof(CustomExceptionOutputModel), StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [HttpPut("{leadId}")]
-        public ActionResult<LeadOutputModel> UpdateLead([FromRoute]int leadId, [FromBody] UpdateLeadInputModel inputModel)
+        public async Task<ActionResult<LeadOutputModel>> UpdateLeadAsync([FromRoute] int leadId, [FromBody] UpdateLeadInputModel inputModel)
         {
             if (!_checker.CheckIfUserIsAllowed(leadId, HttpContext))
                 throw new ForbidException(Constants.ERROR_NOT_ALLOWED_ACTIONS_WITH_OTHER_LEAD);
 
             if (!ModelState.IsValid)
-            {
                 throw new CustomValidationException(ModelState);
-            }
-            var lead = _leadService.GetLeadById(leadId);
+            
+            var lead = await _leadService.GetLeadByIdAsync(leadId);
             if (lead == null)
-            {
-                return NotFound(string.Format(Constants.ERROR_LEAD_NOT_FOUND_BY_ID, leadId));
-            }
-            if ( _cityService.GetCityById(inputModel.CityId) == null)
-            {
-                return NotFound(string.Format(Constants.ERROR_CITY_NOT_FOUND, inputModel.CityId));
-            }
+                 return NotFound(new CustomExceptionOutputModel
+                 {
+                     Code = StatusCodes.Status404NotFound,
+                     Message = string.Format(Constants.ERROR_LEAD_NOT_FOUND_BY_ID, leadId)
+                 });
+            
+            if (await _cityService.GetCityByIdAsync(inputModel.CityId) == null)
+                 return NotFound(new CustomExceptionOutputModel
+                 {
+                     Code = StatusCodes.Status404NotFound,
+                     Message = string.Format(Constants.ERROR_CITY_NOT_FOUND, inputModel.CityId)
+                 });
+            
             var dto = _mapper.Map<LeadDto>(inputModel);
-            _leadService.UpdateLead(leadId, dto);
-            var outputModel = _mapper.Map<LeadOutputModel>(_leadService.GetLeadById(leadId));
+            await _leadService.UpdateLeadAsync(leadId, dto);
+            var outputModel = _mapper.Map<LeadOutputModel>(await _leadService.GetLeadByIdAsync(leadId));
             return Ok(outputModel);
 
         }
@@ -273,27 +282,33 @@ namespace powerful_crm.API.Controllers
         /// <param name="leadId">Id of lead</param>
         /// <returns>Info about lead which is deleted</returns>
         [ProducesResponseType(typeof(List<LeadOutputModel>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
-        [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(string), StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(CustomExceptionOutputModel), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(CustomExceptionOutputModel), StatusCodes.Status409Conflict)]
+        [ProducesResponseType(typeof(CustomExceptionOutputModel), StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [HttpDelete("{leadId}")]
-        public ActionResult<LeadOutputModel> DeleteLead(int leadId)
+        public async Task<ActionResult<LeadOutputModel>> DeleteLeadAsync(int leadId)
         {
             if (!_checker.CheckIfUserIsAllowed(leadId, HttpContext))
                 throw new ForbidException(Constants.ERROR_NOT_ALLOWED_ACTIONS_WITH_OTHER_LEAD);
 
-            var lead = _leadService.GetLeadById(leadId);
+            var lead = await _leadService.GetLeadByIdAsync(leadId);
             if (lead == null)
-            {
-                return NotFound(string.Format(Constants.ERROR_LEAD_NOT_FOUND_BY_ID, leadId));
-            }
-            if (lead.IsDeleted == true)
-            {
-                return BadRequest(string.Format(Constants.ERROR_LEAD_ALREADY_DELETED, leadId));
-            }
-            _leadService.DeleteLead(leadId);
-            var dto = _mapper.Map<LeadOutputModel>(_leadService.GetLeadById(leadId));
+                return NotFound(new CustomExceptionOutputModel 
+                { 
+                    Code = StatusCodes.Status404NotFound,
+                    Message = string.Format(Constants.ERROR_LEAD_NOT_FOUND_BY_ID, leadId) 
+                });
+            
+            if (lead.IsDeleted)
+                return Conflict(new CustomExceptionOutputModel
+                {
+                    Code= StatusCodes.Status409Conflict,
+                    Message=  string.Format(Constants.ERROR_LEAD_ALREADY_DELETED, leadId)
+                });
+            
+            await _leadService.DeleteLeadAsync(leadId);
+            var dto = _mapper.Map<LeadOutputModel>(await _leadService.GetLeadByIdAsync(leadId));
             return Ok(dto);
         }
 
@@ -301,148 +316,36 @@ namespace powerful_crm.API.Controllers
         /// <param name="leadId">Id of lead</param>
         /// <returns>Info about lead which is recovered</returns>
         [ProducesResponseType(typeof(List<LeadOutputModel>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
-        [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(string), StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(CustomExceptionOutputModel), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(CustomExceptionOutputModel), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(CustomExceptionOutputModel), StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [HttpPut("{leadId}/recover")]
-        public ActionResult<LeadOutputModel> RecoverLead(int leadId)
+        public async Task<ActionResult<LeadOutputModel>> RecoverLeadAsync(int leadId)
         {
             if (!_checker.CheckIfUserIsAllowed(leadId, HttpContext))
                 throw new ForbidException(Constants.ERROR_NOT_ALLOWED_ACTIONS_WITH_OTHER_LEAD);
 
-            var lead = _leadService.GetLeadById(leadId);
+            var lead = await _leadService.GetLeadByIdAsync(leadId);
             if (lead == null)
-            {
-                return NotFound(string.Format(Constants.ERROR_LEAD_NOT_FOUND_BY_ID, leadId));
-            }
-            if (lead.IsDeleted == false)
-            {
-                return BadRequest(string.Format(Constants.ERROR_LEAD_NOT_DELETED, leadId));
-            }
-            _leadService.RecoverLead(leadId);
-            var dto = _mapper.Map<LeadOutputModel>(_leadService.GetLeadById(leadId));
+                return NotFound(new CustomExceptionOutputModel
+                {
+                    Code = StatusCodes.Status404NotFound,
+                    Message = string.Format(Constants.ERROR_LEAD_NOT_FOUND_BY_ID, leadId)
+                });
+            if (!lead.IsDeleted)
+                return Conflict(new CustomExceptionOutputModel
+                {
+                    Code = StatusCodes.Status409Conflict,
+                    Message = string.Format(Constants.ERROR_LEAD_NOT_DELETED, leadId)
+                });
+
+            await _leadService.RecoverLeadAsync(leadId);
+            var dto = _mapper.Map<LeadOutputModel>(await _leadService.GetLeadByIdAsync(leadId));
             return Ok(dto);
         }
 
 
-        /// <summary>Gets lead balance</summary>
-        /// <param name="leadId">Id of lead</param>
-        /// <param name="currency">presentation currency</param>
-        /// <returns>Info about balance</returns>
-        [ProducesResponseType(typeof(LeadBalanceOutputModel), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
-        [ProducesResponseType(typeof(string), StatusCodes.Status403Forbidden)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [HttpGet("{leadId}/balance/{currency}")]
-        public ActionResult<LeadBalanceOutputModel> GetBalanceByLeadId(int leadId, string currency)
-        {
-            if (!_checker.CheckIfUserIsAllowed(leadId, HttpContext))
-                throw new ForbidException(Constants.ERROR_NOT_ALLOWED_ACTIONS_WITH_OTHER_LEAD);
-            if (!_checker.CheckCurrencyIsDefined(currency))
-                return Conflict(Constants.ERROR_CURRENCY_NOT_SUPPORT);
-
-            var lead = _leadService.GetLeadById(leadId);
-            if (lead == null)
-            {
-                return NotFound(string.Format(Constants.ERROR_LEAD_NOT_FOUND_BY_ID, leadId));
-            }
-
-            var middle = new BalanceMiddleModel { 
-                AccountIds = _accountService.GetAccountsByLeadId(leadId).ConvertAll(acc => acc.Id),
-                Currency = currency
-            };
-
-            var request = new RestRequest(Constants.API_GET_BALANCE, Method.POST);
-            request.AddParameter("application/json", JsonSerializer.Serialize(middle), ParameterType.RequestBody);
-            var queryResult = _client.Execute<LeadBalanceOutputModel>(request).Data;
-
-            return Ok(queryResult);
-        }
-
-        /// <summary>Gets lead transactions</summary>
-        /// <param name="leadId">Id of lead</param>
-        /// <returns>Info about transactions</returns>
-        [ProducesResponseType(typeof(List<TransactionOutputModel>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
-        [ProducesResponseType(typeof(string), StatusCodes.Status403Forbidden)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [HttpGet("{leadId}/transactions")]
-        public ActionResult<List<TransactionOutputModel>> GetTransactionsByLeadId(int leadId)
-        {
-            if (!_checker.CheckIfUserIsAllowed(leadId, HttpContext))
-                throw new ForbidException(Constants.ERROR_NOT_ALLOWED_ACTIONS_WITH_OTHER_LEAD);
-
-            var lead = _leadService.GetLeadById(leadId);
-            if (lead == null)
-            {
-                return NotFound(string.Format(Constants.ERROR_LEAD_NOT_FOUND_BY_ID, leadId));
-            }
-
-            var request = new RestRequest(string.Format(Constants.API_GET_TRANSACTION, leadId), Method.GET);
-            var queryResult = _client.Execute<string>(request).Data;
-
-            return Ok(queryResult);
-        }
-
-        /// <summary>Adds deposit</summary>
-        /// <param name="inputModel">Information about deposit</param>
-        /// <returns>Id of added deposit</returns>
-        [ProducesResponseType(typeof(int), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status409Conflict)]
-        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
-        [ProducesResponseType(typeof(string), StatusCodes.Status403Forbidden)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [HttpPost("deposit")]
-        public ActionResult<int> AddDeposit([FromBody] TransactionInputModel inputModel)
-        {
-            if (!_checker.CheckIfUserIsAllowed(inputModel.LeadId, HttpContext))
-                throw new ForbidException(Constants.ERROR_NOT_ALLOWED_ACTIONS_WITH_OTHER_LEAD);
-
-            if (!ModelState.IsValid)
-                throw new CustomValidationException(ModelState);
-            if (_leadService.GetLeadById(inputModel.LeadId) == null)
-            {
-                return NotFound(string.Format(Constants.ERROR_LEAD_NOT_FOUND_BY_ID, inputModel.LeadId));
-            }
-            var middle = _mapper.Map<TransactionMiddleModel>(inputModel);
-            var request = new RestRequest(Constants.API_DEPOSIT, Method.POST);
-            request.AddParameter("application/json", JsonSerializer.Serialize(middle), ParameterType.RequestBody);
-            var queryResult = _client.Execute<int>(request).Data;
-            return Ok(queryResult);
-        }
-
-
-        /// <summary>Adds transfer</summary>
-        /// <param name="inputModel">Information about transfer</param>
-        /// <returns>Id of added transfer</returns>
-        [ProducesResponseType(typeof(int), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status409Conflict)]
-        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
-        [ProducesResponseType(typeof(string), StatusCodes.Status403Forbidden)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [HttpPost("transfer")]
-        public ActionResult<int> AddTransfer([FromBody] TransferInputModel inputModel)
-        {
-            if (!_checker.CheckIfUserIsAllowed(inputModel.SenderId,HttpContext))
-                throw new ForbidException(Constants.ERROR_NOT_ALLOWED_ACTIONS_WITH_OTHER_LEAD);
-
-            if (!ModelState.IsValid)
-                throw new CustomValidationException(ModelState);
-
-            if (_leadService.GetLeadById(inputModel.RecipientId) == null)
-            {
-                return NotFound(string.Format(Constants.ERROR_LEAD_NOT_FOUND_BY_ID, inputModel.RecipientId));
-            }
-            if (_leadService.GetLeadById(inputModel.SenderId) == null)
-            {
-                return NotFound(string.Format(Constants.ERROR_LEAD_NOT_FOUND_BY_ID, inputModel.SenderId));
-            }
-            var middle = _mapper.Map<TransferMiddleModel>(inputModel);
-            var request = new RestRequest(Constants.API_TRANSFER, Method.POST);
-            request.AddParameter("application/json", JsonSerializer.Serialize(middle), ParameterType.RequestBody);
-            var queryResult = _client.Execute<int>(request).Data;
-            return Ok(queryResult);
-        }
+       
     }
 }

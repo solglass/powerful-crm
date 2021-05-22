@@ -1,11 +1,12 @@
 ﻿using powerful_crm.Core.Models;
+using System.Threading.Tasks;
 
 namespace powerful_crm.Data
 {
     public interface ICityRepository
     {
-        int AddCity(CityDto city);
-        int DeleteCity(int id);
-        CityDto GetCityById(int id);
+        Task<int> AddCityAsync(CityDto city);
+        Task<bool> DeleteCityAsync(int id);
+        Task<CityDto> GetCityByIdAsync(int id);
     }
 }
