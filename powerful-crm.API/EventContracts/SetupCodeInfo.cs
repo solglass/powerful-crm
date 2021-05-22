@@ -7,6 +7,6 @@ namespace EventContracts
 {
     public class SetupCodeInfo
     {
-        public Dictionary<string, string> Value { get; set; }
+        public Dictionary<string, string> SendValue { get; set; }
     }
 }
