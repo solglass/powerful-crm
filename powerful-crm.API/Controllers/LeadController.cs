@@ -15,6 +15,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
 using System.Security.Claims;
+using EventContracts;
 
 namespace powerful_crm.API.Controllers
 {
@@ -53,9 +54,13 @@ namespace powerful_crm.API.Controllers
             TwoFactorAuthenticator twoFactor = new TwoFactorAuthenticator();
             var setupInfo = twoFactor.GenerateSetupCode("myapp", lead.Email, TwoFactor.TwoFactorKey(lead.Email), false, 3);
 
-            await _publishEndpoint.Publish<SetupCode>(new
+            Dictionary<string,string> setupInfoDictionary = new Dictionary<string, string>();
+            setupInfoDictionary.Add("Account", setupInfo.Account);
+            setupInfoDictionary.Add("ManualEntryKey", setupInfo.ManualEntryKey);
+            setupInfoDictionary.Add("QrCodeSetupImageUrl", setupInfo.QrCodeSetupImageUrl);
+            await _publishEndpoint.Publish<SetupCodeInfo>(new
             {
-                Value = setupInfo
+                Value = new SetupCodeInfo { SendValue = setupInfoDictionary }
             });
             return setupInfo;
         }
