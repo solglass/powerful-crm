@@ -4,18 +4,14 @@ using MassTransit;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Options;
 using powerful_crm.API.Models.InputModels;
 using powerful_crm.API.Models.OutputModels;
 using powerful_crm.Business;
 using powerful_crm.Core;
 using powerful_crm.Core.CustomExceptions;
 using powerful_crm.Core.Models;
-using powerful_crm.Core.Settings;
 using System;
 using System.Collections.Generic;
-using System.Text.Json;
 using System.Threading.Tasks;
 using System.Linq;
 using System.Security.Claims;
@@ -52,10 +48,10 @@ namespace powerful_crm.API.Controllers
         public async Task<ActionResult<SetupCode>> GetCodeAsync()
         {
             var leadId= Convert.ToInt32(HttpContext.User.Claims.Where(t => t.Type == ClaimTypes.NameIdentifier).FirstOrDefault().Value);
-            var lead = _leadService.GetLeadById(leadId);
+            var lead = await _leadService.GetLeadByIdAsync(leadId);
 
             TwoFactorAuthenticator twoFactor = new TwoFactorAuthenticator();
-            var setupInfo = twoFactor.GenerateSetupCode("myapp", lead.Email, TwoFactorKey(lead.Email), false, 3);
+            var setupInfo = twoFactor.GenerateSetupCode("myapp", lead.Email, TwoFactor.TwoFactorKey(lead.Email), false, 3);
 
             await _publishEndpoint.Publish<SetupCode>(new
             {
@@ -64,77 +60,6 @@ namespace powerful_crm.API.Controllers
             return setupInfo;
         }
 
-
-        /// <summary>Adds withdraw</summary>
-        /// <param name="inputModel">Information about withdraw</param>
-        /// <returns>Key of validated and added to MemoryCache input model </returns>
-        [ProducesResponseType(typeof(int), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status409Conflict)]
-        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
-        [ProducesResponseType(typeof(string), StatusCodes.Status403Forbidden)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [HttpPost("withdraw")]
-        public ActionResult<int> AddWithdraw([FromBody] TransactionInputModel inputModel)
-        {
-            if (!_checker.CheckIfUserIsAllowed(inputModel.LeadId, HttpContext))
-                throw new ForbidException(Constants.ERROR_NOT_ALLOWED_ACTIONS_WITH_OTHER_LEAD);
-
-            if (!ModelState.IsValid)
-                throw new CustomValidationException(ModelState);
-            var lead = _leadService.GetLeadById(inputModel.LeadId);
-            if (lead == null)
-            {
-                return NotFound(string.Format(Constants.ERROR_LEAD_NOT_FOUND_BY_ID, inputModel.LeadId));
-            }
-
-            var memoryCacheKey = (int)DateTime.Now.Ticks;
-            _validatedModelCache.Cache.Set<TransactionInputModel>(memoryCacheKey, inputModel);
-            
-            return Ok(memoryCacheKey);
-        }
-
-        /// <summary>Provide withdraw into DB if user confirm operation by GA</summary>
-        /// <param name="memoryCacheKey">key to ValidatedInputModels Dictionary</param>
-        /// <param name="inputCode">Code from Google Authentificator</param>
-        /// <returns>Id of added withdraw</returns>
-        [ProducesResponseType(typeof(int), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status409Conflict)]
-        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
-        [ProducesResponseType(typeof(string), StatusCodes.Status403Forbidden)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [HttpPost("providewithdraw")]
-        public ActionResult<int> ProvideWithdraw(int memoryCacheKey, string inputCode)
-        {
-
-            if (!_validatedModelCache.Cache.TryGetValue(memoryCacheKey, out TransactionInputModel inputModel))
-            {
-                return NotFound("operation not found");
-            }
-
-            if (!_checker.CheckIfUserIsAllowed(inputModel.LeadId, HttpContext))
-                throw new ForbidException(Constants.ERROR_NOT_ALLOWED_ACTIONS_WITH_OTHER_LEAD);
-            
-            var lead = _leadService.GetLeadById(inputModel.LeadId);
-
-            TwoFactorAuthenticator twoFactor = new TwoFactorAuthenticator();
-            bool isValid = twoFactor.ValidateTwoFactorPIN(TwoFactorKey(lead.Email), inputCode);
-            if (!isValid)
-                throw new ForbidException("Operation not confirmed");
-
-            var middle = _mapper.Map<TransactionMiddleModel>(inputModel);
-            var request = new RestRequest(Constants.API_WITHDRAW, Method.POST);
-            request.AddParameter("application/json", JsonSerializer.Serialize(middle), ParameterType.RequestBody);
-            var queryResult = _client.Execute<int>(request).Data;
-
-            _validatedModelCache.Cache.Remove(memoryCacheKey);
-
-            return Ok(queryResult);
-        }
-
-        private static string TwoFactorKey(string email)
-        {
-            return $"myverysecretkey+{email}";
-        }
         /// <summary>Adds new lead</summary>
         /// <param name="inputModel">Information about lead to add</param>
         /// <returns>Information about added lead</returns>

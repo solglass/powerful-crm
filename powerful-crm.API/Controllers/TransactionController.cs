@@ -1,7 +1,10 @@
 ﻿using AutoMapper;
+using Google.Authenticator;
+using MassTransit;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using powerful_crm.API.Models.InputModels;
 using powerful_crm.API.Models.MiddleModels;
@@ -11,6 +14,7 @@ using powerful_crm.Core;
 using powerful_crm.Core.CustomExceptions;
 using powerful_crm.Core.Settings;
 using RestSharp;
+using System;
 using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -26,6 +30,7 @@ namespace powerful_crm.API.Controllers
         private IMapper _mapper;
         private IAccountService _accountService;
         private ILeadService _leadService;
+        private MemoryCacheSingleton _validatedModelCache;
 
         public TransactionController(IOptions<AppSettings> options,
                               IMapper mapper,
@@ -39,6 +44,7 @@ namespace powerful_crm.API.Controllers
             _checker = checker;
             _mapper = mapper;
             _client = new RestClient(options.Value.TSTORE_URL);
+            _validatedModelCache = MemoryCacheSingleton.GetCacheInstance();
         }
 
         /// <summary>Gets lead balance</summary>
@@ -156,7 +162,7 @@ namespace powerful_crm.API.Controllers
         [ProducesResponseType(typeof(CustomExceptionOutputModel), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(CustomExceptionOutputModel), StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [HttpPost("lead/{leadId}/withdraw")]
+        [HttpPost("{leadId}/withdraw")]
         public async Task<ActionResult<int>> AddWithdrawAsync(int leadId, [FromBody] TransactionInputModel inputModel)
         {
             if (!_checker.CheckIfUserIsAllowed(leadId, HttpContext))
@@ -182,9 +188,52 @@ namespace powerful_crm.API.Controllers
                 });
             }
 
-            var transactionModel = _mapper.Map<TransactionMiddleModel>(inputModel);
-            transactionModel.Account.Currency = account.Currency.ToString();
-            var queryResult = (await GetResponseAsync<int>(Constants.API_WITHDRAW, Method.POST, transactionModel)).Data;
+            var memoryCacheKey = (int)DateTime.Now.Ticks;
+            _validatedModelCache.Cache.Set<TransactionInputModel>(memoryCacheKey, inputModel);
+
+            return Ok(memoryCacheKey);
+
+            //var transactionModel = _mapper.Map<TransactionMiddleModel>(inputModel);
+            //transactionModel.Account.Currency = account.Currency.ToString();
+            //var queryResult = (await GetResponseAsync<int>(Constants.API_WITHDRAW, Method.POST, transactionModel)).Data;
+            //return Ok(queryResult);
+        }
+
+        /// <summary>Provide withdraw into DB if user confirm operation by GA</summary>
+        /// <param name="memoryCacheKey">key to ValidatedInputModels Dictionary</param>
+        /// <param name="inputCode">Code from Google Authentificator</param>
+        /// <returns>Id of added withdraw</returns>
+        [ProducesResponseType(typeof(int), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [HttpPost("{leadId}/providewithdraw")]
+        public async Task<ActionResult<int>> ProvideWithdraw(int leadId, int memoryCacheKey, string inputCode)
+        {
+
+            if (!_validatedModelCache.Cache.TryGetValue(memoryCacheKey, out TransactionInputModel inputModel))
+            {
+                return NotFound("operation not found");
+            }
+
+            if (!_checker.CheckIfUserIsAllowed(leadId, HttpContext))
+                throw new ForbidException(Constants.ERROR_NOT_ALLOWED_ACTIONS_WITH_OTHER_LEAD);
+
+            var lead = await _leadService.GetLeadByIdAsync(leadId);
+
+            TwoFactorAuthenticator twoFactor = new TwoFactorAuthenticator();
+            bool isValid = twoFactor.ValidateTwoFactorPIN(TwoFactor.TwoFactorKey(lead.Email), inputCode);
+            if (!isValid)
+                throw new ForbidException("Operation not confirmed");
+
+            var middle = _mapper.Map<TransactionMiddleModel>(inputModel);
+            var request = new RestRequest(Constants.API_WITHDRAW, Method.POST);
+            request.AddParameter("application/json", JsonSerializer.Serialize(middle), ParameterType.RequestBody);
+            var queryResult = _client.Execute<int>(request).Data;
+
+            _validatedModelCache.Cache.Remove(memoryCacheKey);
+
             return Ok(queryResult);
         }
 
