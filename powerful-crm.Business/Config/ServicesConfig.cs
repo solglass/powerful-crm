@@ -17,7 +17,6 @@ namespace EducationSystem.Business.Config
             services.AddScoped<ILeadRepository, LeadRepository>();
             services.AddScoped<ICityRepository, CityRepository>();
             services.AddScoped<IAccountRepository, AccountRepository>();
-
         }
     }
 }

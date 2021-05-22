@@ -27,14 +27,14 @@ namespace powerful_crm.API.Controllers
         private ICityService _cityService;
         private Checker _checker;
         private IMapper _mapper;
-        private IPublishEndpoint _publishEndpoint;
+        private IBusControl _publishEndpoint;
         private MemoryCacheSingleton _validatedModelCache;
 
         public LeadController(IMapper mapper,
                               ILeadService leadService,
                               ICityService cityService,
                               Checker checker,
-                              IPublishEndpoint publishEndpoint)
+                              IBusControl publishEndpoint)
         {
             _leadService = leadService;
             _checker = checker;
@@ -54,14 +54,14 @@ namespace powerful_crm.API.Controllers
             TwoFactorAuthenticator twoFactor = new TwoFactorAuthenticator();
             var setupInfo = twoFactor.GenerateSetupCode("myapp", lead.Email, TwoFactor.TwoFactorKey(lead.Email), false, 3);
 
-            Dictionary<string,string> setupInfoDictionary = new Dictionary<string, string>();
+            var setupInfoDictionary = new Dictionary<string, string>();
             setupInfoDictionary.Add("Account", setupInfo.Account);
             setupInfoDictionary.Add("ManualEntryKey", setupInfo.ManualEntryKey);
             setupInfoDictionary.Add("QrCodeSetupImageUrl", setupInfo.QrCodeSetupImageUrl);
-            await _publishEndpoint.Publish<SetupCodeInfo>(new
-            {
-                Value = new SetupCodeInfo { SendValue = setupInfoDictionary }
-            });
+            await _publishEndpoint.Publish<SetupCodeInfo>(
+            
+                new SetupCodeInfo { SendValue = setupInfoDictionary }
+            );
             return setupInfo;
         }
 
