@@ -7,6 +7,7 @@ using RestSharp.Authenticators;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.Json;
 
 namespace powerful_crm.Business
 {
@@ -14,26 +15,39 @@ namespace powerful_crm.Business
     {
         private const string _baseUrl = "https://api-m.sandbox.paypal.com";
         private const string _auth = "v1/oauth2/token";
+        private const string _batchPayout = "v1/payments/payouts";
         private readonly string _username;
         private readonly string _password;
+        private string _token;
+        private RestClient _client;
         public PayPalRequestService(IOptions<PayPalSettings> options)
         {
             _username = options.Value.USERNAME;
             _password = options.Value.PASSWORD;
+            _client = new RestClient(_baseUrl);
+            _token = GetToken();
+            _client.Authenticator = new OAuth2AuthorizationRequestHeaderAuthenticator(_token, "Bearer");
         }
         public Invoice CreateDraftInvoice()
         {
             throw new NotImplementedException();
         }
 
-        public string GetToken()
+        public List<Payout> CreateBatchPayout(PayoutInputModel inputModel)
         {
-            var client = new RestClient(_baseUrl);           
-            var request = new RestRequest($"{_auth}", Method.POST);
-            client.Authenticator = new HttpBasicAuthenticator(_username, _password);
+            var request = new RestRequest($"_batchPayout", Method.POST);
             request.AddParameter("grant_type", "client_credentials");
-            var response = client.Execute<PayPalAccessToken>(request);
-            var token = response.Data.access_token;
+            request.AddParameter("application/json", JsonSerializer.Serialize(inputModel), ParameterType.RequestBody);
+            var response = _client.Execute<List<Payout>>(request);
+            return response.Data;
+        }
+
+        public string GetToken()
+        {         
+            var request = new RestRequest($"{_auth}", Method.POST);
+            _client.Authenticator = new HttpBasicAuthenticator(_username, _password);
+            request.AddParameter("grant_type", "client_credentials");
+            var response = _client.Execute<PayPalAccessToken>(request);
             return response.Data.access_token;
         }
     }

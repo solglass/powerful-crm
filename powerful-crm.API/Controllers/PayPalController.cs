@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using powerful_crm.Business;
+using powerful_crm.Business.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,5 +24,12 @@ namespace powerful_crm.API.Controllers
         {
             return Ok(_payPalService.GetToken());
         }
+
+        [HttpPost]
+        public ActionResult CreateBatchPayout([FromBody] PayoutInputModel payout)
+        {
+            return Ok(_payPalService.CreateBatchPayout(payout));
+        }
+
     }
 }
