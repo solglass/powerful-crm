@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using powerful_crm.Core.Enums;
 using powerful_crm.Core.CustomExceptions;
+using System.Threading.Tasks;
 
 namespace powerful_crm.Business
 {
@@ -19,41 +20,39 @@ namespace powerful_crm.Business
             _securityService = securityService;
         }
 
-        public int AddLead(LeadDto dto)
+        public async Task<int> AddLeadAsync(LeadDto dto)
         {
-            dto.Password = _securityService.GetHash(dto.Password);
-            return  _leadRepository.AddUpdateLead(dto);
+            dto.Password =  _securityService.GetHash(dto.Password);
+            return await _leadRepository.AddUpdateLeadAsync(dto);
         }
-        public int UpdateLead(int leadId, LeadDto dto)
+        public async Task<int> UpdateLeadAsync(int leadId, LeadDto dto)
         {
             dto.Id = leadId;
-            return _leadRepository.AddUpdateLead(dto);
+            return await _leadRepository.AddUpdateLeadAsync(dto);
         }
-        public int DeleteLead(int leadId) => _leadRepository.DeleteOrRecoverLead(leadId, true);
-        public int RecoverLead(int leadId) => _leadRepository.DeleteOrRecoverLead(leadId, false);
-        public int ChangePassword(int leadId, string oldPassword, string newPassword)
+        public async Task<bool> DeleteLeadAsync(int leadId) => await _leadRepository.DeleteOrRecoverLeadAsync(leadId, true);
+        public async Task<bool> RecoverLeadAsync(int leadId) => await _leadRepository.DeleteOrRecoverLeadAsync(leadId, false);
+        public async Task<bool> ChangePasswordAsync(int leadId, string oldPassword, string newPassword)
         {
-            if (_securityService.VerifyPassword(_leadRepository.GetLeadCredentials(leadId, null).Password, oldPassword))
+            if (_securityService.VerifyPassword((await _leadRepository.GetLeadCredentialsAsync(leadId, null)).Password, oldPassword))
             {
                 newPassword = _securityService.GetHash(newPassword);
-                if(_leadRepository.ChangePasswordLead(leadId, oldPassword, newPassword)==1)
-                    return 1;
-                throw new Exception();
+                return await _leadRepository.ChangePasswordLeadAsync(leadId, oldPassword, newPassword);
             }
             throw new WrongCredentialsException();
         }
-        public LeadDto GetLeadById(int leadId)
+        public async Task<LeadDto> GetLeadByIdAsync(int leadId)
         {
-          var lead =  _leadRepository.GetLeadById(leadId);
+          var lead =  await _leadRepository.GetLeadByIdAsync(leadId);
             if(lead!=null)
             {
-                lead.Accounts = _accountRepository.GetAccountsByLeadId(leadId);
+                lead.Accounts = await _accountRepository.GetAccountsByLeadIdAsync(leadId);
             }
             return lead;
 
         }
-        public int UpdateLeadRole(int leadId, int roleId) => _leadRepository.UpdateLeadRole(leadId, roleId);
-        public List<LeadDto> SearchLead(SearchLeadDto leadDto)
+        public async Task<bool> UpdateLeadRoleAsync(int leadId, int roleId) => await _leadRepository.UpdateLeadRoleAsync(leadId, roleId);
+        public async Task<List<LeadDto>> SearchLeadAsync(SearchLeadDto leadDto)
         {
             if (leadDto.City.Name != null) { leadDto.City.Name = StringWithSearchType.GetStringWithSearchType(leadDto.City.Name, leadDto.TypeSearchCityName); }
             if (leadDto.Email != null) { leadDto.Email = StringWithSearchType.GetStringWithSearchType(leadDto.Email, leadDto.TypeSearchEmail); }
@@ -61,7 +60,7 @@ namespace powerful_crm.Business
             if (leadDto.FirstName != null) { leadDto.FirstName = StringWithSearchType.GetStringWithSearchType(leadDto.FirstName, leadDto.TypeSearchFirstName); }
             if (leadDto.LastName != null) { leadDto.LastName = StringWithSearchType.GetStringWithSearchType(leadDto.LastName, leadDto.TypeSearchLastName); }
             if (leadDto.Phone != null) { leadDto.Phone = StringWithSearchType.GetStringWithSearchType(leadDto.Phone, leadDto.TypeSearchPhone); }
-            return _leadRepository.SearchLeads(leadDto);
+            return await _leadRepository.SearchLeadsAsync(leadDto);
         }
     }
 }

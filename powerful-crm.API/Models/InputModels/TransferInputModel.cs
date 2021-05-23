@@ -7,17 +7,11 @@ namespace powerful_crm.API.Models.InputModels
     {
         [Required]
         [Range(1, int.MaxValue)]
-        public int SenderId { get; set; }
+        public int SenderAccountId { get; set; }
         [Required]
         [Range(1, int.MaxValue)]
-        public int RecipientId { get; set; }
+        public int RecipientAccountId { get; set; }
         [Required]
         public decimal Amount { get; set; }
-        [Required]
-        [CustomCurrencyValidation]
-        public string CurrentCurrency { get; set; }
-        [Required]
-        [CustomCurrencyValidation]
-        public string AccountCurrency { get; set; }
     }
 }

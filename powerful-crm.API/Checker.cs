@@ -18,5 +18,9 @@ namespace powerful_crm.API
         {
             return Enum.IsDefined(typeof(Currency), currency);
         }
+        public bool CheckIfUserIsAllowed(HttpContext httpContext)
+        {
+            return httpContext.User.IsInRole(Role.Administrator.ToString());
+        }
     }
 }

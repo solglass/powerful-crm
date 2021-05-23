@@ -1,9 +1,11 @@
 ﻿using Dapper;
 using Microsoft.Extensions.Options;
+using powerful_crm.Core;
 using powerful_crm.Core.Models;
 using powerful_crm.Core.Settings;
 using System.Data;
 using System.Data.SqlClient;
+using System.Threading.Tasks;
 
 namespace powerful_crm.Data
 {
@@ -13,9 +15,9 @@ namespace powerful_crm.Data
         {
             _connection = new SqlConnection(_connectionString);
         }
-        public int AddCity(CityDto dto)
+        public async Task<int> AddCityAsync(CityDto dto)
         {
-            return _connection.QuerySingleOrDefault<int>(
+            return await _connection.QuerySingleOrDefaultAsync<int>(
                 "dbo.City_Add",
                 param: new
                 {
@@ -23,20 +25,20 @@ namespace powerful_crm.Data
                 },
                 commandType: CommandType.StoredProcedure);
         }
-        public int DeleteCity(int id)
+        public async Task<bool> DeleteCityAsync(int id)
         {
-            return _connection.Execute(
+            return await _connection.ExecuteAsync(
                 "dbo.City_Delete",
                 param: new
                 {
                     id
                 },
-                commandType: CommandType.StoredProcedure);
+                commandType: CommandType.StoredProcedure) == Constants.EXPECTED_CHANGED_ROWS_COUNT;
         }
 
-        public CityDto GetCityById(int id)
+        public async Task<CityDto> GetCityByIdAsync(int id)
         {
-            return _connection.QueryFirstOrDefault<CityDto>(
+            return await _connection.QueryFirstOrDefaultAsync<CityDto>(
                 "dbo.City_SelectById",
                 new { id },
                 commandType: CommandType.StoredProcedure);

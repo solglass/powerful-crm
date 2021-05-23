@@ -5,11 +5,13 @@
         public const string DATE_FORMAT = "dd.MM.yyyy";
         public const string DATE_FORMAT_WITH_TIME = "dd.MM.yyyy HH:mm:ss";
 
+        public const int EXPECTED_CHANGED_ROWS_COUNT = 1;
+
         public const string LOGIN_UNIQUE_CONSTRAINT = "UQLead5E55825B7B2276C4";
         public const string EMAIL_UNIQUE_CONSTRAINT = "UQLeadA9D10534BF185160";
         public const string CURRENCY_UNIQUE_CONSTRAINT = "UQAccount5E55825B7B2276C4";
 
-        public const string API_GET_TRANSACTION = "/api/Transaction/{0}";
+        public const string API_GET_TRANSACTION = "/api/Transaction";
         public const string API_GET_BALANCE = "/api/Transaction/balance";
         public const string API_DEPOSIT = "/api/Transaction/deposite";
         public const string API_WITHDRAW = "/api/Transaction/withdraw";
@@ -29,6 +31,7 @@
         public const string GLOBAL_ERROR_MESSAGE = "An error occured while processing the request.";
         public const string ERROR_LEAD_NOT_FOUND_BY_ID = "Lead with id {0} is not found";
         public const string ERROR_LEAD_NOT_FOUND_BY_LOGIN = "Lead with login {0} is not found";
+        public const string ERROR_LEADS_NOT_FOUND = "Leads are not found.";
         public const string ERROR_CURRENCY_NOT_SUPPORT = "Currency not supported";
     }
 }
