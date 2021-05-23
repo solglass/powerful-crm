@@ -6,9 +6,9 @@ namespace powerful_crm.Business.Models
 {
     public class SenderBatchHeaderInputModel
     {
-        string sender_batch_id { get; set; }
-        string recipient_type { get; set; }
-        string email_subject { get; set; }
-        string email_message { get; set; }
+        public string Sender_batch_id { get; set; }
+        public string Recipient_type { get; set; }
+        public string Email_subject { get; set; }
+        public string Email_message { get; set; }
     }
 }

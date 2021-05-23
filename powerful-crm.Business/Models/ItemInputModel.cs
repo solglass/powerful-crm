@@ -4,11 +4,11 @@ using System.Text;
 
 namespace powerful_crm.Business.Models
 {
-    class ItemInputModel
+    public class ItemInputModel
     {
-        AmountInputModel Amount { get; set; }
-        string Sender_item_id { get; set; }
-        string recepient_wallet { get; set; }
-        string receiver { get; set; }
+        public AmountInputModel Amount { get; set; }
+        public string Sender_item_id { get; set; }
+        public string Recepient_wallet { get; set; }
+        public  string Receiver { get; set; }
 }
 }

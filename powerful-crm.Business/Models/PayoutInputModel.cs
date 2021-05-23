@@ -6,7 +6,7 @@ namespace powerful_crm.Business.Models
 {
    public class PayoutInputModel
     {
-        SenderBatchHeaderInputModel SenderBatchHeader { get; set; }
-        List<ItemInputModel> Items { get; set; }
+        public SenderBatchHeaderInputModel SenderBatchHeader { get; set; }
+        public  List<ItemInputModel> Items { get; set; }
     }
 }

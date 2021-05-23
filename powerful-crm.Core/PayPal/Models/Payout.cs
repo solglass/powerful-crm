@@ -6,9 +6,9 @@ namespace powerful_crm.Core.PayPal.Models
 {
     public class Payout
     {
-        dynamic Batch_header { get; set; }
-        dynamic Items { get; set; }
-        dynamic Links { get; set; }
+        public dynamic Batch_header { get; set; }
+        public dynamic Items { get; set; }
+        public dynamic Links { get; set; }
 
     }
 }

@@ -6,7 +6,7 @@ namespace powerful_crm.Business.Models
 {
     public class AmountInputModel
     {
-        decimal Value { get; set; }
-        string Currency { get; set; }
+        public decimal Value { get; set; }
+        public string Currency { get; set; }
     }
 }

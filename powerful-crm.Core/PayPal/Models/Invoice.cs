@@ -6,15 +6,15 @@ namespace powerful_crm.Core.PayPal.Models
 {
     public class Invoice
     {
-        String Id { get; set; }
-        String Status { get; set; }
-        dynamic Detail { get; set; }
-        dynamic Invoicer { get; set; }
-        dynamic Primary_recipients { get; set; }
-        dynamic Items { get; set; }
-        dynamic Configuration { get; set; }
-        dynamic Amount { get; set; }
-        dynamic Due_amount { get; set; }
-        dynamic Links { get; set; }
+        public String Id { get; set; }
+        public String Status { get; set; }
+        public dynamic Detail { get; set; }
+        public dynamic Invoicer { get; set; }
+        public dynamic Primary_recipients { get; set; }
+        public dynamic Items { get; set; }
+        public dynamic Configuration { get; set; }
+        public dynamic Amount { get; set; }
+        public dynamic Due_amount { get; set; }
+        public dynamic Links { get; set; }
     }
 }
