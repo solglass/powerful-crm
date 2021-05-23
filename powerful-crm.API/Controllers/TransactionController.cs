@@ -18,6 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading.Tasks;
+using System.Timers;
 
 namespace powerful_crm.API.Controllers
 {
@@ -31,6 +32,9 @@ namespace powerful_crm.API.Controllers
         private IAccountService _accountService;
         private ILeadService _leadService;
         private MemoryCacheSingleton _validatedModelCache;
+        private MemoryCacheTimer _timer;
+        private int _timerInterval = 60000;
+        private long _cashCleaningInterval = 3000000000;
 
         public TransactionController(IOptions<AppSettings> options,
                               IMapper mapper,
@@ -45,6 +49,7 @@ namespace powerful_crm.API.Controllers
             _mapper = mapper;
             _client = new RestClient(options.Value.TSTORE_URL);
             _validatedModelCache = MemoryCacheSingleton.GetCacheInstance();
+            _timer = new MemoryCacheTimer(_timerInterval);
         }
 
         /// <summary>Gets lead balance</summary>
@@ -188,15 +193,22 @@ namespace powerful_crm.API.Controllers
                 });
             }
 
-            var memoryCacheKey = (int)DateTime.Now.Ticks;
+            var memoryCacheKey = (long)DateTime.Now.Ticks;
             _validatedModelCache.Cache.Set<TransactionInputModel>(memoryCacheKey, inputModel);
 
-            return Ok(memoryCacheKey);
+            _timer.SubscribeToTimer((Object source, ElapsedEventArgs e) => DeleteModelFromCache(memoryCacheKey));
 
-            //var transactionModel = _mapper.Map<TransactionMiddleModel>(inputModel);
-            //transactionModel.Account.Currency = account.Currency.ToString();
-            //var queryResult = (await GetResponseAsync<int>(Constants.API_WITHDRAW, Method.POST, transactionModel)).Data;
-            //return Ok(queryResult);
+            return Ok(memoryCacheKey);
+        }
+
+        private async void DeleteModelFromCache(long memoryCacheKey)
+        {
+            if ((long)DateTime.Now.Ticks - memoryCacheKey > _cashCleaningInterval)
+            {
+                _validatedModelCache.Cache.Remove(memoryCacheKey);
+                _timer.UnsubscribeFromTimer((Object source, ElapsedEventArgs e) => DeleteModelFromCache(memoryCacheKey));
+            }
+            Console.WriteLine("Все удалил");
         }
 
         /// <summary>Provide withdraw into DB if user confirm operation by GA</summary>
