@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Http;
-using powerful_crm.API.Models.OutputModels;
 using powerful_crm.Core;
 using powerful_crm.Core.CustomExceptions;
 using System;
@@ -80,7 +79,7 @@ namespace powerful_crm.API.Middleware
         private Task ConstructResponse(HttpContext context, int statusCode, string message)
         {
             var errorResponse = JsonSerializer.Serialize(
-                new CustomExceptionOutputModel
+                new
                 {
                     Code = statusCode,
                     Message = message

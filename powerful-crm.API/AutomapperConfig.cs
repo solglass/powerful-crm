@@ -37,7 +37,7 @@ namespace EducationSystem.API
          .ForMember(dest => dest.City, opts => opts.MapFrom(src => new CityDto() { Name = src.CityName }));
 
             CreateMap<TransactionInputModel, TransactionMiddleModel>()
-                .ForMember(dest => dest.Account, opt => opt.MapFrom(c => new AccountMiddleModel { AccountId = c.AccountId}))
+                .ForMember(dest => dest.Account, opt => opt.MapFrom(c => new AccountMiddleModel { AccountId = c.AccountId, Currency = c.Currency }))
                 .ForMember(dest => dest.Value, opt => opt.MapFrom(c => new ValueMiddleModel { Amount = c.Amount, Currency = c.Currency }));
             CreateMap<AccountDto, AccountMiddleModel>()
                 .ForMember(dest => dest.AccountId, opt => opt.MapFrom(c => c.Id))
