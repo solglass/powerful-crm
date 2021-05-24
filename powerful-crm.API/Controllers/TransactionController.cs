@@ -31,7 +31,7 @@ namespace powerful_crm.API.Controllers
         private IMapper _mapper;
         private IAccountService _accountService;
         private ILeadService _leadService;
-        private MemoryCacheSingleton _validatedModelCache;
+        private IMemoryCache _modelCache;
         private MemoryCacheTimer _timer;
         private int _timerInterval = 60000;
         private long _cashCleaningInterval = 3000000000;
@@ -41,14 +41,15 @@ namespace powerful_crm.API.Controllers
                               ILeadService leadService,
                               ICityService cityService,
                               Checker checker,
-                              IAccountService accountService)
+                              IAccountService accountService,
+                              IMemoryCache modelCache)
         {
             _accountService = accountService;
             _leadService = leadService;
             _checker = checker;
             _mapper = mapper;
             _client = new RestClient(options.Value.TSTORE_URL);
-            _validatedModelCache = MemoryCacheSingleton.GetCacheInstance();
+            _modelCache = modelCache;
             _timer = new MemoryCacheTimer(_timerInterval);
         }
 
@@ -194,7 +195,7 @@ namespace powerful_crm.API.Controllers
             }
 
             var memoryCacheKey = (long)DateTime.Now.Ticks;
-            _validatedModelCache.Cache.Set<TransactionInputModel>(memoryCacheKey, inputModel);
+            _modelCache.Set<TransactionInputModel>(memoryCacheKey, inputModel);
 
             _timer.SubscribeToTimer((Object source, ElapsedEventArgs e) => DeleteModelFromCache(memoryCacheKey));
 
@@ -205,7 +206,7 @@ namespace powerful_crm.API.Controllers
         {
             if ((long)DateTime.Now.Ticks - memoryCacheKey > _cashCleaningInterval)
             {
-                _validatedModelCache.Cache.Remove(memoryCacheKey);
+                _modelCache.Remove(memoryCacheKey);
                 _timer.UnsubscribeFromTimer((Object source, ElapsedEventArgs e) => DeleteModelFromCache(memoryCacheKey));
             }
             Console.WriteLine("Все удалил");
@@ -224,7 +225,7 @@ namespace powerful_crm.API.Controllers
         public async Task<ActionResult<int>> ProvideWithdraw(int leadId, int memoryCacheKey, string inputCode)
         {
 
-            if (!_validatedModelCache.Cache.TryGetValue(memoryCacheKey, out TransactionInputModel inputModel))
+            if (!_modelCache.TryGetValue(memoryCacheKey, out TransactionInputModel inputModel))
             {
                 return NotFound("operation not found");
             }
@@ -244,7 +245,7 @@ namespace powerful_crm.API.Controllers
             request.AddParameter("application/json", JsonSerializer.Serialize(middle), ParameterType.RequestBody);
             var queryResult = _client.Execute<int>(request).Data;
 
-            _validatedModelCache.Cache.Remove(memoryCacheKey);
+            _modelCache.Remove(memoryCacheKey);
 
             return Ok(queryResult);
         }
