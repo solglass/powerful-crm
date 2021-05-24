@@ -35,8 +35,7 @@ namespace powerful_crm.Business
 
         public List<Payout> CreateBatchPayout(PayoutInputModel inputModel)
         {
-            var request = new RestRequest($"_batchPayout", Method.POST);
-            request.AddParameter("grant_type", "client_credentials");
+            var request = new RestRequest($"{ _batchPayout }", Method.POST);
             request.AddParameter("application/json", JsonSerializer.Serialize(inputModel), ParameterType.RequestBody);
             var response = _client.Execute<List<Payout>>(request);
             return response.Data;
