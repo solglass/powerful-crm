@@ -1,4 +1,5 @@
 using EducationSystem.Business.Config;
+using MassTransit;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -43,6 +44,21 @@ namespace powerful_crm.API
                 Configuration.GetValue<string>("TSTORE_TEST_URL");               
             });
             services.Configure<PayPalSettings>(Configuration);
+
+            services.AddMassTransit(x =>
+            {
+                x.UsingRabbitMq((context, cfg) =>
+                {
+                    cfg.Host(Configuration.GetValue<string>("RABBITMQ_HOST"), configurator =>
+                    {
+                        configurator.Username(Configuration.GetValue<string>("RABBITMQ_LOGIN"));
+                        configurator.Password(Configuration.GetValue<string>("RABBITMQ_PASSWORD"));
+                    });
+                });
+            });
+
+            services.AddMassTransitHostedService();
+
             services.RegistrateServicesConfig();
             services.AddAutoMapper(typeof(Startup));
             services.SwaggerExtention();

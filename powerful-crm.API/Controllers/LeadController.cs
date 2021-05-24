@@ -1,4 +1,6 @@
 using AutoMapper;
+using Google.Authenticator;
+using MassTransit;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -8,8 +10,12 @@ using powerful_crm.Business;
 using powerful_crm.Core;
 using powerful_crm.Core.CustomExceptions;
 using powerful_crm.Core.Models;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Linq;
+using System.Security.Claims;
+using EventContracts;
 
 namespace powerful_crm.API.Controllers
 {
@@ -21,18 +27,44 @@ namespace powerful_crm.API.Controllers
         private ICityService _cityService;
         private Checker _checker;
         private IMapper _mapper;
-        
+        private IBusControl _publishEndpoint;
+        private MemoryCacheSingleton _validatedModelCache;
 
         public LeadController(IMapper mapper,
                               ILeadService leadService,
                               ICityService cityService,
-                              Checker checker)
+                              Checker checker,
+                              IBusControl publishEndpoint)
         {
             _leadService = leadService;
             _checker = checker;
             _cityService = cityService;
             _mapper = mapper;
+            _validatedModelCache = MemoryCacheSingleton.GetCacheInstance();
+            _publishEndpoint = publishEndpoint;
         }
+        /// <summary>GetManualGA Code</summary>
+        /// <returns>Manual GA setup code</returns>
+        [HttpGet("getcode")]
+        public async Task<ActionResult<SetupCode>> GetCodeAsync()
+        {
+            var leadId= Convert.ToInt32(HttpContext.User.Claims.Where(t => t.Type == ClaimTypes.NameIdentifier).FirstOrDefault().Value);
+            var lead = await _leadService.GetLeadByIdAsync(leadId);
+
+            TwoFactorAuthenticator twoFactor = new TwoFactorAuthenticator();
+            var setupInfo = twoFactor.GenerateSetupCode("myapp", lead.Email, TwoFactor.TwoFactorKey(lead.Email), false, 3);
+
+            var setupInfoDictionary = new Dictionary<string, string>();
+            setupInfoDictionary.Add("Account", setupInfo.Account);
+            setupInfoDictionary.Add("ManualEntryKey", setupInfo.ManualEntryKey);
+            setupInfoDictionary.Add("QrCodeSetupImageUrl", setupInfo.QrCodeSetupImageUrl);
+            await _publishEndpoint.Publish<SetupCodeInfo>(
+            
+                new SetupCodeInfo { SendValue = setupInfoDictionary }
+            );
+            return setupInfo;
+        }
+
         /// <summary>Adds new lead</summary>
         /// <param name="inputModel">Information about lead to add</param>
         /// <returns>Information about added lead</returns>
