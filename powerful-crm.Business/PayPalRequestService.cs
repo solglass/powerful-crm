@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Text.Json;
+using System.Threading.Tasks;
 
 namespace powerful_crm.Business
 {
@@ -33,11 +34,11 @@ namespace powerful_crm.Business
             throw new NotImplementedException();
         }
 
-        public List<Payout> CreateBatchPayout(PayoutInputModel inputModel)
+        public async Task<List<Payout>> CreateBatchPayoutAsync(PayoutInputModel inputModel)
         {
             var request = new RestRequest($"{ _batchPayout }", Method.POST);
             request.AddParameter("application/json", JsonSerializer.Serialize(inputModel), ParameterType.RequestBody);
-            var response = _client.Execute<List<Payout>>(request);
+            var response = await _client.ExecuteAsync<List<Payout>>(request);
             return response.Data;
         }
 
