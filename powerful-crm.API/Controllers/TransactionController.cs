@@ -32,9 +32,7 @@ namespace powerful_crm.API.Controllers
         private IAccountService _accountService;
         private ILeadService _leadService;
         private IMemoryCache _modelCache;
-        private MemoryCacheTimer _timer;
-        private int _timerInterval = 60000;
-        private long _cashCleaningInterval = 3000000000;
+        private int _timerInterval = 300000;
 
         public TransactionController(IOptions<AppSettings> options,
                               IMapper mapper,
@@ -50,7 +48,6 @@ namespace powerful_crm.API.Controllers
             _mapper = mapper;
             _client = new RestClient(options.Value.TSTORE_URL);
             _modelCache = modelCache;
-            _timer = new MemoryCacheTimer(_timerInterval);
         }
 
         /// <summary>Gets lead balance</summary>
@@ -160,7 +157,7 @@ namespace powerful_crm.API.Controllers
         }
 
         /// <summary>Adds withdraw</summary>
-        /// <param name="leadId"></param>
+        /// <param name="leadId">Id lead</param>
         /// <param name="inputModel">Information about withdraw</param>
         /// <returns>Id of added withdraw</returns>
         [ProducesResponseType(typeof(int), StatusCodes.Status200OK)]
@@ -196,23 +193,18 @@ namespace powerful_crm.API.Controllers
 
             var memoryCacheKey = (long)DateTime.Now.Ticks;
             _modelCache.Set<TransactionInputModel>(memoryCacheKey, inputModel);
-
-            _timer.SubscribeToTimer((Object source, ElapsedEventArgs e) => DeleteModelFromCache(memoryCacheKey));
+            _ = Task.Run(async delegate
+               {
+                   await Task.Delay(_timerInterval);
+                   _modelCache.Remove(memoryCacheKey);
+                   Console.WriteLine($"MemoryCache {memoryCacheKey} deleted");
+               });
 
             return Ok(memoryCacheKey);
         }
 
-        private async void DeleteModelFromCache(long memoryCacheKey)
-        {
-            if ((long)DateTime.Now.Ticks - memoryCacheKey > _cashCleaningInterval)
-            {
-                _modelCache.Remove(memoryCacheKey);
-                _timer.UnsubscribeFromTimer((Object source, ElapsedEventArgs e) => DeleteModelFromCache(memoryCacheKey));
-            }
-            Console.WriteLine("Все удалил");
-        }
-
         /// <summary>Provide withdraw into DB if user confirm operation by GA</summary>
+        // <param name="leadId">Id lead</param>
         /// <param name="memoryCacheKey">key to ValidatedInputModels Dictionary</param>
         /// <param name="inputCode">Code from Google Authentificator</param>
         /// <returns>Id of added withdraw</returns>
