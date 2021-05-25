@@ -160,9 +160,9 @@ namespace powerful_crm.API.Controllers
         }
 
 
-        /// <summary>Adds withdraw</summary>
+        /// <summary>Adds withdrawal</summary>
         /// <param name="leadId">Id lead</param>
-        /// <param name="inputModel">Information about withdraw</param>
+        /// <param name="inputModel">Information about withdrawal</param>
         /// <returns>Id of added withdraw</returns>
         [ProducesResponseType(typeof(int), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(CustomExceptionOutputModel), StatusCodes.Status409Conflict)]
@@ -207,9 +207,9 @@ namespace powerful_crm.API.Controllers
             return Ok(memoryCacheKey);
         }
 
-        /// <summary>Adds withdraw</summary>
+        /// <summary>Adds withdrawal  via PayPal</summary>
         /// <param name="leadId">Id lead</param>
-        /// <param name="inputModel">Information about withdraw</param>
+        /// <param name="inputModel">Information about withdrawal</param>
         /// <param name="sender_batch_id">Sender batch Id for PayPal</param>
         /// <param name="receiverEmail">Email of the receiver bound to PayPal account</param>
         /// <returns>Id of added withdraw</returns>

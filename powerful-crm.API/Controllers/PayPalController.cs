@@ -30,7 +30,7 @@ namespace powerful_crm.API.Controllers
         {
             return Ok(_payPalService.GetToken());
         }
-
+        [HttpPost]
         public async Task<ActionResult<List<Payout>>> CreateBatchPayoutAsync(string sender_batch_id, string receiverEmail, TransactionInputModel transaction)
         {
             var payout = new PayoutInputModel
