@@ -1,9 +1,11 @@
 ﻿using Microsoft.Extensions.Options;
-using System.Text.Json;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Serialization;
 using PayPalCheckoutSdk.Core;
 using PayPalCheckoutSdk.Orders;
 using powerful_crm.Business.Models;
+using powerful_crm.Core.CustomExceptions;
 using powerful_crm.Core.PayPal.Models;
 using powerful_crm.Core.Settings;
 using RestSharp;
@@ -40,24 +42,23 @@ namespace powerful_crm.Business
         public async Task<Object> CreateBatchPayoutAsync(PayoutInputModel inputModel)
         {
             var request = new RestRequest($"{ _batchPayout }", Method.POST);
-            var requestBody = JsonSerializer.Serialize(inputModel);
+            var requestBody = JsonConvert.SerializeObject(inputModel);
             request.AddParameter("application/json", requestBody, ParameterType.RequestBody);
             var response = await _client.ExecuteAsync(request);
             if (!response.IsSuccessful)
             {
-                throw new Exception();
+                var deserializedResponse = JsonConvert.DeserializeObject<JObject>(response.Content);
+                throw new PayPalException($"{deserializedResponse }");
             }
             
             if(response.StatusCode == System.Net.HttpStatusCode.OK)
             {
-                //JObject
-                return JObject.FromObject(response);
+                var deserializedResponse = JsonConvert.DeserializeObject<JObject>(response.Content);
+                return deserializedResponse;
             }
             else if (response.StatusCode == System.Net.HttpStatusCode.Created)
             {
-               // var jResponse = JObject.FromObject(response);
-                
-                var deserializedResponse = Newtonsoft.Json.JsonConvert.DeserializeObject<PayoutResponse>(response.Content);
+                var deserializedResponse = JsonConvert.DeserializeObject<PayoutResponse>(response.Content);
                 return deserializedResponse;
             
             }

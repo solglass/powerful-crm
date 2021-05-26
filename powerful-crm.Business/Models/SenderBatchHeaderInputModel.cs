@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Text.Json.Serialization;
@@ -7,16 +8,16 @@ namespace powerful_crm.Business.Models
 {
     public class SenderBatchHeaderInputModel
     {
-        [JsonPropertyName("sender_batch_id")]
+        [JsonProperty("sender_batch_id")]
         public string SenderBatchId { get; set; }
         
-        [JsonPropertyName("recipient_type")]
+        [JsonProperty("recipient_type")]
         public string RecipientType { get; set; }
         
-        [JsonPropertyName("email_subject")]
+        [JsonProperty("email_subject")]
         public string EmailSubject { get; set; }
         
-        [JsonPropertyName("email_message")]
+        [JsonProperty("email_message")]
         public string EmailMessage { get; set; }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Text.Json.Serialization;
@@ -7,13 +8,13 @@ namespace powerful_crm.Core.PayPal.Models
 {
     public class Payout_links
     {
-        [JsonPropertyName("href")]
+        [JsonProperty("href")]
         public string Href { get; set; }
-        [JsonPropertyName("rel")]
+        [JsonProperty("rel")]
         public string Rel { get; set; }
-        [JsonPropertyName("method")]
+        [JsonProperty("method")]
         public string Method { get; set; }
-        [JsonPropertyName("encType")]
+        [JsonProperty("encType")]
         public string EncType { get; set; }
     }
 }

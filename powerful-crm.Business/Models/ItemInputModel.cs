@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Text.Json.Serialization;
@@ -7,16 +8,16 @@ namespace powerful_crm.Business.Models
 {
     public class ItemInputModel
     {
-        [JsonPropertyName("amount")]
+        [JsonProperty("amount")]
         public AmountPayoutInputModel Amount { get; set; }
         
-        [JsonPropertyName("sender_item_id")]
+        [JsonProperty("sender_item_id")]
         public string SenderItemId { get; set; }
        
-        [JsonPropertyName("recepient_wallet")]
+        [JsonProperty("recepient_wallet")]
         public string RecepientWallet { get; set; }
        
-        [JsonPropertyName("receiver")]
+        [JsonProperty("receiver")]
         public  string Receiver { get; set; }
 }
 }
