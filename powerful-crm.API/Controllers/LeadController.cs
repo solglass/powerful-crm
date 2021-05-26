@@ -62,7 +62,7 @@ namespace powerful_crm.API.Controllers
             _emailMessage.ToEmail = lead.Email;
             _emailMessage.ToName = lead.FirstName + " "+ lead.LastName;
             _emailMessage.Subject = "Your Google Authentication EntryKeys";
-            _emailMessage.Body = $"<img src={setupInfo.QrCodeSetupImageUrl}>, <br />{setupInfo.ManualEntryKey}";
+            _emailMessage.Body = $"<img src={setupInfo.QrCodeSetupImageUrl}> <br />{setupInfo.ManualEntryKey}";
 
           await _publishEndpoint.Publish<EmailMessage>(_emailMessage);
             return setupInfo;
