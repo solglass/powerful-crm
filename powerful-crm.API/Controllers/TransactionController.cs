@@ -31,8 +31,8 @@ namespace powerful_crm.API.Controllers
         private IMapper _mapper;
         private IAccountService _accountService;
         private ILeadService _leadService;
-        private IMemoryCache _modelCache;
         private IPayPalRequestService _payPalService;
+        private IMemoryCache _modelCache;
         private int _timerInterval = 300000;
 
         public TransactionController(IOptions<AppSettings> options,
@@ -159,10 +159,9 @@ namespace powerful_crm.API.Controllers
             return Ok(queryResult);
         }
 
-
-        /// <summary>Adds withdrawal</summary>
+        /// <summary>Adds withdraw</summary>
         /// <param name="leadId">Id lead</param>
-        /// <param name="inputModel">Information about withdrawal</param>
+        /// <param name="inputModel">Information about withdraw</param>
         /// <returns>Id of added withdraw</returns>
         [ProducesResponseType(typeof(int), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(CustomExceptionOutputModel), StatusCodes.Status409Conflict)]
@@ -198,11 +197,11 @@ namespace powerful_crm.API.Controllers
             var memoryCacheKey = (long)DateTime.Now.Ticks;
             _modelCache.Set<TransactionInputModel>(memoryCacheKey, inputModel);
             _ = Task.Run(async delegate
-            {
-                await Task.Delay(_timerInterval);
-                _modelCache.Remove(memoryCacheKey);
-                Console.WriteLine($"MemoryCache {memoryCacheKey} deleted");
-            });
+               {
+                   await Task.Delay(_timerInterval);
+                   _modelCache.Remove(memoryCacheKey);
+                   Console.WriteLine($"MemoryCache {memoryCacheKey} deleted");
+               });
 
             return Ok(memoryCacheKey);
         }

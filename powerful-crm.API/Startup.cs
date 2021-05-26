@@ -1,4 +1,5 @@
 using EducationSystem.Business.Config;
+using EventContracts;
 using MassTransit;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -58,11 +59,13 @@ namespace powerful_crm.API
             });
 
             services.AddMassTransitHostedService();
-
             services.RegistrateServicesConfig();
             services.AddAutoMapper(typeof(Startup));
             services.SwaggerExtention();
+            services.AddMemoryCache();
             services.AddScoped<Checker>();
+            services.AddScoped<EmailMessage>();
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
