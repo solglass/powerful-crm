@@ -55,7 +55,7 @@ namespace powerful_crm.API.Controllers
             var payoutResult = await _payPalService.CreateBatchPayoutAsync(payout);
             return Ok(payoutResult);
         }
-        [AllowAnonymous]
+
         [HttpPost("order")]
         public async Task<BraintreeHttp.HttpResponse> CreateOrder()
         {
