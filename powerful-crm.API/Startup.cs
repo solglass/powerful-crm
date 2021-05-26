@@ -72,6 +72,8 @@ namespace powerful_crm.API
             {
                 app.UseDeveloperExceptionPage();
             }
+            app.UseDefaultFiles();
+            app.UseStaticFiles();
             app.UseSwagger();
             app.UseSwaggerUI(c =>
             {

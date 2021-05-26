@@ -25,12 +25,7 @@ namespace powerful_crm.API.Controllers
         {
             _payPalService = payPalService;
         }
-        [HttpGet]
-        public ActionResult GetToken()
-        {
-            return Ok(_payPalService.GetToken());
-        }
-        [HttpPost]
+        [HttpPost("payout")]
         public async Task<ActionResult<List<Payout>>> CreateBatchPayoutAsync(string sender_batch_id, string receiverEmail, TransactionInputModel transaction)
         {
             var payout = new PayoutInputModel
@@ -58,7 +53,11 @@ namespace powerful_crm.API.Controllers
             var payoutResult = await _payPalService.CreateBatchPayoutAsync(payout);
             return Ok(payoutResult);
         }
-
+        [HttpPost("order")]
+        public async Task<BraintreeHttp.HttpResponse> CreateOrder()
+        {
+            return await(_payPalService.CreateOrder(false));
+        }
 
     }
 }
