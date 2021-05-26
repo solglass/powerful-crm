@@ -1,4 +1,6 @@
 ﻿using Microsoft.Extensions.Options;
+using System.Text.Json;
+using Newtonsoft.Json.Linq;
 using PayPalCheckoutSdk.Core;
 using PayPalCheckoutSdk.Orders;
 using powerful_crm.Business.Models;
@@ -9,7 +11,6 @@ using RestSharp.Authenticators;
 using System;
 using System.Collections.Generic;
 using System.Text;
-using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace powerful_crm.Business
@@ -36,12 +37,32 @@ namespace powerful_crm.Business
             throw new NotImplementedException();
         }
 
-        public async Task<List<Payout>> CreateBatchPayoutAsync(PayoutInputModel inputModel)
+        public async Task<Object> CreateBatchPayoutAsync(PayoutInputModel inputModel)
         {
             var request = new RestRequest($"{ _batchPayout }", Method.POST);
-            request.AddParameter("application/json", JsonSerializer.Serialize(inputModel), ParameterType.RequestBody);
-            var response = await _client.ExecuteAsync<List<Payout>>(request);
-            return response.Data;
+            var requestBody = JsonSerializer.Serialize(inputModel);
+            request.AddParameter("application/json", requestBody, ParameterType.RequestBody);
+            var response = await _client.ExecuteAsync(request);
+            if (!response.IsSuccessful)
+            {
+                throw new Exception();
+            }
+            
+            if(response.StatusCode == System.Net.HttpStatusCode.OK)
+            {
+                //JObject
+                return JObject.FromObject(response);
+            }
+            else if (response.StatusCode == System.Net.HttpStatusCode.Created)
+            {
+               // var jResponse = JObject.FromObject(response);
+                
+                var deserializedResponse = Newtonsoft.Json.JsonConvert.DeserializeObject<PayoutResponse>(response.Content);
+                return deserializedResponse;
+            
+            }
+            return null;
+  
         }
 
         private string GetToken()

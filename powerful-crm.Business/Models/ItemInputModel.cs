@@ -1,14 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.Json.Serialization;
 
 namespace powerful_crm.Business.Models
 {
     public class ItemInputModel
     {
-        public AmountInputModel Amount { get; set; }
-        public string Sender_item_id { get; set; }
-        public string Recepient_wallet { get; set; }
+        [JsonPropertyName("amount")]
+        public AmountPayoutInputModel Amount { get; set; }
+        
+        [JsonPropertyName("sender_item_id")]
+        public string SenderItemId { get; set; }
+       
+        [JsonPropertyName("recepient_wallet")]
+        public string RecepientWallet { get; set; }
+       
+        [JsonPropertyName("receiver")]
         public  string Receiver { get; set; }
 }
 }

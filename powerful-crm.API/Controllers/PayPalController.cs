@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using powerful_crm.API.Models.InputModels;
 using powerful_crm.Business;
@@ -13,6 +14,7 @@ namespace powerful_crm.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+
     public class PayPalController : ControllerBase
     {
         private IPayPalRequestService _payPalService;
@@ -25,26 +27,26 @@ namespace powerful_crm.API.Controllers
         {
             _payPalService = payPalService;
         }
-        [HttpPost("payout")]
-        public async Task<ActionResult<List<Payout>>> CreateBatchPayoutAsync(string sender_batch_id, string receiverEmail, TransactionInputModel transaction)
+        [HttpPost("payout/{sender_batch_id}/{receiverEmail}")]
+        public async Task<ActionResult<List<PayoutResponse>>> CreateBatchPayoutAsync(string sender_batch_id, string receiverEmail, [FromBody] TransactionInputModel transaction)
         {
             var payout = new PayoutInputModel
             {
                 SenderBatchHeader = new SenderBatchHeaderInputModel {
-                    Sender_batch_id = sender_batch_id,
-                    Recipient_type =  "EMAIL",
-                    Email_message = _email_subject, 
-                    Email_subject = _email_message,
+                    SenderBatchId = sender_batch_id,
+                    RecipientType =  "EMAIL",
+                    EmailMessage = _email_subject, 
+                    EmailSubject = _email_message,
                 },
                 Items = new List<ItemInputModel> {
                     new  ItemInputModel{
                         Amount =
-                            new AmountInputModel {
+                            new AmountPayoutInputModel {
                             Value = transaction.Amount,
                             Currency = transaction.Currency.ToString() },
 
-                        Recepient_wallet = "test",
-                        Sender_item_id = _sender_item_id,
+                        RecepientWallet = "test",
+                        SenderItemId = _sender_item_id,
                         Receiver = receiverEmail
                      }
                 }
@@ -53,6 +55,7 @@ namespace powerful_crm.API.Controllers
             var payoutResult = await _payPalService.CreateBatchPayoutAsync(payout);
             return Ok(payoutResult);
         }
+        [AllowAnonymous]
         [HttpPost("order")]
         public async Task<BraintreeHttp.HttpResponse> CreateOrder()
         {
