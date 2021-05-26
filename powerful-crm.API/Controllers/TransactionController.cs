@@ -31,25 +31,23 @@ namespace powerful_crm.API.Controllers
         private IMapper _mapper;
         private IAccountService _accountService;
         private ILeadService _leadService;
-        private MemoryCacheSingleton _validatedModelCache;
-        private MemoryCacheTimer _timer;
-        private int _timerInterval = 60000;
-        private long _cashCleaningInterval = 3000000000;
+        private IMemoryCache _modelCache;
+        private int _timerInterval = 300000;
 
         public TransactionController(IOptions<AppSettings> options,
                               IMapper mapper,
                               ILeadService leadService,
                               ICityService cityService,
                               Checker checker,
-                              IAccountService accountService)
+                              IAccountService accountService,
+                              IMemoryCache modelCache)
         {
             _accountService = accountService;
             _leadService = leadService;
             _checker = checker;
             _mapper = mapper;
             _client = new RestClient(options.Value.TSTORE_URL);
-            _validatedModelCache = MemoryCacheSingleton.GetCacheInstance();
-            _timer = new MemoryCacheTimer(_timerInterval);
+            _modelCache = modelCache;
         }
 
         /// <summary>Gets lead balance</summary>
@@ -159,7 +157,7 @@ namespace powerful_crm.API.Controllers
         }
 
         /// <summary>Adds withdraw</summary>
-        /// <param name="leadId"></param>
+        /// <param name="leadId">Id lead</param>
         /// <param name="inputModel">Information about withdraw</param>
         /// <returns>Id of added withdraw</returns>
         [ProducesResponseType(typeof(int), StatusCodes.Status200OK)]
@@ -194,24 +192,19 @@ namespace powerful_crm.API.Controllers
             }
 
             var memoryCacheKey = (long)DateTime.Now.Ticks;
-            _validatedModelCache.Cache.Set<TransactionInputModel>(memoryCacheKey, inputModel);
-
-            _timer.SubscribeToTimer((Object source, ElapsedEventArgs e) => DeleteModelFromCache(memoryCacheKey));
+            _modelCache.Set<TransactionInputModel>(memoryCacheKey, inputModel);
+            _ = Task.Run(async delegate
+               {
+                   await Task.Delay(_timerInterval);
+                   _modelCache.Remove(memoryCacheKey);
+                   Console.WriteLine($"MemoryCache {memoryCacheKey} deleted");
+               });
 
             return Ok(memoryCacheKey);
         }
 
-        private async void DeleteModelFromCache(long memoryCacheKey)
-        {
-            if ((long)DateTime.Now.Ticks - memoryCacheKey > _cashCleaningInterval)
-            {
-                _validatedModelCache.Cache.Remove(memoryCacheKey);
-                _timer.UnsubscribeFromTimer((Object source, ElapsedEventArgs e) => DeleteModelFromCache(memoryCacheKey));
-            }
-            Console.WriteLine("Все удалил");
-        }
-
         /// <summary>Provide withdraw into DB if user confirm operation by GA</summary>
+        // <param name="leadId">Id lead</param>
         /// <param name="memoryCacheKey">key to ValidatedInputModels Dictionary</param>
         /// <param name="inputCode">Code from Google Authentificator</param>
         /// <returns>Id of added withdraw</returns>
@@ -224,7 +217,7 @@ namespace powerful_crm.API.Controllers
         public async Task<ActionResult<int>> ProvideWithdraw(int leadId, int memoryCacheKey, string inputCode)
         {
 
-            if (!_validatedModelCache.Cache.TryGetValue(memoryCacheKey, out TransactionInputModel inputModel))
+            if (!_modelCache.TryGetValue(memoryCacheKey, out TransactionInputModel inputModel))
             {
                 return NotFound("operation not found");
             }
@@ -244,7 +237,7 @@ namespace powerful_crm.API.Controllers
             request.AddParameter("application/json", JsonSerializer.Serialize(middle), ParameterType.RequestBody);
             var queryResult = _client.Execute<int>(request).Data;
 
-            _validatedModelCache.Cache.Remove(memoryCacheKey);
+            _modelCache.Remove(memoryCacheKey);
 
             return Ok(queryResult);
         }

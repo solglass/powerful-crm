@@ -16,6 +16,7 @@ using System.Threading.Tasks;
 using System.Linq;
 using System.Security.Claims;
 using EventContracts;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace powerful_crm.API.Controllers
 {
@@ -28,19 +29,24 @@ namespace powerful_crm.API.Controllers
         private Checker _checker;
         private IMapper _mapper;
         private IBusControl _publishEndpoint;
-        private MemoryCacheSingleton _validatedModelCache;
+        private IMemoryCache _modelCache;
+        private EmailMessage _emailMessage;
+
 
         public LeadController(IMapper mapper,
                               ILeadService leadService,
                               ICityService cityService,
                               Checker checker,
-                              IBusControl publishEndpoint)
+                              IBusControl publishEndpoint,
+                              IMemoryCache modelCache,
+                              EmailMessage emailMessage)
         {
             _leadService = leadService;
             _checker = checker;
             _cityService = cityService;
             _mapper = mapper;
-            _validatedModelCache = MemoryCacheSingleton.GetCacheInstance();
+            _emailMessage = emailMessage;
+            _modelCache = modelCache;
             _publishEndpoint = publishEndpoint;
         }
         /// <summary>GetManualGA Code</summary>
@@ -52,16 +58,13 @@ namespace powerful_crm.API.Controllers
             var lead = await _leadService.GetLeadByIdAsync(leadId);
 
             TwoFactorAuthenticator twoFactor = new TwoFactorAuthenticator();
-            var setupInfo = twoFactor.GenerateSetupCode("myapp", lead.Email, TwoFactor.TwoFactorKey(lead.Email), false, 3);
+            var setupInfo = twoFactor.GenerateSetupCode("CRM", lead.Email, TwoFactor.TwoFactorKey(lead.Email), false, 3);
+            _emailMessage.ToEmail = lead.Email;
+            _emailMessage.ToName = lead.FirstName + " "+ lead.LastName;
+            _emailMessage.Subject = "Your Google Authentication EntryKeys";
+            _emailMessage.Body = $"<img src={setupInfo.QrCodeSetupImageUrl}>, <br />{setupInfo.ManualEntryKey}";
 
-            var setupInfoDictionary = new Dictionary<string, string>();
-            setupInfoDictionary.Add("Account", setupInfo.Account);
-            setupInfoDictionary.Add("ManualEntryKey", setupInfo.ManualEntryKey);
-            setupInfoDictionary.Add("QrCodeSetupImageUrl", setupInfo.QrCodeSetupImageUrl);
-            await _publishEndpoint.Publish<SetupCodeInfo>(
-            
-                new SetupCodeInfo { SendValue = setupInfoDictionary }
-            );
+          await _publishEndpoint.Publish<EmailMessage>(_emailMessage);
             return setupInfo;
         }
 
