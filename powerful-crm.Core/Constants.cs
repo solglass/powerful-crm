@@ -33,5 +33,6 @@
         public const string ERROR_LEAD_NOT_FOUND_BY_LOGIN = "Lead with login {0} is not found";
         public const string ERROR_LEADS_NOT_FOUND = "Leads are not found.";
         public const string ERROR_CURRENCY_NOT_SUPPORT = "Currency not supported";
+        public const string ERROR_PAYPAL_SERVICE_ERROR = "Paypal service error on time: {0}";
     }
 }

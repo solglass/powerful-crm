@@ -251,7 +251,7 @@ namespace powerful_crm.API.Controllers
 
             var payoutResult = await payPalController.CreateBatchPayoutAsync(sender_batch_id, receiverEmail, inputModel);
 
-   
+
             if (payoutResult is JObject)
                 return Ok(payoutResult);
             if (payoutResult is PayoutResponse)
@@ -268,7 +268,12 @@ namespace powerful_crm.API.Controllers
                 var payoutResultCreated = (payoutResult as PayoutResponse);
                 return Created(payoutResultCreated.Links[0].Href, payoutResultCreated);
             }
-            return StatusCodes.Status400BadRequest;
+            return BadRequest(new CustomExceptionOutputModel
+            {
+                Code = StatusCodes.Status400BadRequest,
+                Message = string.Format(Constants.ERROR_PAYPAL_SERVICE_ERROR, DateTime.Now)
+            }
+            );
 
         }
 
