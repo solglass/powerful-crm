@@ -46,8 +46,8 @@ namespace powerful_crm.API.Controllers
             _leadService = leadService;
             _checker = checker;
             _mapper = mapper;
-            _client = new RestClient(options.Value.TSTORE_URL);
             _modelCache = modelCache;
+            _client = new RestClient(options.Value.TSTORE_URL);
         }
 
         /// <summary>Gets lead balance</summary>
@@ -191,7 +191,7 @@ namespace powerful_crm.API.Controllers
                 });
             }
 
-            var memoryCacheKey = (long)DateTime.Now.Ticks;
+            int memoryCacheKey = (int)DateTime.Now.Ticks;
             _modelCache.Set<TransactionInputModel>(memoryCacheKey, inputModel);
             _ = Task.Run(async delegate
                {
