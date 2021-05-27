@@ -29,7 +29,6 @@ namespace powerful_crm.API.Controllers
         private Checker _checker;
         private IMapper _mapper;
         private IBusControl _publishEndpoint;
-        private IMemoryCache _modelCache;
         private EmailMessage _emailMessage;
 
 
@@ -38,7 +37,6 @@ namespace powerful_crm.API.Controllers
                               ICityService cityService,
                               Checker checker,
                               IBusControl publishEndpoint,
-                              IMemoryCache modelCache,
                               EmailMessage emailMessage)
         {
             _leadService = leadService;
@@ -46,7 +44,6 @@ namespace powerful_crm.API.Controllers
             _cityService = cityService;
             _mapper = mapper;
             _emailMessage = emailMessage;
-            _modelCache = modelCache;
             _publishEndpoint = publishEndpoint;
         }
         /// <summary>GetManualGA Code</summary>
