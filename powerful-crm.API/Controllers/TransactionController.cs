@@ -6,12 +6,14 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json.Linq;
 using powerful_crm.API.Models.InputModels;
 using powerful_crm.API.Models.MiddleModels;
 using powerful_crm.API.Models.OutputModels;
 using powerful_crm.Business;
 using powerful_crm.Core;
 using powerful_crm.Core.CustomExceptions;
+using powerful_crm.Core.PayPal.Models;
 using powerful_crm.Core.Settings;
 using RestSharp;
 using System;
@@ -212,10 +214,12 @@ namespace powerful_crm.API.Controllers
         /// <param name="sender_batch_id">Sender batch Id for PayPal</param>
         /// <param name="receiverEmail">Email of the receiver bound to PayPal account</param>
         /// <returns>Id of added withdraw</returns>
-        [ProducesResponseType(typeof(int), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(JObject), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(PayoutResponse), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(CustomExceptionOutputModel), StatusCodes.Status409Conflict)]
         [ProducesResponseType(typeof(CustomExceptionOutputModel), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(CustomExceptionOutputModel), StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(CustomExceptionOutputModel), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [HttpPost("{leadId}/withdraw/{sender_batch_id}/{receiverEmail}")]
         public async Task<ActionResult<int>> AddPaypalWithdrawAsync(int leadId, [FromBody] TransactionInputModel inputModel, string sender_batch_id, string receiverEmail)
@@ -245,18 +249,27 @@ namespace powerful_crm.API.Controllers
 
             var payPalController = new PayPalController(_payPalService);
 
-            var payoutresult = await payPalController.CreateBatchPayoutAsync(sender_batch_id, receiverEmail, inputModel);
+            var payoutResult = await payPalController.CreateBatchPayoutAsync(sender_batch_id, receiverEmail, inputModel);
 
-            var memoryCacheKey = (long)DateTime.Now.Ticks;
-            _modelCache.Set<TransactionInputModel>(memoryCacheKey, inputModel);
-            _ = Task.Run(async delegate
+   
+            if (payoutResult is JObject)
+                return Ok(payoutResult);
+            if (payoutResult is PayoutResponse)
             {
-                await Task.Delay(_timerInterval);
-                _modelCache.Remove(memoryCacheKey);
-                Console.WriteLine($"MemoryCache {memoryCacheKey} deleted");
-            });
+                var memoryCacheKey = (long)DateTime.Now.Ticks;
+                _modelCache.Set<TransactionInputModel>(memoryCacheKey, inputModel);
+                _ = Task.Run(async delegate
+                {
+                    await Task.Delay(_timerInterval);
+                    _modelCache.Remove(memoryCacheKey);
+                    Console.WriteLine($"MemoryCache {memoryCacheKey} deleted");
+                });
 
-            return Ok(memoryCacheKey);
+                var payoutResultCreated = (payoutResult as PayoutResponse);
+                return Created(payoutResultCreated.Links[0].Href, payoutResultCreated);
+            }
+            return StatusCodes.Status400BadRequest;
+
         }
 
         /// <summary>Provide withdraw into DB if user confirm operation by GA</summary>
