@@ -10,7 +10,7 @@ namespace powerful_crm.Business
     public interface IPayPalRequestService
     {
         Invoice CreateDraftInvoice();
-        Task <Object> CreateBatchPayoutAsync(PayoutInputModel inputModel);      
+        Task <PayoutResponse> CreateBatchPayoutAsync(PayoutInputModel inputModel);      
         Task<BraintreeHttp.HttpResponse> CreateOrder(bool debug);
     }
 }

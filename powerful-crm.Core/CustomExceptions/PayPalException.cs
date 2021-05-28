@@ -9,7 +9,7 @@ namespace powerful_crm.Core.CustomExceptions
     {
         public PayPalException(string errorMessage) {
             StatusCode = (int)HttpStatusCode.BadGateway;
-            ErrorMessage = errorMessage;
+            ErrorMessage =$"{ string.Format(Constants.ERROR_PAYPAL_SERVICE_ERROR, DateTime.Now)}  {errorMessage}";
         }
     }
 }
