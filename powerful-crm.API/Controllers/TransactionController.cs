@@ -6,12 +6,14 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json.Linq;
 using powerful_crm.API.Models.InputModels;
 using powerful_crm.API.Models.MiddleModels;
 using powerful_crm.API.Models.OutputModels;
 using powerful_crm.Business;
 using powerful_crm.Core;
 using powerful_crm.Core.CustomExceptions;
+using powerful_crm.Core.PayPal.Models;
 using powerful_crm.Core.Settings;
 using RestSharp;
 using System;
@@ -31,6 +33,7 @@ namespace powerful_crm.API.Controllers
         private IMapper _mapper;
         private IAccountService _accountService;
         private ILeadService _leadService;
+        private IPayPalRequestService _payPalService;
         private IMemoryCache _modelCache;
         private int _timerInterval = 300000;
 
@@ -40,6 +43,7 @@ namespace powerful_crm.API.Controllers
                               ICityService cityService,
                               Checker checker,
                               IAccountService accountService,
+                              IPayPalRequestService payPalService,
                               IMemoryCache modelCache)
         {
             _accountService = accountService;
@@ -47,6 +51,7 @@ namespace powerful_crm.API.Controllers
             _checker = checker;
             _mapper = mapper;
             _modelCache = modelCache;
+            _payPalService = payPalService;
             _client = new RestClient(options.Value.TSTORE_URL);
         }
 
@@ -165,7 +170,7 @@ namespace powerful_crm.API.Controllers
         [ProducesResponseType(typeof(CustomExceptionOutputModel), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(CustomExceptionOutputModel), StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [HttpPost("{leadId}/withdraw")]
+        [HttpPost("{leadId}/withdraw/")]
         public async Task<ActionResult<int>> AddWithdrawAsync(int leadId, [FromBody] TransactionInputModel inputModel)
         {
             if (!_checker.CheckIfUserIsAllowed(leadId, HttpContext))
@@ -201,6 +206,74 @@ namespace powerful_crm.API.Controllers
                });
 
             return Ok(memoryCacheKey);
+        }
+
+        /// <summary>Adds withdrawal  via PayPal</summary>
+        /// <param name="leadId">Id lead</param>
+        /// <param name="inputModel">Information about withdrawal</param>
+        /// <param name="sender_batch_id">Sender batch Id for PayPal</param>
+        /// <param name="receiverEmail">Email of the receiver bound to PayPal account</param>
+        /// <returns>Id of added withdraw</returns>
+        [ProducesResponseType(typeof(JObject), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(PayoutResponse), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(CustomExceptionOutputModel), StatusCodes.Status409Conflict)]
+        [ProducesResponseType(typeof(CustomExceptionOutputModel), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(CustomExceptionOutputModel), StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(CustomExceptionOutputModel), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [HttpPost("{leadId}/withdraw/{sender_batch_id}/{receiverEmail}")]
+        public async Task<ActionResult<int>> AddPaypalWithdrawAsync(int leadId, [FromBody] TransactionInputModel inputModel, string sender_batch_id, string receiverEmail)
+        {
+            if (!_checker.CheckIfUserIsAllowed(leadId, HttpContext))
+                throw new ForbidException(Constants.ERROR_NOT_ALLOWED_ACTIONS_WITH_OTHER_LEAD);
+
+            if (!ModelState.IsValid)
+                throw new CustomValidationException(ModelState);
+            var lead = await _leadService.GetLeadByIdAsync(leadId);
+            if (lead == null)
+                return NotFound(new CustomExceptionOutputModel
+                {
+                    Code = StatusCodes.Status404NotFound,
+                    Message = string.Format(Constants.ERROR_LEAD_NOT_FOUND_BY_ID, leadId)
+                });
+
+            var account = lead.Accounts.Find((acc) => acc.Id == inputModel.AccountId);
+            if (account == null)
+            {
+                return NotFound(new CustomExceptionOutputModel
+                {
+                    Code = StatusCodes.Status404NotFound,
+                    Message = string.Format(Constants.ERROR_ACCOUNT_NOT_FOUND, inputModel.AccountId)
+                });
+            }
+
+            var payPalController = new PayPalController(_payPalService);
+
+            var payoutResultObject = await payPalController.CreateBatchPayoutAsync(sender_batch_id, receiverEmail, inputModel);
+            var payoutResult  = payoutResultObject.Value;
+            if (payoutResult is JObject)
+                return Ok(payoutResult);
+            if (payoutResult is PayoutResponse)
+            {
+                var memoryCacheKey = (long)DateTime.Now.Ticks;
+                _modelCache.Set<TransactionInputModel>(memoryCacheKey, inputModel);
+                _ = Task.Run(async delegate
+                {
+                    await Task.Delay(_timerInterval);
+                    _modelCache.Remove(memoryCacheKey);
+                    Console.WriteLine($"MemoryCache {memoryCacheKey} deleted");
+                });
+
+                var payoutResultCreated = (payoutResult as PayoutResponse);
+                return Created(payoutResultCreated.Links[0].Href, payoutResultCreated);
+            }
+            return BadRequest(new CustomExceptionOutputModel
+            {
+                Code = StatusCodes.Status400BadRequest,
+                Message = string.Format(Constants.ERROR_PAYPAL_SERVICE_ERROR, DateTime.Now)
+            }
+            );
+
         }
 
         /// <summary>Provide withdraw into DB if user confirm operation by GA</summary>

@@ -5,6 +5,7 @@
         RUB = 1,
         USD,
         EUR,
-        JPY
+        JPY,
+        GB
     }
 }

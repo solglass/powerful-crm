@@ -39,11 +39,13 @@ namespace powerful_crm.API
                 c.CONNECTION_STRING = _env.IsProduction() ?
                 Configuration.GetValue<string>("CRM_CONNECTION_STRING") :
                 Configuration.GetValue<string>("CRM_TEST_CONNECTION_STRING");
+                
 
                 c.TSTORE_URL = _env.IsProduction() ?
                 Configuration.GetValue<string>("TSTORE_URL") :
-                Configuration.GetValue<string>("TSTORE_TEST_URL");
+                Configuration.GetValue<string>("TSTORE_TEST_URL");               
             });
+            services.Configure<PayPalSettings>(Configuration);
 
             services.AddMassTransit(x =>
             {
@@ -74,6 +76,8 @@ namespace powerful_crm.API
             {
                 app.UseDeveloperExceptionPage();
             }
+            app.UseDefaultFiles();
+            app.UseStaticFiles();
             app.UseSwagger();
             app.UseSwaggerUI(c =>
             {

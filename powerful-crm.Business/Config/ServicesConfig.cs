@@ -13,6 +13,7 @@ namespace EducationSystem.Business.Config
             services.AddScoped<ICityService, CityService>();
             services.AddScoped<IAuthenticationService, AuthenticationService>();
             services.AddScoped<IAccountService, AccountService>();
+            services.AddScoped<IPayPalRequestService, PayPalRequestService>();
 
             services.AddScoped<ILeadRepository, LeadRepository>();
             services.AddScoped<ICityRepository, CityRepository>();
