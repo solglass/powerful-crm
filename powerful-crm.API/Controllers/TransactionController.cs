@@ -277,7 +277,7 @@ namespace powerful_crm.API.Controllers
         }
 
         /// <summary>Provide withdraw into DB if user confirm operation by GA</summary>
-        // <param name="leadId">Id lead</param>
+        /// <param name="leadId">Id lead</param>
         /// <param name="memoryCacheKey">key to ValidatedInputModels Dictionary</param>
         /// <param name="inputCode">Code from Google Authentificator</param>
         /// <returns>Id of added withdraw</returns>
