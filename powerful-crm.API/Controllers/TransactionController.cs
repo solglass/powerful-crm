@@ -249,9 +249,8 @@ namespace powerful_crm.API.Controllers
 
             var payPalController = new PayPalController(_payPalService);
 
-            var payoutResult = await payPalController.CreateBatchPayoutAsync(sender_batch_id, receiverEmail, inputModel);
-
-
+            var payoutResultObject = await payPalController.CreateBatchPayoutAsync(sender_batch_id, receiverEmail, inputModel);
+            var payoutResult  = payoutResultObject.Value;
             if (payoutResult is JObject)
                 return Ok(payoutResult);
             if (payoutResult is PayoutResponse)
