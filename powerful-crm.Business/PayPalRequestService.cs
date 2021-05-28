@@ -39,35 +39,26 @@ namespace powerful_crm.Business
             throw new NotImplementedException();
         }
 
-        public async Task<Object> CreateBatchPayoutAsync(PayoutInputModel inputModel)
+        public async Task<PayoutResponse> CreateBatchPayoutAsync(PayoutInputModel inputModel)
         {
             var request = new RestRequest($"{ _batchPayout }", Method.POST);
             var requestBody = JsonConvert.SerializeObject(inputModel);
             request.AddParameter("application/json", requestBody, ParameterType.RequestBody);
             var response = await _client.ExecuteAsync(request);
-            if (!response.IsSuccessful)
+            if (!response.IsSuccessful || response.StatusCode == System.Net.HttpStatusCode.OK)
             {
-                var deserializedResponse = JsonConvert.DeserializeObject<JObject>(response.Content);
-                throw new PayPalException($"{deserializedResponse }");
+                var deserializedResponseError = JsonConvert.DeserializeObject<JObject>(response.Content);
+                throw new PayPalException(deserializedResponseError.ToString());
             }
-            
-            if(response.StatusCode == System.Net.HttpStatusCode.OK)
-            {
-                var deserializedResponse = JsonConvert.DeserializeObject<JObject>(response.Content);
-                return deserializedResponse;
-            }
-            else if (response.StatusCode == System.Net.HttpStatusCode.Created)
-            {
-                var deserializedResponse = JsonConvert.DeserializeObject<PayoutResponse>(response.Content);
-                return deserializedResponse;
-            
-            }
-             return response.StatusCode ;
-  
+
+            var deserializedResponse = JsonConvert.DeserializeObject<PayoutResponse>(response.Content);
+            return deserializedResponse;
+
+
         }
 
         private string GetToken()
-        {         
+        {
             var request = new RestRequest($"{_auth}", Method.POST);
             _client.Authenticator = new HttpBasicAuthenticator(_username, _password);
             request.AddParameter("grant_type", "client_credentials");
@@ -153,7 +144,7 @@ namespace powerful_crm.Business
               }
             },
             Items = new List<Item>
-            {             
+            {
               new Item
               {
                 Name = "Shoes",

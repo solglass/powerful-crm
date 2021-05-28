@@ -11,6 +11,7 @@ using powerful_crm.API.Models.InputModels;
 using powerful_crm.API.Models.MiddleModels;
 using powerful_crm.API.Models.OutputModels;
 using powerful_crm.Business;
+using powerful_crm.Business.Mappers;
 using powerful_crm.Core;
 using powerful_crm.Core.CustomExceptions;
 using powerful_crm.Core.PayPal.Models;
@@ -247,14 +248,11 @@ namespace powerful_crm.API.Controllers
                 });
             }
 
-            var payPalController = new PayPalController(_payPalService);
+            var payoutMapper = new PayoutMapper();
+            var payoutInputModel = payoutMapper.FromTransactionInputModel(sender_batch_id, receiverEmail, inputModel);
+            var payoutResult = await _payPalService.CreateBatchPayoutAsync(payoutInputModel);
 
-            var payoutResultObject = await payPalController.CreateBatchPayoutAsync(sender_batch_id, receiverEmail, inputModel);
-            var payoutResult  = payoutResultObject.Value;
-            if (payoutResult is JObject)
-                return Ok(payoutResult);
-            if (payoutResult is PayoutResponse)
-            {
+
                 var memoryCacheKey = (long)DateTime.Now.Ticks;
                 _modelCache.Set<TransactionInputModel>(memoryCacheKey, inputModel);
                 _ = Task.Run(async delegate
@@ -266,13 +264,7 @@ namespace powerful_crm.API.Controllers
 
                 var payoutResultCreated = (payoutResult as PayoutResponse);
                 return Created(payoutResultCreated.Links[0].Href, payoutResultCreated);
-            }
-            return BadRequest(new CustomExceptionOutputModel
-            {
-                Code = StatusCodes.Status400BadRequest,
-                Message = string.Format(Constants.ERROR_PAYPAL_SERVICE_ERROR, DateTime.Now)
-            }
-            );
+ 
 
         }
 
