@@ -28,7 +28,7 @@ namespace powerful_crm.API.Controllers
             _payPalService = payPalService;
         }
         [HttpPost("payout/{sender_batch_id}/{receiverEmail}")]
-        public async Task<OkObjectResult> CreateBatchPayoutAsync(string sender_batch_id, string receiverEmail, [FromBody] TransactionInputModel transaction)
+        public async Task<OkObjectResult> CreateBatchPayoutAsync(long sender_batch_id, string receiverEmail, [FromBody] TransactionInputModel transaction)
         {
             var payout = new PayoutInputModel
             {
@@ -51,7 +51,7 @@ namespace powerful_crm.API.Controllers
                      }
                 }
             };
-
+            _payPalService.TakeComission( ref payout);
             var payoutResult = await _payPalService.CreateBatchPayoutAsync(payout);
             return Ok(payoutResult);
         }

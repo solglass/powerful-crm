@@ -9,7 +9,7 @@ namespace powerful_crm.Business.Models
     public class SenderBatchHeaderInputModel
     {
         [JsonProperty("sender_batch_id")]
-        public string SenderBatchId { get; set; }
+        public long SenderBatchId { get; set; }
         
         [JsonProperty("recipient_type")]
         public string RecipientType { get; set; }

@@ -1,4 +1,6 @@
 ﻿using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using powerful_crm.Business.Models;
 using powerful_crm.Core.CustomExceptions;
 using powerful_crm.Core.PayPal.Models;
@@ -22,6 +24,7 @@ namespace powerful_crm.Business
         private readonly string _password;
         private string _token;
         private RestClient _client;
+        private decimal _comissionPercent;
         public PayPalRequestService(IOptions<PayPalSettings> options)
         {
             _username = options.Value.USERNAME;
@@ -29,10 +32,7 @@ namespace powerful_crm.Business
             _client = new RestClient(_baseUrl);
             _token = GetToken();
             _client.Authenticator = new JwtAuthenticator(_token);
-        }
-        public Invoice CreateDraftInvoice()
-        {
-            throw new NotImplementedException();
+            _comissionPercent = options.Value.COMMISSION_PERCENT;
         }
 
         public async Task<PayoutResponse> CreateBatchPayoutAsync(PayoutInputModel inputModel)
@@ -78,9 +78,14 @@ namespace powerful_crm.Business
                 }
             };
             var request = new RestRequest($"{_order}", Method.POST);     
-            request.AddParameter("application/json", JsonSerializer.Serialize(order), ParameterType.RequestBody);
+            request.AddParameter("application/json", System.Text.Json.JsonSerializer.Serialize(order), ParameterType.RequestBody);
             var response = await _client.ExecuteAsync<OrderOutPutModel>(request);                   
             return response.Data;          
-        }                  
+        }
+
+        public void TakeComission(ref PayoutInputModel inputModel)
+        {
+            inputModel.Items[0].Amount.Value = inputModel.Items[0].Amount.Value - inputModel.Items[0].Amount.Value*_comissionPercent / 100;
+        }
     }
 }

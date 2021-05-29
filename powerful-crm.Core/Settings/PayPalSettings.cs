@@ -8,6 +8,7 @@ namespace powerful_crm.Core.Settings
     {
         public string USERNAME { get; set; }
         public string PASSWORD { get; set; }
-        public string BASE_URL { get; set; }
+        public string BASE_URL { get; set; }       
+        public decimal COMMISSION_PERCENT { get; set; }
     }
 }

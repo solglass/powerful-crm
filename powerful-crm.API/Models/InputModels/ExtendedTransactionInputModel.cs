@@ -13,6 +13,6 @@ namespace powerful_crm.API.Models.InputModels
         [EmailAddress(ErrorMessage = "Enter valid email")]
         public string LeadPayPalEmail { get; set; }
 
-        public string IDPaypalBatch { get; set; }
+        public long IDPaypalBatch { get; set; }
     }
 }
