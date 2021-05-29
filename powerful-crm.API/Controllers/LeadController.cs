@@ -16,7 +16,6 @@ using System.Threading.Tasks;
 using System.Linq;
 using System.Security.Claims;
 using EventContracts;
-using Microsoft.Extensions.Caching.Memory;
 
 namespace powerful_crm.API.Controllers
 {
@@ -26,7 +25,7 @@ namespace powerful_crm.API.Controllers
     {
         private ILeadService _leadService;
         private ICityService _cityService;
-        private Checker _checker;
+        private ICheckerService _checker;
         private IMapper _mapper;
         private IBusControl _publishEndpoint;
         private EmailMessage _emailMessage;
@@ -35,7 +34,7 @@ namespace powerful_crm.API.Controllers
         public LeadController(IMapper mapper,
                               ILeadService leadService,
                               ICityService cityService,
-                              Checker checker,
+                              ICheckerService checker,
                               IBusControl publishEndpoint,
                               EmailMessage emailMessage)
         {

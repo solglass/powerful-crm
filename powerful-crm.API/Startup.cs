@@ -64,7 +64,6 @@ namespace powerful_crm.API
             services.AddAutoMapper(typeof(Startup));
             services.SwaggerExtention();
             services.AddMemoryCache();
-            services.AddScoped<Checker>();
             services.AddScoped<EmailMessage>();
 
         }

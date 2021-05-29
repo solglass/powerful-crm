@@ -50,6 +50,9 @@ namespace EducationSystem.API
             CreateMap<AccountDto, AccountOutputModel>()
                 .ForMember(dest => dest.LeadId, opts => opts.MapFrom(src => src.LeadDto.Id))
                 .ForMember(dest => dest.Currency, opts => opts.MapFrom(src => src.Currency.ToString()));
+
+            CreateMap<ExtendedTransactionInputModel, FullInfoTransactionModel>();
+
         }
     }
 }
