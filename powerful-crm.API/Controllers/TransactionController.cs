@@ -12,6 +12,7 @@ using powerful_crm.API.Models.MiddleModels;
 using powerful_crm.API.Models.OutputModels;
 using powerful_crm.Business;
 using powerful_crm.Business.Mappers;
+using powerful_crm.Business.Models;
 using powerful_crm.Core;
 using powerful_crm.Core.CustomExceptions;
 using powerful_crm.Core.PayPal.Models;
@@ -215,8 +216,6 @@ namespace powerful_crm.API.Controllers
         /// <param name="sender_batch_id">Sender batch Id for PayPal</param>
         /// <param name="receiverEmail">Email of the receiver bound to PayPal account</param>
         /// <returns>Id of added withdraw</returns>
-        [ProducesResponseType(typeof(JObject), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(PayoutResponse), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(CustomExceptionOutputModel), StatusCodes.Status409Conflict)]
         [ProducesResponseType(typeof(CustomExceptionOutputModel), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(CustomExceptionOutputModel), StatusCodes.Status403Forbidden)]
@@ -250,22 +249,21 @@ namespace powerful_crm.API.Controllers
 
             var payoutMapper = new PayoutMapper();
             var payoutInputModel = payoutMapper.FromTransactionInputModel(sender_batch_id, receiverEmail, inputModel);
-            var payoutResult = await _payPalService.CreateBatchPayoutAsync(payoutInputModel);
 
 
-                var memoryCacheKey = (long)DateTime.Now.Ticks;
-                _modelCache.Set<TransactionInputModel>(memoryCacheKey, inputModel);
-                _ = Task.Run(async delegate
-                {
-                    await Task.Delay(_timerInterval);
-                    _modelCache.Remove(memoryCacheKey);
-                    Console.WriteLine($"MemoryCache {memoryCacheKey} deleted");
-                });
+            var memoryCacheKey = (long)DateTime.Now.Ticks;
+            _modelCache.Set<TransactionInputModel>(memoryCacheKey, inputModel);
+            _modelCache.Set<PayoutInputModel>(sender_batch_id, payoutInputModel);
+            _ = Task.Run(async delegate
+                        {
+                            await Task.Delay(_timerInterval);
+                            _modelCache.Remove(memoryCacheKey);
+                            _modelCache.Remove(sender_batch_id);
+                            Console.WriteLine($"MemoryCache {memoryCacheKey} deleted");
+                        });
+            
 
-                var payoutResultCreated = (payoutResult as PayoutResponse);
-                return Created(payoutResultCreated.Links[0].Href, payoutResultCreated);
- 
-
+            return Ok(new { memoryCacheKey, sender_batch_id });
         }
 
         /// <summary>Provide withdraw into DB if user confirm operation by GA</summary>
@@ -274,21 +272,28 @@ namespace powerful_crm.API.Controllers
         /// <param name="inputCode">Code from Google Authentificator</param>
         /// <returns>Id of added withdraw</returns>
         [ProducesResponseType(typeof(int), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(PayoutResponse), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
         [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(string), StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [HttpPost("{leadId}/providewithdraw")]
-        public async Task<ActionResult<int>> ProvideWithdraw(int leadId, int memoryCacheKey, string inputCode)
+        [HttpPost("{leadId}/providewithdraw/{memoryCacheKey}/{inputCode}/{sender_batch_id}")]
+        public async Task<ActionResult<int>> ProvideWithdraw(int leadId, long memoryCacheKey,  string inputCode,  long sender_batch_id)
         {
-
+ 
             if (!_modelCache.TryGetValue(memoryCacheKey, out TransactionInputModel inputModel))
             {
                 return NotFound("operation not found");
             }
 
+            if (!_modelCache.TryGetValue(sender_batch_id, out PayoutInputModel payoutInputModel))
+            {
+                return NotFound("Payout operation not found");
+            }
+
             if (!_checker.CheckIfUserIsAllowed(leadId, HttpContext))
                 throw new ForbidException(Constants.ERROR_NOT_ALLOWED_ACTIONS_WITH_OTHER_LEAD);
+
 
             var lead = await _leadService.GetLeadByIdAsync(leadId);
 
@@ -297,6 +302,11 @@ namespace powerful_crm.API.Controllers
             if (!isValid)
                 throw new ForbidException("Operation not confirmed");
 
+
+            var payoutResult = await _payPalService.CreateBatchPayoutAsync(payoutInputModel);
+            var payoutResultCreated = (payoutResult as PayoutResponse);
+
+
             var middle = _mapper.Map<TransactionMiddleModel>(inputModel);
             var request = new RestRequest(Constants.API_WITHDRAW, Method.POST);
             request.AddParameter("application/json", JsonSerializer.Serialize(middle), ParameterType.RequestBody);
@@ -304,7 +314,9 @@ namespace powerful_crm.API.Controllers
 
             _modelCache.Remove(memoryCacheKey);
 
-            return Ok(queryResult);
+
+            return Created(payoutResultCreated.Links[0].Href, payoutResultCreated);
+
         }
 
         /// <summary>Adds transfer</summary>
