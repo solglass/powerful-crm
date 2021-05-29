@@ -175,7 +175,7 @@ namespace powerful_crm.API.Controllers
             var payoutMapper = new PayoutMapper();
             memoryCacheModel.PayoutInputModel = payoutMapper.FromTransactionInputModel(inputModel);
 
-            int memoryCacheKey = (int)DateTime.Now.Ticks;
+            long memoryCacheKey = (int)DateTime.Now.Ticks;
             _modelCache.Set<FullInfoTransactionModel>(memoryCacheKey, memoryCacheModel);
             ClearCachedModel(memoryCacheKey);
 
@@ -196,11 +196,11 @@ namespace powerful_crm.API.Controllers
         [HttpPost("providewithdraw/{memoryCacheKey}/{inputCode}")]
         public async Task<ActionResult<int>> ProvideWithdraw(long memoryCacheKey, string inputCode)
         {
-
             if (!_modelCache.TryGetValue(memoryCacheKey, out FullInfoTransactionModel inputModel))
             {
                 return NotFound("Invalid Memory Cache key");
             }
+
 
             TwoFactorAuthenticator twoFactor = new TwoFactorAuthenticator();
             bool isValid = twoFactor.ValidateTwoFactorPIN(TwoFactor.TwoFactorKey(inputModel.LeadEmail), inputCode);
@@ -273,7 +273,7 @@ namespace powerful_crm.API.Controllers
             return await _client.ExecuteAsync<T>(request);
         }
 
-        private void ClearCachedModel(int memoryCacheKey)
+        private void ClearCachedModel(long memoryCacheKey)
         {
             _ = Task.Run(async delegate
             {
