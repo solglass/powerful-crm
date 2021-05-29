@@ -57,10 +57,14 @@ namespace powerful_crm.API.Controllers
         }
 
         [HttpPost("order")]
-        public async Task<BraintreeHttp.HttpResponse> CreateOrder()
+        public async Task<ActionResult<OrderOutPutModel>> CreateOrder(PayPalOrderInputModel payPalOrderInputModel)
         {
-            return await(_payPalService.CreateOrder(false));
+            return await(_payPalService.CreateOrder(payPalOrderInputModel));
         }
-
+        //[HttpPost("capture")]
+        //public async Task<ActionResult<OrderOutPutModel>> CaptureOrder(string orderId)
+        //{
+        //    return await (_payPalService.CreateOrder(payPalOrderInputModel));
+        //}
     }
 }
