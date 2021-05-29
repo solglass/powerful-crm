@@ -13,13 +13,13 @@ namespace powerful_crm.Business.Mappers
         private const string _recipient_type = "EMAIL";
         private const string _sender_item_id = "201403140001";
         private const string _recipient_wallet = "PAYPAL";
-        public PayoutInputModel FromTransactionInputModel(string sender_batch_id, string receiverEmail, TransactionInputModel transaction)
+        public PayoutInputModel FromTransactionInputModel(ExtendedTransactionInputModel inputModel)
         {
             var payout = new PayoutInputModel
             {
                 SenderBatchHeader = new SenderBatchHeaderInputModel
                 {
-                    SenderBatchId = sender_batch_id,
+                    SenderBatchId = inputModel.IDPaypalBatch,
                     RecipientType = "EMAIL",
                     EmailMessage = _email_subject,
                     EmailSubject = _email_message,
@@ -28,12 +28,12 @@ namespace powerful_crm.Business.Mappers
                     new  ItemInputModel{
                         Amount =
                             new AmountPayoutInputModel {
-                            Value = transaction.Amount,
-                            Currency = transaction.Currency.ToString() },
+                            Value = inputModel.Amount,
+                            Currency = inputModel.Currency.ToString() },
 
                         RecepientWallet = "test",
                         SenderItemId = _sender_item_id,
-                        Receiver = receiverEmail
+                        Receiver = inputModel.LeadPayPalEmail
                      }
                 }
             };

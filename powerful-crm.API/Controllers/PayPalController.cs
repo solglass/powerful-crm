@@ -28,7 +28,7 @@ namespace powerful_crm.API.Controllers
             _payPalService = payPalService;
         }
         [HttpPost("payout/{sender_batch_id}/{receiverEmail}")]
-        public async Task<OkObjectResult> CreateBatchPayoutAsync(string sender_batch_id, string receiverEmail, [FromBody] TransactionInputModel transaction)
+        public async Task<OkObjectResult> CreateBatchPayoutAsync(long sender_batch_id, string receiverEmail, [FromBody] TransactionInputModel transaction)
         {
             var payout = new PayoutInputModel
             {
@@ -51,16 +51,20 @@ namespace powerful_crm.API.Controllers
                      }
                 }
             };
-
+            _payPalService.TakeComission( ref payout);
             var payoutResult = await _payPalService.CreateBatchPayoutAsync(payout);
             return Ok(payoutResult);
         }
 
         [HttpPost("order")]
-        public async Task<BraintreeHttp.HttpResponse> CreateOrder()
+        public async Task<ActionResult<OrderOutPutModel>> CreateOrder(PayPalOrderInputModel payPalOrderInputModel)
         {
-            return await(_payPalService.CreateOrder(false));
+            return await(_payPalService.CreateOrder(payPalOrderInputModel));
         }
-
+        //[HttpPost("capture")]
+        //public async Task<ActionResult<OrderOutPutModel>> CaptureOrder(string orderId)
+        //{
+        //    return await (_payPalService.CreateOrder(payPalOrderInputModel));
+        //}
     }
 }
