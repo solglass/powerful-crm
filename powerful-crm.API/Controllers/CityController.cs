@@ -20,8 +20,8 @@ namespace powerful_crm.API.Controllers
     {
         private ICityService _cityService;
         private IMapper _mapper;
-        private Checker _checker;
-        public CityController(IOptions<AppSettings> options, IMapper mapper, Checker checker, ICityService cityService)
+        private ICheckerService _checker;
+        public CityController(IOptions<AppSettings> options, IMapper mapper, ICheckerService checker, ICityService cityService)
         {
             _cityService = cityService;
             _checker = checker;

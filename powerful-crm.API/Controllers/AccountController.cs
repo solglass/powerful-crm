@@ -18,9 +18,9 @@ namespace powerful_crm.API.Controllers
     {
         private IAccountService _accountService;
         private ILeadService _leadService;
-        private Checker _checker;
+        private ICheckerService _checker;
         private IMapper _mapper;
-        public AccountController(IMapper mapper, IAccountService accountService, ILeadService leadService, Checker checker)
+        public AccountController(IMapper mapper, IAccountService accountService, ILeadService leadService, ICheckerService checker)
         {
             _accountService = accountService;
             _leadService = leadService;
