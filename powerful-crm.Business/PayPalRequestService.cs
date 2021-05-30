@@ -9,7 +9,6 @@ using RestSharp;
 using RestSharp.Authenticators;
 using System;
 using System.Collections.Generic;
-using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace powerful_crm.Business
@@ -27,12 +26,12 @@ namespace powerful_crm.Business
         private decimal _comissionPercent;
         public PayPalRequestService(IOptions<PayPalSettings> options)
         {
-            _username = options.Value.USERNAME;
-            _password = options.Value.PASSWORD;
+            _username = options.Value.POWERFUL_CRM_PAYPAL_USERNAME;
+            _password = options.Value.POWERFUL_CRM_PAYPAL_PASSWORD;
             _client = new RestClient(_baseUrl);
             _token = GetToken();
             _client.Authenticator = new JwtAuthenticator(_token);
-            _comissionPercent = options.Value.COMMISSION_PERCENT;
+            _comissionPercent = options.Value.POWERFUL_CRM_COMMISSION_PERCENT;
         }
 
         public async Task<PayoutResponse> CreateBatchPayoutAsync(PayoutInputModel inputModel)

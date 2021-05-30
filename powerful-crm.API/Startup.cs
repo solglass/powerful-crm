@@ -49,14 +49,7 @@ namespace powerful_crm.API
 
             services.AddMassTransit(x =>
             {
-                x.UsingRabbitMq((context, cfg) =>
-                {
-                    cfg.Host(Configuration.GetValue<string>("RABBITMQ_HOST"), configurator =>
-                    {
-                        configurator.Username(Configuration.GetValue<string>("RABBITMQ_LOGIN"));
-                        configurator.Password(Configuration.GetValue<string>("RABBITMQ_PASSWORD"));
-                    });
-                });
+                x.UsingRabbitMq();
             });
 
             services.AddMassTransitHostedService();

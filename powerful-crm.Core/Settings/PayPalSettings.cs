@@ -6,9 +6,9 @@ namespace powerful_crm.Core.Settings
 {
     public class PayPalSettings
     {
-        public string USERNAME { get; set; }
-        public string PASSWORD { get; set; }
-        public string BASE_URL { get; set; }       
-        public decimal COMMISSION_PERCENT { get; set; }
+        public string POWERFUL_CRM_PAYPAL_USERNAME { get; set; }
+        public string POWERFUL_CRM_PAYPAL_PASSWORD { get; set; }
+        public string POWERFUL_CRM_PAYPAL_BASE_URL { get; set; }       
+        public decimal POWERFUL_CRM_COMMISSION_PERCENT { get; set; }
     }
 }
