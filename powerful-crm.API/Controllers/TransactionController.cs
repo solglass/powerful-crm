@@ -28,6 +28,7 @@ using System.Threading.Tasks;
 
 namespace powerful_crm.API.Controllers
 {
+    [ApiController]
     [Authorize]
     [Route("api/[controller]")]
     public class TransactionController : ControllerBase
@@ -193,7 +194,7 @@ namespace powerful_crm.API.Controllers
         [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(string), StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [HttpPost("providewithdraw/{memoryCacheKey}/{inputCode}")]
+        [HttpPost("providewithdraw")]
         public async Task<ActionResult<int>> ProvideWithdraw(long memoryCacheKey, string inputCode)
         {
             if (!_modelCache.TryGetValue(memoryCacheKey, out FullInfoTransactionModel inputModel))
@@ -227,13 +228,13 @@ namespace powerful_crm.API.Controllers
         /// <summary>Adds transfer</summary>
         /// <param name="inputModel">Information about transfer</param>
         /// <returns>Id of added transfer</returns>
-        [ProducesResponseType(typeof(int), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(CustomExceptionOutputModel), StatusCodes.Status409Conflict)]
         [ProducesResponseType(typeof(CustomExceptionOutputModel), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(CustomExceptionOutputModel), StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [HttpPost("transfer")]
-        public async Task<ActionResult<int>> AddTransferAsync([FromBody] TransferInputModel inputModel)
+        public async Task<ActionResult<string>> AddTransferAsync([FromBody] TransferInputModel inputModel)
         {
             _checker.CheckInputModel(ModelState);
             var lead = await GetLeadFromTokenAsync();
@@ -256,7 +257,7 @@ namespace powerful_crm.API.Controllers
                 Amount = inputModel.Amount
             };
 
-            var queryResult = (await GetResponseAsync<int>(Constants.API_TRANSFER, Method.POST, transferModel)).Data;
+            var queryResult = (await GetResponseAsync<string>(Constants.API_TRANSFER, Method.POST, transferModel)).Data;
             return Ok(queryResult);
         }
 
