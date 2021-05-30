@@ -13,9 +13,11 @@ namespace powerful_crm.Business
         private ILeadRepository _leadRepository;
         private ISecurityService _securityService;
         private IAccountRepository _accountRepository;
-        public LeadService(ILeadRepository leadRepository, ISecurityService securityService, IAccountRepository accountRepository)
+        private IAccountService _accountService;
+        public LeadService(ILeadRepository leadRepository, ISecurityService securityService, IAccountRepository accountRepository, IAccountService accountService)
         {
             _leadRepository = leadRepository;
+            _accountService = accountService;
             _accountRepository = accountRepository;
             _securityService = securityService;
         }
@@ -23,7 +25,9 @@ namespace powerful_crm.Business
         public async Task<int> AddLeadAsync(LeadDto dto)
         {
             dto.Password =  _securityService.GetHash(dto.Password);
-            return await _leadRepository.AddUpdateLeadAsync(dto);
+            var addedLeadId = await _leadRepository.AddUpdateLeadAsync(dto);
+            await _accountService.AddAccountAsync(new AccountDto { Name = "Default", Currency = (Currency)1, LeadDto = new LeadDto() { Id = addedLeadId } });
+            return addedLeadId;
         }
         public async Task<int> UpdateLeadAsync(int leadId, LeadDto dto)
         {
